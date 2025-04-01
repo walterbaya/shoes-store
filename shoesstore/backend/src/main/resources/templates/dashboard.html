@@ -1,0 +1,16 @@
+<div th:fragment="content">
+    <h1 class="h2">Dashboard</h1>
+    <div class="row">
+        <!-- Tarjetas de Resumen -->
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Ventas Hoy</h5>
+                    <p class="card-text" th:text="${dailySales} + ' ventas'"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Gráfico de Ventas -->
+    <canvas id="salesChart" class="my-4 w-100"></canvas>
+</div>

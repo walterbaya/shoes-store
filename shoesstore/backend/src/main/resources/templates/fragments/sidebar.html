@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="sidebar" class="col-md-2 d-none d-md-block bg-light sidebar">
+    <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}">
+                    Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/products}">
+                    Productos
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/sales}">
+                    Ventas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/reports/sales}">
+                    Reportes
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+</html>

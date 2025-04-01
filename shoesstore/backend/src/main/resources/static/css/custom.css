@@ -1,0 +1,17 @@
+/* Personaliza colores principales */
+:root {
+    --primary-color: #6c757d;
+    --secondary-color: #5a6268;
+}
+
+/* Estilo para la sidebar */
+.sidebar {
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+/* Ajustes para tablas */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
