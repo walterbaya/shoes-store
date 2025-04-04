@@ -1,52 +1,24 @@
-<html th:replace="layout :: html" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
 <head>
-    <title>Ventas</title>
+    <title>Listado de Ventas</title>
 </head>
 <body>
 <div th:fragment="content">
-    <h1 class="h2 mb-4">Historial de Ventas</h1>
-
-    <!-- Filtros -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form th:action="@{/sales}" method="get">
-                <div class="row">
-                    <div class="col-md-3">
-                        <input type="date" name="startDate" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" name="endDate" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <button type="submit" class="btn btn-primary">Filtrar</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Tabla de Ventas -->
-    <table class="table table-hover">
-        <thead class="table-dark">
+    <h2>Listado de Ventas</h2>
+    <table>
+        <thead>
         <tr>
-            <th>ID</th>
-            <th>Fecha</th>
             <th>Canal</th>
+            <th>Fecha</th>
             <th>Total</th>
-            <th>Vendedor</th>
-            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="sale : ${sales}">
-            <td th:text="${sale.id}"></td>
-            <td th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
             <td th:text="${sale.channel}"></td>
-            <td th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></td>
-            <td th:text="${sale.user.fullName}"></td>
-            <td>
-                <a th:href="@{/sales/details/{id}(id=${sale.id})}" class="btn btn-sm btn-info">Detalles</a>
-            </td>
+            <td th:text="${#dates.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${sale.total}"></td>
         </tr>
         </tbody>
     </table>

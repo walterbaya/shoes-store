@@ -3,11 +3,7 @@ package com.shoesstore.shoesstore.service;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import org.springframework.stereotype.Service;
-
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,14 +19,15 @@ public class ReportService {
     }
 
     public Map<String, Object> generateSalesReport(String reportType) {
-        LocalDateTime startDate;
         LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate;
 
         // Determinar rango según el tipo de reporte
         if ("weekly".equalsIgnoreCase(reportType)) {
             startDate = endDate.minusWeeks(1);
         } else {
-            startDate = endDate.withDayOfMonth(1).withHour(0).withMinute(0);
+            // Para reporte mensual: inicia el día 1 del mes a las 00:00
+            startDate = endDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
         }
 
         // Obtener ventas en el rango
@@ -44,18 +41,19 @@ public class ReportService {
 
         sales.forEach(sale -> {
             String periodKey = getPeriodKey(sale.getSaleDate(), reportType);
+            Double saleTotal = sale.getTotal();
 
             // Actualizar datos del gráfico
             if (!labels.contains(periodKey)) {
                 labels.add(periodKey);
-                data.add(sale.getTotal());
+                data.add(saleTotal);
             } else {
                 int index = labels.indexOf(periodKey);
-                data.set(index, data.get(index) + sale.getTotal());
+                data.set(index, data.get(index) + saleTotal);
             }
 
             // Actualizar datos de la tabla
-            updateReportList(reportList, periodKey, sale.getTotal());
+            updateReportList(reportList, periodKey, saleTotal);
         });
 
         reportData.put("chartLabels", labels);
@@ -83,7 +81,6 @@ public class ReportService {
                 break;
             }
         }
-
         if (!found) {
             Map<String, Object> newItem = new HashMap<>();
             newItem.put("period", period);

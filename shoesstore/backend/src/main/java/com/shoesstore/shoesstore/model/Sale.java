@@ -28,6 +28,7 @@ public class Sale {
     private List<SaleDetails> details;
 
     public enum SaleChannel {
-        LOCAL, MERCADOLIBRE, REDES_SOCIALES, OTROS
+        ONLINE,
+        TIENDA;
     }
 }

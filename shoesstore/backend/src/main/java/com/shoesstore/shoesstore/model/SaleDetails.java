@@ -17,11 +17,7 @@ public class SaleDetails {
     private Sale sale;
 
     @ManyToOne
-    @JoinColumn(
-            name = "product_id",
-            referencedColumnName = "id", // Debe coincidir con la PK de Product
-            foreignKey = @ForeignKey(name = "FK_product_sale_details")
-    )
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
     private int quantity;

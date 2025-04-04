@@ -2,6 +2,8 @@ package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.model.User;
 import com.shoesstore.shoesstore.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,5 +27,18 @@ public class CustomUserDetailsService implements org.springframework.security.co
                 .password(user.getPassword())
                 .authorities(user.getRole().name()) // Asegurar que el rol tiene formato correcto
                 .build();
+    }
+
+    public String getCurrentUserName(){
+        String username = "";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+            }
+        }
+
+        return username;
     }
 }

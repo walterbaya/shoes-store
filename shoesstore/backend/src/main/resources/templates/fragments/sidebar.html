@@ -1,29 +1,74 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="sidebar" class="col-md-2 d-none d-md-block bg-light sidebar">
-    <div class="sidebar-sticky pt-3">
-        <ul class="nav flex-column">
+<div th:fragment="sidebar" class="sidebar">
+    <div class="sidebar-sticky pt-4">
+        <ul class="nav flex-column gap-2 px-3">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/dashboard}">
-                    Dashboard
+                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                   th:href="@{/dashboard}">
+                    <i class="bi bi-speedometer2 fs-5 text-primary"></i>
+                    <span class="fw-medium text-secondary">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/products}">
-                    Productos
+                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                   th:href="@{/products}">
+                    <i class="bi bi-box-seam fs-5 text-primary"></i>
+                    <span class="fw-medium text-secondary">Productos</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/sales}">
-                    Ventas
+                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                   th:href="@{/sales}">
+                    <i class="bi bi-currency-dollar fs-5 text-primary"></i>
+                    <span class="fw-medium text-secondary">Ventas</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/reports/sales}">
-                    Reportes
+                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                   th:href="@{/reports/sales}">
+                    <i class="bi bi-graph-up fs-5 text-primary"></i>
+                    <span class="fw-medium text-secondary">Reportes</span>
                 </a>
             </li>
         </ul>
     </div>
 </div>
+
+<style>
+    .sidebar {
+        width: 240px;
+        background: #ffffff;
+        border-right: 1px solid #dee2e6;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .sidebar-sticky {
+        padding: 1rem 0.5rem;
+    }
+
+    .hover-custom {
+        transition: all 0.3s ease;
+        color: #2c3e50 !important;
+    }
+
+    .hover-custom:hover {
+        background: #e9f2ff !important;
+        transform: translateX(5px);
+    }
+
+    .nav-link.active {
+        background: #e9f2ff !important;
+        border-left: 3px solid #0d6efd;
+        color: #0d6efd !important;
+    }
+
+    .bi {
+        min-width: 24px;
+    }
+
+    .text-secondary {
+        color: #2c3e50 !important;
+    }
+</style>
 </html>

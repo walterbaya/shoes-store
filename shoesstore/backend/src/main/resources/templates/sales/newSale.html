@@ -1,0 +1,57 @@
+<form th:action="@{/sales}" method="post" th:object="${saleForm}" class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Registrar Nueva Venta</h4>
+        </div>
+
+        <div class="card-body">
+            <!-- Canal de Venta -->
+            <div class="mb-4">
+                <label class="form-label fw-bold">Canal de Venta</label>
+                <select th:field="*{channel}" class="form-select form-select-lg">
+                    <option th:each="channel : ${channels}"
+                            th:value="${channel}"
+                            th:text="${channel}"
+                            class="text-capitalize"></option>
+                </select>
+            </div>
+
+            <!-- Productos -->
+            <div class="border-top pt-3">
+                <h5 class="mb-3 fw-bold">Selección de Productos</h5>
+
+                <div th:each="product, iterStat : ${products}" class="card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <input type="hidden" th:field="*{saleItems[__${iterStat.index}__].productId}" th:value="${product.id}" />
+                                <h6 class="card-title mb-1" th:text="${product.name}"></h6>
+                                <div class="d-flex gap-3 text-muted small">
+                                    <span th:text="|$${#numbers.formatDecimal(product.price, 1, 2)}|"></span>
+                                    <span th:text="|Stock: ${product.stock}|"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="number"
+                                           th:field="*{saleItems[__${iterStat.index}__].quantity}"
+                                           class="form-control form-control-lg"
+                                           min="0"
+                                           th:max="${product.stock}"
+                                           placeholder="Cantidad">
+                                    <span class="input-group-text">unidades</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer bg-light">
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="bi bi-cart-check me-2"></i>Confirmar Venta
+            </button>
+        </div>
+    </div>
+</form>

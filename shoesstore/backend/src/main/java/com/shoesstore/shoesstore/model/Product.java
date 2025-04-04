@@ -23,7 +23,7 @@ public class Product {
     private String description;  // Campo nuevo
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "La talla es obligatoria")  // Cambiado de @NotBlank a @NotNull
+    @NotNull(message = "La talla es obligatoria")
     private ShoeSize size;
 
     @Min(value = 0, message = "El precio no puede ser negativo")
@@ -34,7 +34,6 @@ public class Product {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Enum actualizado para mostrar mejor las tallas
     public enum ShoeSize {
         S35("35"), S36("36"), S37("37"), S38("38"),
         S39("39"), S40("40"), S41("41"), S42("42"),
