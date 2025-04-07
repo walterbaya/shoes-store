@@ -9,7 +9,7 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(100) NOT NULL,
     full_name VARCHAR(100),
-    role ENUM('ADMIN', 'SELLER') NOT NULL,  -- Se mantiene igual
+    role ENUM('ROLE_ADMIN', 'ROLE_SELLER') NOT NULL,  -- Se mantiene igual
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -51,7 +51,7 @@ VALUES (
     'admin',
     '$2a$04$f6MJKU3x50kcIx5kTQdOf.VYwWUZQgSR4xld82QbDRzROAe5v.Uoe',
     'Administrador Principal',
-    'ADMIN'
+    'ROLE_ADMIN'
 );
 
 -- Insertar algunos productos de ejemplo
@@ -60,4 +60,11 @@ VALUES
 ('Zapatilla Deportiva', 'Zapatilla para correr', 'S42', 59.99, 20),
 ('Zapato Formal', 'Zapato para ocasiones formales', 'S41', 89.99, 15),
 ('Bota de Montaña', 'Bota resistente para senderismo', 'S43', 120.50, 10);
+
+-- Insertar usuarios SELLER de ejemplo
+INSERT INTO users (username, password, full_name, role)
+VALUES
+('seller1', '$2a$04$f6MJKU3x50kcIx5kTQdOf.VYwWUZQgSR4xld82QbDRzROAe5v.Uoe', 'Vendedor Uno', 'ROLE_SELLER'),
+('seller2', '$2a$04$f6MJKU3x50kcIx5kTQdOf.VYwWUZQgSR4xld82QbDRzROAe5v.Uoe', 'Vendedor Dos', 'ROLE_SELLER'),
+('seller3', '$2a$04$f6MJKU3x50kcIx5kTQdOf.VYwWUZQgSR4xld82QbDRzROAe5v.Uoe', 'Vendedor Tres', 'ROLE_SELLER');
 

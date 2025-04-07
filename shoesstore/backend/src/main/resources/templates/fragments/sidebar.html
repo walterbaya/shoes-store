@@ -5,12 +5,12 @@
         <ul class="nav flex-column gap-2 px-3">
             <li class="nav-item">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
-                   th:href="@{/dashboard}">
+                   th:href="@{/dashboard}" >
                     <i class="bi bi-speedometer2 fs-5 text-primary"></i>
                     <span class="fw-medium text-secondary">Dashboard</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
                    th:href="@{/products}">
                     <i class="bi bi-box-seam fs-5 text-primary"></i>
@@ -24,7 +24,7 @@
                     <span class="fw-medium text-secondary">Ventas</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
                    th:href="@{/reports/sales}">
                     <i class="bi bi-graph-up fs-5 text-primary"></i>

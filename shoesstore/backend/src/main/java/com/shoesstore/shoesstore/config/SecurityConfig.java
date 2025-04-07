@@ -33,6 +33,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/webjars/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/reports/**").hasRole("ADMIN")
+                        .requestMatchers("/products/**").hasRole("ADMIN")
+                        .requestMatchers("/sales/**").hasAnyRole("ADMIN", "SELLER")
+                        .requestMatchers("/dashboard/**").hasAnyRole("ADMIN", "SELLER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

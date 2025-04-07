@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.access.WebInvocationPrivilegeEvaluator;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class CustomUserDetailsService implements org.springframework.security.co
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
