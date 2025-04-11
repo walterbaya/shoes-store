@@ -7,12 +7,14 @@
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/createTables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/createTables.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/DashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/DashboardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/CustomUserDetailsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/CustomUserDetailsService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/footer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/header.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/sidebar.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/sidebar.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/layout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/newSale.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/newSale.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

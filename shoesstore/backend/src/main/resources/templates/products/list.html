@@ -1,41 +1,112 @@
-<div th:fragment="content">
-  <h1 class="h2 mb-4">Gestión de Stock</h1>
-  <a th:href="@{/products/new}" class="btn btn-success mb-3">Nuevo Producto</a>
+<div th:fragment="content card shadow">
+  <div class="card-header bg-primary text-white">
+    <h1 class="h4 mb-0">Gestión de Stock</h1>
+  </div>
 
-  <table class="table table-hover">
-    <thead class="table-dark">
-    <tr>
-      <th>Nombre</th>
-      <th>Descripción</th>
-      <th>Talla</th>
-      <th>Precio</th>
-      <th>Stock</th>
-      <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="product : ${products}">
-      <td th:text="${product.name}"></td>
-      <td th:text="${product.description}"></td>
-      <td th:text="${product.size.displayValue}"></td>
-      <td th:text="${product.formattedPrice}"></td>
-      <td th:text="${product.stock}"></td>
-      <td>
-        <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-warning">Editar</a>
-        <form th:action="@{/products/{id}(id=${product.id})}" method="post">
-          <input type="hidden" name="_method" value="DELETE">
-          <button type="submit"
-                  class="btn btn-sm btn-danger"
-                  onclick="return confirm('¿Eliminar producto?')">
-            Eliminar
-          </button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+      <input type="text"
+             id="buscador"
+             onkeyup="filtrarProductos()"
+             placeholder="Buscar producto..."
+             class="form-control form-control-lg w-auto me-3">
 
+      <a th:href="@{/products/new}" class="btn btn-primary btn-lg">
+        <i class="bi bi-plus-circle me-2"></i>Nuevo Producto
+      </a>
+    </div>
+
+    <!-- Tabla de productos -->
+    <div class="table-responsive">
+      <table class="table table-hover align-middle" id="tablaProductos">
+        <thead class="table-light">
+        <tr>
+          <th class="py-3">Nombre</th>
+          <th class="py-3">Descripción</th>
+          <th class="py-3 text-center">Talla</th>
+          <th class="py-3 text-end">Precio</th>
+          <th class="py-3 text-center">Stock</th>
+          <th class="py-3 text-end">Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="product : ${products}" class="hover-shadow">
+          <td th:text="${product.name}" class="fw-semibold"></td>
+          <td th:text="${product.description}" class="text-muted small"></td>
+          <td th:text="${product.size.displayValue}" class="text-center"></td>
+          <td th:text="${product.formattedPrice}" class="text-end"></td>
+          <td th:text="${product.stock}" class="text-center"></td>
+          <td class="text-end">
+            <div class="gap-2">
+              <a th:href="@{/products/edit/{id}(id=${product.id})}"
+                 class="btn btn-sm btn-warning px-3">
+                Editar
+              </a>
+              <form th:action="@{/products/{id}(id=${product.id})}" method="post"
+                    class="d-inline">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit"
+                        class="btn btn-sm btn-danger px-3"
+                        onclick="return confirm('¿Eliminar producto?')">
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
+<style>
+  .card.shadow {
+      border-radius: 0.75rem;
+      transition: transform 0.2s ease-in-out;
+  }
 
+  .card.shadow:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+  }
 
+  .card-header.bg-primary {
+      border-radius: 0.75rem 0.75rem 0 0;
+      padding: 1.25rem 1.5rem;
+  }
+
+  .card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+  }
+
+  .card-text.display-5 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+  }
+
+  #salesChart {
+      border-radius: 0.5rem;
+      background: #fff;
+  }
+</style>
+
+<script>
+  function filtrarProductos() {
+      var input = document.getElementById("buscador");
+      var filter = input.value.toUpperCase();
+      var table = document.getElementById("tablaProductos");
+      var tr = table.getElementsByTagName("tr");
+
+      for (var i = 1; i < tr.length; i++) {
+          var td = tr[i].getElementsByTagName("td")[0];
+          if (td) {
+              var txtValue = td.textContent || td.innerText;
+              tr[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+          }
+      }
+  }
+</script>

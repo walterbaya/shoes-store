@@ -1,33 +1,59 @@
-<div th:fragment="content">
-    <h1 class="h2">Dashboard</h1>
-    <div class="row">
-        <!-- Tarjetas de Resumen -->
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5 class="card-title">Ventas Hoy</h5>
-                    <p class="card-text" th:text="${dailySales} + ' ventas'"></p>
+<div th:fragment="content card shadow">
+    <div class="card-header bg-primary text-white">
+        <h1 class="h4 mb-0">Dashboard</h1>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Tarjetas de Resumen -->
+            <div class="col-md-4 mb-4">
+                <div class="card text-white bg-primary shadow-lg">
+                    <div class="card-body">
+                        <h5 class="card-title">Ventas Hoy</h5>
+                        <p class="card-text display-5" th:text="${dailySales} + ' ventas'"></p>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Gráfico de Ventas -->
+        <div class="card shadow border-0 mt-4">
+            <div class="card-body">
+                <canvas id="salesChart" class="w-100" style="height: 400px"></canvas>
+            </div>
+        </div>
     </div>
-    <!-- Gráfico de Ventas -->
-    <canvas id="salesChart" class="my-4 w-100"></canvas>
 </div>
+
 <style>
-    .card-summary {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        transition: transform 0.2s;
-        background: white;
+    .card.shadow {
+        border-radius: 0.75rem;
+        transition: transform 0.2s ease-in-out;
     }
-    .card-summary:hover {
+
+    .card.shadow:hover {
         transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
     }
+
+    .card-header.bg-primary {
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .card-text.display-5 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+    }
+
     #salesChart {
-        background: white;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border-radius: 0.5rem;
+        background: #fff;
     }
 </style>
