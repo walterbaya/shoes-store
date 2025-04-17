@@ -89,4 +89,13 @@ public class SaleService {
     public void deleteSale(Long id) {
         saleRepository.deleteById(id);
     }
+    
+    public List<Object[]> getDailySalesData(LocalDateTime start, LocalDateTime end) {
+        return saleRepository.findDailySalesByUser(start, end);
+    }
+
+    public List<Object[]> getTopSellers(LocalDateTime start, LocalDateTime end) {
+        return saleRepository.findTopSellers(start, end);
+    }
+    
 }
