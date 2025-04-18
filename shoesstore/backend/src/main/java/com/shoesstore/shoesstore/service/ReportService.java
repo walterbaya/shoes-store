@@ -3,9 +3,14 @@ package com.shoesstore.shoesstore.service;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.IsoFields;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,75 +23,93 @@ public class ReportService {
         this.saleRepository = saleRepository;
     }
 
-    public Map<String, Object> generateSalesReport(String reportType) {
+    public Map<String, Object> generateSalesReport(String reportType, String startDateString, String endDateString) {
+
         LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate;
+        LocalDateTime startDate = endDate.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        // Determinar rango según el tipo de reporte
-        if ("weekly".equalsIgnoreCase(reportType)) {
-            startDate = endDate.minusWeeks(1);
-        } else {
-            // Para reporte mensual: inicia el día 1 del mes a las 00:00
-            startDate = endDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+    	if(startDateString != null && startDateString != null) {
+            startDate = LocalDate.parse(startDateString).atStartOfDay();
+            endDate = LocalDate.parse(endDateString).atStartOfDay();
+    	}
+        else if(startDateString != null && endDateString == null){
+            startDate = LocalDate.parse(startDateString).atStartOfDay();
+        }
+        else if(startDateString == null && endDateString != null){
+            endDate = LocalDate.parse(endDateString).atStartOfDay();
         }
 
-        // Obtener ventas en el rango
-        List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
-
-        // Procesar datos para el reporte
-        Map<String, Object> reportData = new HashMap<>();
-        List<String> labels = new ArrayList<>();
-        List<Double> data = new ArrayList<>();
-        List<Map<String, Object>> reportList = new ArrayList<>();
-
-        sales.forEach(sale -> {
-            String periodKey = getPeriodKey(sale.getSaleDate(), reportType);
-            Double saleTotal = sale.getTotal();
-
-            // Actualizar datos del gráfico
-            if (!labels.contains(periodKey)) {
-                labels.add(periodKey);
-                data.add(saleTotal);
-            } else {
-                int index = labels.indexOf(periodKey);
-                data.set(index, data.get(index) + saleTotal);
-            }
-
-            // Actualizar datos de la tabla
-            updateReportList(reportList, periodKey, saleTotal);
-        });
-
-        reportData.put("chartLabels", labels);
-        reportData.put("chartData", data);
-        reportData.put("reports", reportList);
-
-        return reportData;
-    }
-
-    private String getPeriodKey(LocalDateTime date, String reportType) {
-        if ("weekly".equalsIgnoreCase(reportType)) {
-            return "Semana " + date.getDayOfWeek().getValue();
-        } else {
-            return date.getMonth().toString() + " " + date.getYear();
-        }
-    }
-
-    private void updateReportList(List<Map<String, Object>> reportList, String period, Double total) {
-        boolean found = false;
-        for (Map<String, Object> item : reportList) {
-            if (item.get("period").equals(period)) {
-                item.put("totalSales", (Double) item.get("totalSales") + total);
-                item.put("transactionCount", (Integer) item.get("transactionCount") + 1);
-                found = true;
+        switch (reportType) {
+            case "byUser":
+            case "byProduct":
+                startDate = endDate.minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
                 break;
+            case "period":
+            	break;
+            case "weekly":
+            default:
+                startDate = endDate.minusWeeks(1);
+                reportType = "weekly";
+                break;
+        }
+
+        Map<String, Object> result = new HashMap<>();
+
+        if ("byUser".equals(reportType)) {
+            List<Object[]> raw = saleRepository.fetchSalesByUser(startDate, endDate);
+            List<String> labels = new ArrayList<>();
+            List<Number> values = new ArrayList<>();
+            List<Map<String, Object>> rows = new ArrayList<>();
+            for (Object[] o : raw) {
+                labels.add((String) o[0]);
+                values.add((Number) o[1]);
+                rows.add(Map.of("Usuario", o[0], "Ventas", o[1]));
             }
+            result.put("labels", labels);
+            result.put("datasets", List.of(Map.of("label", "Ventas por Usuario", "data", values, "borderWidth", 1)));
+            result.put("tableRows", rows);
+            return result;
         }
-        if (!found) {
-            Map<String, Object> newItem = new HashMap<>();
-            newItem.put("period", period);
-            newItem.put("totalSales", total);
-            newItem.put("transactionCount", 1);
-            reportList.add(newItem);
+
+        if ("byProduct".equals(reportType)) {
+            List<Object[]> raw = saleRepository.fetchSalesByProduct(startDate, endDate);
+            
+            List<String> labels = new ArrayList<>();
+            List<Number> quantities = new ArrayList<>();
+            List<Map<String, Object>> rows = new ArrayList<>();
+            for (Object[] o : raw) {
+                labels.add((String) o[0]);
+                quantities.add((Number) o[1]);
+                rows.add(Map.of("Producto", o[0], "Cantidad", o[1], "Total", String.format("%.2f", o[2])));
+            }
+            result.put("labels", labels);
+            result.put("datasets", List.of(Map.of("label", "Top Productos", "data", quantities, "borderWidth", 1)));
+            result.put("tableRows", rows);
+            return result;
         }
+
+        List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
+        Map<String, Double> agg = new LinkedHashMap();
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Sale s : sales) {
+            String key = formatPeriod(s.getSaleDate(), reportType);
+            agg.put(key, agg.getOrDefault(key, 0.0) + s.getTotal());
+        }
+        List<String> labels = new ArrayList<>(agg.keySet());
+        List<Number> data = new ArrayList<>(agg.values());
+        for (Map.Entry<String, Double> e : agg.entrySet()) {
+            rows.add(Map.of("period", e.getKey(), "totalSales", e.getValue(), "transactionCount", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())));
+        }
+        result.put("labels", labels);
+        result.put("datasets", List.of(Map.of("label", "Total de Ventas", "data", data, "borderWidth", 1)));
+        result.put("tableRows", rows);
+        return result;
+    }
+
+    private String formatPeriod(LocalDateTime date, String reportType) {
+        if ("weekly".equals(reportType)) {
+            return "Semana " + date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        }
+        return date.getMonth().toString() + " " + date.getYear();
     }
 }
