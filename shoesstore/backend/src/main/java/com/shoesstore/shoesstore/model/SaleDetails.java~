@@ -21,7 +21,7 @@ public class SaleDetails {
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "claim_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "claim_id", referencedColumnName = "id")
     private Claim claim;
 
     private int quantity;
