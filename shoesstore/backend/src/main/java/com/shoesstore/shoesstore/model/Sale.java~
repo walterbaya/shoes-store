@@ -27,7 +27,6 @@ public class Sale {
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleDetails> details;
 
-    //Cuando se elimina la claim no borramos la venta la dejamos agendada
     @OneToOne(optional = true, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Claim claims;
 

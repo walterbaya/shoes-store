@@ -17,7 +17,7 @@
                     <span class="fw-medium text-secondary">Productos</span>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','SELLER')">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
                    th:href="@{/sales}">
                     <i class="bi bi-currency-dollar fs-5 text-primary"></i>
@@ -31,6 +31,14 @@
                     <span class="fw-medium text-secondary">Reportes</span>
                 </a>
             </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                   th:href="@{/claims}">
+                    <i class="bi bi-arrow-counterclockwise fs-5 text-primary"></i>
+                    <span class="fw-medium text-secondary">Reclamos y Devoluciones</span>
+                </a>
+            </li>
+
         </ul>
     </div>
 </div>
