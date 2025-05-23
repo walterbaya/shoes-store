@@ -20,6 +20,10 @@ public class SaleDetails {
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "claim_id", referencedColumnName = "id")
+    private Claim claim;
+
     private int quantity;
     private double subtotal;
 }
