@@ -25,7 +25,7 @@ public class Sale {
 
     private LocalDateTime saleDate = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleDetails> details;
 
     @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)

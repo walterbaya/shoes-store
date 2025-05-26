@@ -16,9 +16,8 @@ public class Claim {
     @JoinColumn(name = "sale_detail_id", referencedColumnName = "id")
     private List<SaleDetails> saleDetails;
 
-    //En caso de que se borre los claims no vamos a borrar las ventas
-    @OneToOne(optional = false, cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "sale_id", referencedColumnName = "id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "sale_id", nullable = false, unique = true)
     private Sale sale;
 
     @Id
