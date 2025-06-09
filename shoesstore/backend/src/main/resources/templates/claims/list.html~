@@ -1,48 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}>
-<head>
-    <title>Gestión de Reclamos</title>
-</head>
-<body>
-    <div th:fragment="content">
-        <h2>Reclamos Registrados</h2>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
+    <head>
+        <title>Gestión de Reclamos</title>
+    </head>
+    <body>
+        <div th:fragment="content">
+            <h2>Reclamos Registrados</h2>
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>ID Venta</th>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="claim : ${claims}">
-                <td th:text="${claim.sale.id}">1001</td>
-                <td th:text="${#dates.format(claim.createdAt, 'dd/MM/yyyy')}">10/06/2023</td>
-                <td th:text="${claim.description}">Producto defectuoso</td>
-                <td>
-                    <span class="badge"
-                          th:classappend="${claim.state.name() == 'INITIATED'} ? 'bg-warning' :
-                                         ${claim.state.name() == 'PROOF_UPLOADED'} ? 'bg-info' :
-                                         ${claim.state.name() == 'REFUND_PROCESSED'} ? 'bg-primary' :
-                                         'bg-success'">
-                        <span th:text="${claim.state.displayValue}">Estado</span>
-                    </span>
-                </td>
-                <td>
-                    <a th:href="@{/claims/{id}(id=${claim.id})}" class="btn btn-sm btn-info">
-                        Ver Detalle
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID Venta</th>
+                    <th>Fecha</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="claim : ${claims}">
+                    <td th:text="${claim.sale.id}">1001</td>
+                    <td th:text="${#dates.format(claim.createdAt, 'dd/MM/yyyy')}">10/06/2023</td>
+                    <td th:text="${claim.description}">Producto defectuoso</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${claim.state.name() == 'INITIATED'} ? 'bg-warning' :
+                                             ${claim.state.name() == 'PROOF_UPLOADED'} ? 'bg-info' :
+                                             ${claim.state.name() == 'REFUND_PROCESSED'} ? 'bg-primary' :
+                                             'bg-success'">
+                            <span th:text="${claim.state.displayValue}">Estado</span>
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/claims/{id}(id=${claim.id})}" class="btn btn-sm btn-info">
+                            Ver Detalle
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
 
-        <a th:href="@{/claims/new}" class="btn btn-primary mt-3">
-            Registrar Nuevo Reclamo
-        </a>
-    </div>
-    </body>
-    </html>
+            <a th:href="@{/claims/new}" class="btn btn-primary mt-3">
+                Registrar Nuevo Reclamo
+            </a>
+        </div>
+        </body>
+</html>
