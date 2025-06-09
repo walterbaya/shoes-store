@@ -24,7 +24,6 @@ CREATE TABLE product (
                          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Tabla sale
 CREATE TABLE sale (
                       id INT PRIMARY KEY AUTO_INCREMENT,
                       user_id INT NOT NULL,
@@ -33,39 +32,54 @@ CREATE TABLE sale (
                       sale_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                       FOREIGN KEY (user_id) REFERENCES users(id)
                           ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB;
+);
 
--- Tabla claim (0–1 claim por sale; cada claim apunta a una sale)
 CREATE TABLE claim (
-                       id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       sale_id INT NOT NULL,
                        description TEXT,
-                       state ENUM(
-    'INITIATED',
-    'PROOF_UPLOADED',
-    'REFUND_PROCESSED',
-    'PACKAGE_RECEIVED'
-  ) NOT NULL,
-                       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                       sale_id INT NOT NULL UNIQUE,
-                       FOREIGN KEY (sale_id) REFERENCES sale(id)
-                           ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB;
+                       state VARCHAR(50) NOT NULL,
+                       created_at DATETIME NOT NULL,
+                       shipping_proof_url VARCHAR(255),
+                       proof_uploaded_date DATETIME,
+                       refund_processed_date DATETIME,
+                       package_received_date DATETIME,
+                       UNIQUE (sale_id)
+    -- No agregues todavía la foreign key
+);
 
--- Tabla sale_details
 CREATE TABLE sale_details (
                               id INT PRIMARY KEY AUTO_INCREMENT,
                               sale_id INT NOT NULL,
                               product_id INT NOT NULL,
-                              claim_id BIGINT NULL,
+                              claim_id INT NULL,
                               quantity INT NOT NULL,
                               subtotal DOUBLE NOT NULL,
                               FOREIGN KEY (sale_id) REFERENCES sale(id)
                                   ON DELETE CASCADE ON UPDATE CASCADE,
                               FOREIGN KEY (product_id) REFERENCES product(id)
-                                  ON DELETE CASCADE ON UPDATE CASCADE,
-                              FOREIGN KEY (claim_id) REFERENCES claim(id)
-                                  ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB;
+                                  ON DELETE CASCADE ON UPDATE CASCADE
+    -- No agregues todavía la foreign key claim_id
+);
+
+CREATE TABLE claim_sale_details (
+                                    claim_id INT NOT NULL,
+                                    sale_details_id INT NOT NULL,
+                                    PRIMARY KEY (claim_id, sale_details_id)
+    -- foreign keys después
+);
+
+ALTER TABLE claim
+    ADD FOREIGN KEY (sale_id) REFERENCES sale(id);
+
+ALTER TABLE sale_details
+    ADD FOREIGN KEY (claim_id) REFERENCES claim(id)
+        ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE claim_sale_details
+    ADD FOREIGN KEY (claim_id) REFERENCES claim(id),
+  ADD FOREIGN KEY (sale_details_id) REFERENCES sale_details(id);
+
 
 -- Inserción de usuarios (bcrypt sin tocar)
 INSERT INTO users (username, password, full_name, role) VALUES
