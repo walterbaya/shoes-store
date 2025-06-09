@@ -1,0 +1,76 @@
+package com.shoesstore.shoesstore.service;
+
+import com.shoesstore.shoesstore.model.Claim;
+import com.shoesstore.shoesstore.repository.ClaimRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.*;
+import java.time.LocalDateTime;
+
+@Service
+public class ClaimServiceImpl {
+
+    private final ClaimRepository claimRepo;
+    private final Path uploadDir = Paths.get("uploads/comprobantes/");
+
+    public ClaimServiceImpl(ClaimRepository claimRepo) {
+        this.claimRepo = claimRepo;
+    }
+
+    @Override
+    @Transactional
+    public Long createClaim(Claim claim) {
+        claim.setState(Claim.State.INITIATED);
+        claim.setCreatedAt(claim.getCreatedAt() == null ? LocalDateTime.now() : claim.getCreatedAt());
+        return claimRepo.save(claim).getId();
+    }
+
+    @Override
+    @Transactional
+    public void uploadProof(Long id, MultipartFile file) {
+        Claim c = claimRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reclamo no existe: " + id));
+        if (c.getState() != Claim.State.INITIATED) {
+            throw new IllegalStateException("Estado inválido para subir comprobante: " + c.getState());
+        }
+        try {
+            Files.createDirectories(uploadDir);
+            Path target = uploadDir.resolve(file.getOriginalFilename());
+            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+            c.setDescription(target.toString());  // o guarda en otro campo URL específico
+            c.setState(State.PROOF_UPLOADED);
+            claimRepo.save(c);
+        } catch (IOException e) {
+            throw new RuntimeException("Error guardando comprobante", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void approveProof(Long id) {
+        Claim c = claimRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reclamo no existe: " + id));
+        if (c.getState() != State.PROOF_UPLOADED) {
+            throw new IllegalStateException("Estado inválido para aprobar: " + c.getState());
+        }
+        // Lógica de reembolso aquí...
+        c.setState(State.REFUND_PROCESSED);
+        claimRepo.save(c);
+    }
+
+    @Override
+    @Transactional
+    public void confirmReception(Long id) {
+        Claim c = claimRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reclamo no existe: " + id));
+        if (c.getState() != State.REFUND_PROCESSED) {
+            throw new IllegalStateException("Estado inválido para confirmación: " + c.getState());
+        }
+        // Lógica de reposición de stock aquí...
+        c.setState(State.PACKAGE_RECEIVED);
+        claimRepo.save(c);
+    }
+}

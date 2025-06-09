@@ -97,5 +97,8 @@ public class SaleService {
     public List<Object[]> getTopSellers(LocalDateTime start, LocalDateTime end) {
         return saleRepository.findTopSellers(start, end);
     }
-    
+
+    public List<Sale> getSalesWithoutClaims() {
+        return saleRepository.findSalesWithoutClaims();
+    }
 }

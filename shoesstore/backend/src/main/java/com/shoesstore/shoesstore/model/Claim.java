@@ -11,47 +11,69 @@ import java.util.List;
 @Table(name = "claim")
 public class Claim {
 
-    //Al barrarse una claim no se borran los detalles de venta.
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "sale_detail_id", referencedColumnName = "id")
-    private List<SaleDetails> saleDetails;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "sale_id", nullable = false, unique = true)
     private Sale sale;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "sale_detail_id", referencedColumnName = "id")
+    private List<SaleDetails> saleDetails;
 
     private String description;
 
+    // Nuevo campo para almacenar la URL del comprobante de despacho
+    private String shippingProofUrl;
+
     @Enumerated(EnumType.STRING)
     @NotNull(message = "El estado es obligatorio")
-    private State state;
+    private State state = State.INITIATED;  // Valor por defecto
 
     @NotNull(message = "Es obligatorio tener una fecha de inicio para el reclamo")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    // Nuevos campos para registrar fechas de cada etapa
+    private LocalDateTime proofUploadedDate;
+    private LocalDateTime refundProcessedDate;
+    private LocalDateTime packageReceivedDate;
+
     public enum State {
-        // Parte 1: devolución iniciada, esperando comprobante
         INITIATED("Devolución iniciada, a la espera de comprobante de despacho"),
-        // Parte 2: comprobante subido, esperando aprobación manual
         PROOF_UPLOADED("Comprobante cargado, a la espera de aprobación del vendedor"),
-        // Parte 3: comprobante aprobado y reembolso procesado
         REFUND_PROCESSED("Comprobante aprobado, reembolso realizado"),
-        // Parte 4: paquete recibido y stock actualizado
         PACKAGE_RECEIVED("Paquete recibido, stock actualizado");
 
         private final String displayValue;
+        State(String displayValue) { this.displayValue = displayValue; }
+        public String getDisplayValue() { return displayValue; }
+    }
 
-        State(String displayValue) {
-            this.displayValue = displayValue;
+    // Métodos para manejar las transiciones de estado
+    public void uploadProof(String proofUrl) {
+        if (this.state != State.INITIATED) {
+            throw new IllegalStateException("Solo se puede subir comprobante en estado INICIADO");
         }
+        this.shippingProofUrl = proofUrl;
+        this.state = State.PROOF_UPLOADED;
+        this.proofUploadedDate = LocalDateTime.now();
+    }
 
-        public String getDisplayValue() {
-            return displayValue;
+    public void approveRefund() {
+        if (this.state != State.PROOF_UPLOADED) {
+            throw new IllegalStateException("El comprobante debe estar subido y en espera de aprobación");
         }
+        this.state = State.REFUND_PROCESSED;
+        this.refundProcessedDate = LocalDateTime.now();
+    }
+
+    public void receivePackage() {
+        if (this.state != State.REFUND_PROCESSED) {
+            throw new IllegalStateException("Debe haberse procesado el reembolso antes de recibir el paquete");
+        }
+        this.state = State.PACKAGE_RECEIVED;
+        this.packageReceivedDate = LocalDateTime.now();
     }
 }
