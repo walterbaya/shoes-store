@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Detalle de Reclamo</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
 <div th:fragment="content">
@@ -13,15 +15,17 @@
             <div class="row">
                 <div class="col-md-6">
                     <p><strong>Venta ID:</strong> <span th:text="${claim.sale.id}"></span></p>
-                    <p><strong>Fecha Creación:</strong> <span th:text="${#dates.format(claim.createdAt, 'dd/MM/yyyy HH:mm')}"></span></p>
+                    <p><strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(claim.createdAt, 'dd/MM/yyyy')}"></span>
+                    </p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Estado:</strong>
                         <span class="badge"
-                              th:classappend="${claim.state.name() == 'INITIATED'} ? 'bg-warning' :
-                                             ${claim.state.name() == 'PROOF_UPLOADED'} ? 'bg-info' :
-                                             ${claim.state.name() == 'REFUND_PROCESSED'} ? 'bg-primary' :
-                                             'bg-success'">
+                              th:classappend="
+                                ${claim.state.name() == 'INITIATED' ? 'bg-warning' :
+                                  (claim.state.name() == 'PROOF_UPLOADED' ? 'bg-info' :
+                                    (claim.state.name() == 'REFUND_PROCESSED' ? 'bg-primary' : 'bg-success'))}">
                             <span th:text="${claim.state.displayValue}"></span>
                         </span>
                     </p>
@@ -35,7 +39,7 @@
     <!-- Sección de acciones según estado -->
     <div th:switch="${claim.state}">
         <!-- Estado: INICIADO - Subir comprobante -->
-        <div th:case="INITIATED" class="card border-warning">
+        <div th:case="'INITIATED'" class="card border-warning">
             <div class="card-header bg-warning text-white">Acción Requerida</div>
             <div class="card-body">
                 <h5>Subir Comprobante de Despacho</h5>
@@ -50,7 +54,7 @@
         </div>
 
         <!-- Estado: COMPROBANTE SUBIDO - Aprobar devolución -->
-        <div th:case="PROOF_UPLOADED" class="card border-info">
+        <div th:case="'PROOF_UPLOADED'" class="card border-info">
             <div class="card-header bg-info text-white">Acción Requerida</div>
             <div class="card-body">
                 <h5>Comprobante Subido</h5>
@@ -64,7 +68,7 @@
         </div>
 
         <!-- Estado: REEMBOLSO PROCESADO - Recibir paquete -->
-        <div th:case="REFUND_PROCESSED" class="card border-primary">
+        <div th:case="'REFUND_PROCESSED'" class="card border-primary">
             <div class="card-header bg-primary text-white">Acción Requerida</div>
             <div class="card-body">
                 <h5>Reembolso Realizado</h5>
@@ -78,10 +82,12 @@
         </div>
 
         <!-- Estado: PAQUETE RECIBIDO - Finalizado -->
-        <div th:case="PACKAGE_RECEIVED" class="card border-success">
+        <div th:case="'PACKAGE_RECEIVED'" class="card border-success">
             <div class="card-header bg-success text-white">Proceso Completado</div>
             <div class="card-body">
-                <p>Paquete recibido el: <span th:text="${#dates.format(claim.packageReceivedDate, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p>Paquete recibido el:
+                    <span th:text="${#dates.format(claim.packageReceivedDate, 'dd/MM/yyyy HH:mm')}"></span>
+                </p>
                 <p>Stock actualizado correctamente</p>
             </div>
         </div>
@@ -103,7 +109,7 @@
                 <tr th:each="detail : ${claim.saleDetails}">
                     <td th:text="${detail.product.name}"></td>
                     <td th:text="${detail.quantity}"></td>
-                    <td th:text="|${#numbers.formatDecimal(detail.price, 1, 2)}|"></td>
+                    <td th:text="|${#numbers.formatDecimal(detail.product.price, 1, 2)}|"></td>
                 </tr>
                 </tbody>
             </table>

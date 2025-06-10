@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -35,18 +37,36 @@ public class ClaimController {
 
     @GetMapping("/new")
     public String newClaimForm(Model model) {
-        // Obtener ventas sin reclamos
         List<Sale> salesWithoutClaims = saleService.getSalesWithoutClaims();
-
         model.addAttribute("sales", salesWithoutClaims);
-        return "claims/new";
+        model.addAttribute("view", "claims/new");
+        return "layout";
     }
 
     @PostMapping
-    public String createClaim(@RequestParam("saleId") Long saleId,
-                              @RequestParam("description") String description) {
-        Claim claim = claimService.createClaim(saleId, description);
-        return "redirect:/claims/" + claim.getId();
+    public String createClaim(
+            @RequestParam("saleId") Long saleId,
+            @RequestParam("description") String description,
+            @RequestParam Map<String, String> allParams) {
+
+        Map<Long, Integer> claimItems = new HashMap<>();
+
+        allParams.keySet().stream()
+                .filter(key -> key.matches("claimItems\\[\\d+\\]\\.include"))
+                .forEach(includeKey -> {
+                    String idStr = includeKey.replaceAll("claimItems\\[(\\d+)]\\.include", "$1");
+                    Long saleDetailId = Long.parseLong(idStr);
+                    String quantityKey = "claimItems[" + saleDetailId + "].quantity";
+                    int quantity = Integer.parseInt(allParams.getOrDefault(quantityKey, "1"));
+                    claimItems.put(saleDetailId, quantity);
+                });
+
+        if (claimItems.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar al menos un producto para reclamar");
+        }
+
+        claimService.createClaim(saleId, description, claimItems);
+        return "redirect:/claims";
     }
 
     @PostMapping("/{id}/proof")
@@ -71,6 +91,8 @@ public class ClaimController {
     public String viewClaim(@PathVariable Long id, Model model) {
         Claim claim = claimService.getClaimById(id);
         model.addAttribute("claim", claim);
-        return "claims/view";
+        model.addAttribute("claims", claimService.getAllClaims());
+        model.addAttribute("view", "claims/view");
+        return "layout";
     }
 }

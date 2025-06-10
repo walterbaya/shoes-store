@@ -5,8 +5,6 @@ import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.repository.ClaimRepository;
-import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
-import com.shoesstore.shoesstore.repository.SaleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,18 +21,15 @@ import java.util.Map;
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
-    private final SaleRepository saleRepository;
-    private final SaleDetailsRepository saleDetailsRepository;
+    private final SaleService saleService;
     private final ProductService productService;
 
     @Autowired
     public ClaimService(ClaimRepository claimRepository,
-                        SaleRepository saleRepository,
-                        SaleDetailsRepository saleDetailsRepository,
+                        SaleService saleService,
                         ProductService productService) {
         this.claimRepository = claimRepository;
-        this.saleRepository = saleRepository;
-        this.saleDetailsRepository = saleDetailsRepository;
+        this.saleService = saleService;
         this.productService = productService;
     }
 

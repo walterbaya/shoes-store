@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nuevo Reclamo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Registrar Nuevo Reclamo</h2>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/claims}" method="post" id="claimForm">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Venta</label>
+                    <select name="saleId" id="saleSelect" class="form-select" required
+                            onchange="loadSaleDetails(this.value)">
+                        <option value="">Seleccione una venta</option>
+                        <option th:each="sale : ${sales}"
+                                th:value="${sale.id}"
+                                th:text="'Venta #' + ${sale.id} + ' - $' + ${#numbers.formatDecimal(sale.total, 1, 2)}">
+                        </option>
+                    </select>
+                </div>
+
+                <div id="saleDetailsSection" class="mb-3" style="display: none;">
+                    <h5 class="mb-3">Productos de la Venta</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad Comprada</th>
+                                <th>Precio Unitario</th>
+                                <th>Subtotal</th>
+                                <th>Reclamar</th>
+                                <th>Cantidad a Reclamar</th>
+                            </tr>
+                            </thead>
+                            <tbody id="saleDetailsTable">
+                            <!-- Se carga dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Descripción del Reclamo</label>
+                    <textarea name="description" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    Registrar Reclamo
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function loadSaleDetails(saleId) {
+        if (!saleId) {
+            document.getElementById('saleDetailsSection').style.display = 'none';
+            return;
+        }
+
+        fetch('/api/sales/' + saleId + '/details')
+            .then(response => response.json())
+            .then(details => {
+                const tableBody = document.getElementById('saleDetailsTable');
+                tableBody.innerHTML = '';
+
+                details.forEach(detail => {
+                    const row = `
+                        <tr>
+                            <td>${detail.product.name} (${detail.product.size})</td>
+                            <td>${detail.quantity}</td>
+                            <td>$${detail.product.price.toFixed(2)}</td>
+                            <td>$${detail.subtotal.toFixed(2)}</td>
+                            <td class="text-center">
+                                <input type="checkbox" name="claimItems[${detail.id}].include" value="true"
+                                       onchange="toggleQuantityInput(this, ${detail.id}, ${detail.quantity})">
+                            </td>
+                            <td>
+                                <input type="number" name="claimItems[${detail.id}].quantity"
+                                       class="form-control quantity-input" min="1" max="${detail.quantity}"
+                                       value="${detail.quantity}" disabled style="width: 80px;">
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+
+                document.getElementById('saleDetailsSection').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error al cargar los detalles de la venta:', error);
+                alert('Error al cargar los productos de la venta.');
+            });
+    }
+
+    function toggleQuantityInput(checkbox, detailId, maxQuantity) {
+        const quantityInput = document.querySelector(`input[name="claimItems[${detailId}].quantity"]`);
+        quantityInput.disabled = !checkbox.checked;
+        if (!checkbox.checked) {
+            quantityInput.value = maxQuantity;
+        }
+    }
+
+    document.getElementById('claimForm').addEventListener('submit', function(e) {
+        const checkedItems = document.querySelectorAll('input[name^="claimItems"][name$=".include"]:checked');
+        if (checkedItems.length === 0) {
+            e.preventDefault();
+            alert('Debe seleccionar al menos un producto para reclamar');
+        }
+    });
+</script>
+</body>
+</html>
