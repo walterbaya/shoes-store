@@ -28,14 +28,11 @@ public class ReportService {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = endDate.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-    	if(startDateString != null && startDateString != null) {
+    	if(!startDateString.isEmpty()) {
             startDate = LocalDate.parse(startDateString).atStartOfDay();
             endDate = LocalDate.parse(endDateString).atStartOfDay();
     	}
-        else if(startDateString != null && endDateString == null){
-            startDate = LocalDate.parse(startDateString).atStartOfDay();
-        }
-        else if(startDateString == null && endDateString != null){
+        else if(!endDateString.isEmpty()){
             endDate = LocalDate.parse(endDateString).atStartOfDay();
         }
 

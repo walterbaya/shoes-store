@@ -65,7 +65,7 @@
         const section = document.getElementById('saleDetailsSection');
         const loading = document.getElementById('loadingIndicator');
         section.style.display = 'none';
-
+        
         if (!saleId) {
             loading.style.display = 'none';
             return;

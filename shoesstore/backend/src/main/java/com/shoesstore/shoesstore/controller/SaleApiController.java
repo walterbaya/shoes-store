@@ -1,8 +1,11 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.Product;
+import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
+import com.shoesstore.shoesstore.repository.SaleRepository;
+import com.shoesstore.shoesstore.service.SaleService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,11 +22,15 @@ import java.util.stream.Collectors;
 public class SaleApiController {
 
     @Autowired
-    private SaleDetailsRepository saleDetailsRepository;
+    private SaleService saleService;
+
 
     @GetMapping("/{saleId}/details")
     public List<SaleDetailResponse> getSaleDetails(@PathVariable Long saleId) {
-        return saleDetailsRepository.findById(saleId).stream()
+
+        Sale sale = saleService.getSaleById(saleId);
+
+        return sale.getDetails().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }

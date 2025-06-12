@@ -3,12 +3,14 @@ package com.shoesstore.shoesstore.controller;
 import com.shoesstore.shoesstore.model.Claim;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.service.ClaimService;
+import com.shoesstore.shoesstore.service.FileStorageService;
 import com.shoesstore.shoesstore.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,11 +23,13 @@ public class ClaimController {
 
     private final ClaimService claimService;
     private final SaleService saleService;
+    private FileStorageService fileStorageService;
 
     @Autowired
-    public ClaimController(ClaimService claimService, SaleService saleService) {
+    public ClaimController(ClaimService claimService, SaleService saleService, FileStorageService fileStorageService) {
         this.claimService = claimService;
         this.saleService = saleService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -70,8 +74,15 @@ public class ClaimController {
     }
 
     @PostMapping("/{id}/proof")
-    public String uploadProof(@PathVariable Long id, @RequestParam("proofUrl") String proofUrl) {
-        claimService.uploadProof(id, proofUrl);
+    public String uploadProof(@PathVariable Long id,
+                              @RequestParam("proofFile") MultipartFile proofFile) {
+        if (proofFile.isEmpty()) {
+            throw new IllegalArgumentException("El archivo está vacío");
+        }
+
+        String fileName = fileStorageService.storeFile(proofFile);
+        claimService.uploadProof(id, fileName);
+
         return "redirect:/claims/" + id;
     }
 

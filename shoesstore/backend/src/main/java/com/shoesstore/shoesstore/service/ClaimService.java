@@ -102,12 +102,11 @@ public class ClaimService {
     }
 
     // Subir comprobante de despacho
-    public Claim uploadProof(Long claimId, String proofUrl) {
+    public Claim uploadProof(Long claimId, String fileName) {
         Claim claim = getClaimById(claimId);
-        claim.uploadProof(proofUrl);
+        claim.uploadProof(fileName); // Solo almacena el nombre del archivo
         return claimRepository.save(claim);
     }
-
     // Aprobar devolución y procesar reembolso
     @Transactional
     public Claim approveRefund(Long claimId) {

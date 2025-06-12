@@ -1,0 +1,4 @@
+package com.shoesstore.shoesstore.config;
+
+public class WebConfig {
+}

@@ -76,9 +76,4 @@ public class Claim {
         this.state = State.PACKAGE_RECEIVED;
         this.packageReceivedDate = LocalDateTime.now();
     }
-
-    // Getter para la URL completa
-    public String getShippingProofUrl() {
-        return "/uploads/" + shippingProofUrl;
-    }
 }
