@@ -1,59 +1,132 @@
 <div th:fragment="content card shadow">
-    <div class="card-header bg-primary text-white">
+    <!-- Cabecera -->
+    <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
         <h1 class="h4 mb-0">Dashboard</h1>
+        <i class="fas fa-chart-pie fa-lg"></i>
     </div>
+
     <div class="card-body">
-        <div class="row">
-            <!-- Tarjetas de Resumen -->
-            <div class="col-md-4 mb-4">
-                <div class="card text-white bg-primary shadow-lg">
-                    <div class="card-body">
-                        <h5 class="card-title">Ventas Hoy</h5>
-                        <p class="card-text display-5" th:text="${dailySales} + ' ventas'"></p>
-                    </div>
+        <!-- Resúmenes omitidos para brevedad -->
+
+        <!-- Pie Chart de Ventas por Usuario -->
+        <div class="card shadow border-0 mt-4">
+            <div class="card-body">
+                <h5 class="mb-4">Ventas por Usuario (Última Semana)</h5>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Gráfico de Ventas -->
+        <!-- Tabla de Detalle -->
         <div class="card shadow border-0 mt-4">
             <div class="card-body">
-                <canvas id="salesChart" class="w-100" style="height: 400px"></canvas>
+                <h5 class="mb-3">Detalle por Usuario</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-primary">
+                        <tr id="tableHead"></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    const PALETTE = ['#FF6384','#36A2EB','#4BC0C0','#FFCE56','#FF9F40','#9966FF','#00A65A','#D2D6DE','#F7464A','#46BFBD'];
+
+    (async () => {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const tableHead = document.getElementById('tableHead');
+        const tableBody = document.getElementById('tableBody');
+
+        const end = new Date(), start = new Date();
+        start.setDate(end.getDate() - 7);
+
+        const formatDate = d => d.toISOString().split('T')[0];
+        const url = new URL("/api/reports/sales/weekly-user-sales", window.location.origin);
+        url.searchParams.append('startDate', formatDate(start));
+        url.searchParams.append('endDate', formatDate(end));
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(res.status);
+            const { labels, datasets, tableRows } = await res.json();
+
+            const bgColors = labels.map((_, i) => PALETTE[i % PALETTE.length]);
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels,
+                    datasets: [{ data: datasets[0].data, backgroundColor: bgColors, borderColor: '#fff', borderWidth: 1 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+
+            if (tableRows?.length) {
+                tableHead.innerHTML = '';
+                tableBody.innerHTML = '';
+
+                const headerRow = document.createElement('tr');
+                Object.keys(tableRows[0]).forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col;
+                    headerRow.appendChild(th);
+                });
+                tableHead.appendChild(headerRow);
+
+                tableRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    Object.values(row).forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                });
+            }
+        } catch (err) {
+            console.error('Error al obtener los datos:', err);
+        }
+    })();
+</script>
+
 <style>
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 40vh; /* Ajustable según tu diseño */
+    }
+
+    /* Asegurar que el canvas se adapte al contenedor para mantener el GRD correcto */
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* Estilos visuales adicionales */
     .card.shadow {
         border-radius: 0.75rem;
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.2s ease;
     }
-
     .card.shadow:hover {
         transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15)!important;
     }
-
-    .card-header.bg-primary {
-        border-radius: 0.75rem 0.75rem 0 0;
-        padding: 1.25rem 1.5rem;
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(90deg,#0062E6,#33AEFF);
+        border-radius: .75rem .75rem 0 0;
+        padding:1.25rem 1.5rem;
     }
-
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
-    }
-
-    .card-text.display-5 {
-        font-size: 1.75rem;
-        font-weight: 600;
-        letter-spacing: -0.5px;
-    }
-
-    #salesChart {
-        border-radius: 0.5rem;
-        background: #fff;
+    .table th, .table td {
+        vertical-align: middle;
     }
 </style>

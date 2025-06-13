@@ -25,9 +25,9 @@ public class ReportRestController {
     }
 
     @GetMapping("/weekly-user-sales")
-    public Map<String, Object> weeklyUserSales(@RequestParam String startDate,
+    public Map<String, Object> byPeriod(@RequestParam String startDate,
                                         @RequestParam String endDate) {
-        return reportService.generateSalesReport("weekly-user-sales", startDate, endDate);
+        return reportService.generateSalesReport("period", startDate, endDate);
     }
 
 

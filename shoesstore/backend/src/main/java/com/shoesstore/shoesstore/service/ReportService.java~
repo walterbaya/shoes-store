@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,35 +25,32 @@ public class ReportService {
 
     public Map<String, Object> generateSalesReport(String reportType, String startDateString, String endDateString) {
 
-        LocalDateTime endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999999999);
-        LocalDateTime startDate = endDate.minusWeeks(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        if (startDateString != null && !startDateString.isEmpty()) {
-            LocalDate parsedStart = LocalDate.parse(startDateString);
-            startDate = parsedStart.atStartOfDay();
-        }
-        if (endDateString != null && !endDateString.isEmpty()) {
-            LocalDate parsedEnd = LocalDate.parse(endDateString);
-            endDate = parsedEnd.atTime(LocalTime.MAX);
+    	if(!startDateString.isEmpty()) {
+            startDate = LocalDate.parse(startDateString).atStartOfDay();
+            endDate = LocalDate.parse(endDateString).atStartOfDay();
+    	}
+        else if(!endDateString.isEmpty()){
+            endDate = LocalDate.parse(endDateString).atStartOfDay();
         }
 
         switch (reportType) {
             case "byUser":
             case "byProduct":
-                startDate = endDate.minusMonths(1).withDayOfMonth(1).with(LocalTime.MIN);
+                startDate = endDate.minusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
                 break;
             case "period":
-                // no cambios en fechas
-                break;
+            	break;
             case "weekly":
-                startDate = endDate.minusWeeks(1).with(LocalTime.MIN);
                 break;
             case "weekly-user-sales":
-                startDate = endDate.minusWeeks(1).with(LocalTime.MIN);
                 break;
             default:
+                startDate = endDate.minusWeeks(1);
                 reportType = "weekly";
-                startDate = endDate.minusWeeks(1).with(LocalTime.MIN);
+                break;
         }
 
         Map<String, Object> result = new HashMap<>();
@@ -77,6 +73,7 @@ public class ReportService {
 
         if ("byProduct".equals(reportType)) {
             List<Object[]> raw = saleRepository.fetchSalesByProduct(startDate, endDate);
+            
             List<String> labels = new ArrayList<>();
             List<Number> quantities = new ArrayList<>();
             List<Map<String, Object>> rows = new ArrayList<>();
@@ -107,9 +104,8 @@ public class ReportService {
             return result;
         }
 
-        // Casos: "weekly" o por defecto
         List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
-        Map<String, Double> agg = new LinkedHashMap<>();
+        Map<String, Double> agg = new LinkedHashMap();
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Sale s : sales) {
             String key = formatPeriod(s.getSaleDate(), reportType);
@@ -118,18 +114,13 @@ public class ReportService {
         List<String> labels = new ArrayList<>(agg.keySet());
         List<Number> data = new ArrayList<>(agg.values());
         for (Map.Entry<String, Double> e : agg.entrySet()) {
-            rows.add(Map.of(
-                    "period", e.getKey(),
-                    "totalSales", e.getValue(),
-                    "transactionCount", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())
-            ));
+            rows.add(Map.of("period", e.getKey(), "totalSales", e.getValue(), "transactionCount", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())));
         }
         result.put("labels", labels);
         result.put("datasets", List.of(Map.of("label", "Total de Ventas", "data", data, "borderWidth", 1)));
         result.put("tableRows", rows);
         return result;
     }
-
 
     private String formatPeriod(LocalDateTime date, String reportType) {
         if ("weekly".equals(reportType)) {
