@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Data
@@ -23,6 +24,9 @@ public class Claim {
     @JoinColumn(name = "sale_detail_id", referencedColumnName = "id")
     private List<SaleDetails> saleDetails;
 
+    @OneToMany(mappedBy = "claim", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    private List<ClaimDetails> claimDetails;
+
     private String description;
 
     // Nuevo campo para almacenar la URL del comprobante de despacho
@@ -34,6 +38,7 @@ public class Claim {
 
     @NotNull(message = "Es obligatorio tener una fecha de inicio para el reclamo")
     private LocalDateTime createdAt = LocalDateTime.now();
+
 
     // Nuevos campos para registrar fechas de cada etapa
     private LocalDateTime proofUploadedDate;

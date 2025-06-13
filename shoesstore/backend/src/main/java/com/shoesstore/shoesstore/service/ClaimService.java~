@@ -1,9 +1,6 @@
 package com.shoesstore.shoesstore.service;
 
-import com.shoesstore.shoesstore.model.Claim;
-import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.model.Sale;
-import com.shoesstore.shoesstore.model.SaleDetails;
+import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.ClaimRepository;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
@@ -38,7 +35,10 @@ public class ClaimService {
         this.productService = productService;
     }
 
-    // Crear nuevo reclamo
+    // Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
+    // Todas las claims tienen asociadas una venta y un conjunto de productos que se quieren actualizar en la venta
+    // Al crear la claim podría eliminarse en algun momento supongo, por lo tanto los items no deberia borrarse instantamente
+    //sino cuando ya se procesaron y se saben que se van a descontar
     @Transactional
     public Claim createClaim(Long saleId, String description, Map<Long, Integer> claimItems) {
         Sale sale = saleRepository.findById(saleId)
@@ -50,13 +50,29 @@ public class ClaimService {
         claim.setState(Claim.State.INITIATED);
         claim.setCreatedAt(LocalDateTime.now());
 
+        //claimItems tiene el id del saleDetail y la cantidad
+
+        List<ClaimDetails> claimDetails = new ArrayList<>();
+
+        //Armo los claim details
+
+        claimItems.keySet().forEach(id -> {
+            ClaimDetails claimDetail = new ClaimDetails();
+            claimDetail.setClaim(claim);
+            claimDetail.setQuantity(claimItems.get(id));
+            claimDetail.setSaleDetails(saleDetailsRepository.findById(id));
+            claimDetails.add(claimDetail);
+        });
+
+        claim.setClaimDetails(claimDetails);
+
         // Guardar el reclamo primero
         Claim savedClaim = claimRepository.save(claim);
 
         // Procesar cada item reclamado
-        List<SaleDetails> claimedDetails = new ArrayList<>();
+        /*List<SaleDetails> claimedDetails = new ArrayList<>();*/
 
-        claimItems.forEach((saleDetailId, quantity) -> {
+       /* claimItems.forEach((saleDetailId, quantity) -> {
             SaleDetails detail = saleDetailsRepository.findById(saleDetailId)
                     .orElseThrow(() -> new EntityNotFoundException("Detalle de venta no encontrado"));
 
@@ -67,32 +83,21 @@ public class ClaimService {
 
             // Si se reclama la cantidad completa
             if (quantity == detail.getQuantity()) {
-                detail.setClaim(savedClaim);
-                saleDetailsRepository.save(detail);
-                claimedDetails.add(detail);
+                //Borramos el detalle de venta, porque es una venta que se elimina
+                saleDetailsRepository.delete(detail);
             }
             // Si es un reclamo parcial
             else {
                 // Crear un nuevo detalle para el reclamo parcial
-                SaleDetails partialDetail = new SaleDetails();
-                partialDetail.setProduct(detail.getProduct());
-                partialDetail.setQuantity(quantity);
-                partialDetail.setSubtotal(detail.getProduct().getPrice() * quantity);
-                partialDetail.setClaim(savedClaim);
-                partialDetail.setSale(sale);  // Misma venta
 
-                SaleDetails savedPartialDetail = saleDetailsRepository.save(partialDetail);
-                claimedDetails.add(savedPartialDetail);
-
-                // Actualizar el detalle original
+                //Hay que actualizar los saleDetails unicamente, sus cantidades
                 detail.setQuantity(detail.getQuantity() - quantity);
-                detail.setSubtotal(detail.getProduct().getPrice() * detail.getQuantity());
+                detail.setSubtotal(detail.getSubtotal() - detail.getProduct().getPrice() * detail.getQuantity());
+
                 saleDetailsRepository.save(detail);
             }
-        });
+        });*/
 
-        // Asignar los detalles reclamados al claim
-        savedClaim.setSaleDetails(claimedDetails);
         return claimRepository.save(savedClaim);
     }
 
@@ -102,12 +107,11 @@ public class ClaimService {
     }
 
     // Subir comprobante de despacho
-    public Claim uploadProof(Long claimId, String proofUrl) {
+    public Claim uploadProof(Long claimId, String fileName) {
         Claim claim = getClaimById(claimId);
-        claim.uploadProof(proofUrl);
+        claim.uploadProof(fileName); // Solo almacena el nombre del archivo
         return claimRepository.save(claim);
     }
-
     // Aprobar devolución y procesar reembolso
     @Transactional
     public Claim approveRefund(Long claimId) {
@@ -115,7 +119,16 @@ public class ClaimService {
         claim.approveRefund();
 
         // Procesar reembolso financiero (implementar esta lógica)
-        processFinancialRefund(claim);
+        // Tenemos que actualizar el stock de los productos(va a fallar ahora porque la logica esta mal implementada de momento)
+
+        // Actualizamos ahora la venta, cambiando el total
+        Sale sale = claim.getSale();
+        sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
+
+        //Tendria que actualizar los stocks de los details y en caso de que se borren todos borrarlos
+
+
+        //Actualizo los valores en cada detalle
 
         return claimRepository.save(claim);
     }
@@ -132,13 +145,6 @@ public class ClaimService {
         return claimRepository.save(claim);
     }
 
-    private void processFinancialRefund(Claim claim) {
-        // Lógica para revertir el pago al cliente
-        // (depende de tu sistema de pagos)
-        BigDecimal refundAmount = calculateRefundAmount(claim);
-        // financialService.processRefund(claim.getSale().getCustomer(), refundAmount);
-    }
-
     private void updateProductStock(Claim claim) {
         for (SaleDetails detail : claim.getSaleDetails()) {
             Product product = productService.getProductById(detail.getProduct().getId());
@@ -148,10 +154,13 @@ public class ClaimService {
     }
 
     private BigDecimal calculateRefundAmount(Claim claim) {
-        return claim.getSaleDetails().stream()
-                .map(detail -> BigDecimal.valueOf(detail.getProduct().getPrice()).multiply(BigDecimal.valueOf(detail.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal total = BigDecimal.ZERO;
+        for (ClaimDetails detail : claim.getClaimDetails()) {
+            total = total.add(detail.getQuantity().multiply(claim.getSaleDetails().get(detail.getId()).getProduct().getPrice()));
+        }
+        return total;
     }
+
 
     public Claim getClaimById(Long id) {
         return claimRepository.findById(id)

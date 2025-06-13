@@ -24,6 +24,9 @@ public class SaleDetails {
     @JoinColumn(name = "claim_id", referencedColumnName = "id", nullable = true)
     private Claim claim;
 
+    @OneToOne(mappedBy = "claimDetail", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ClaimDetails claimDetails;
+
     private int quantity;
     private double subtotal;
 }

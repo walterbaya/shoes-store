@@ -41,6 +41,7 @@ public class DashboardController {
         //pendingOrders (entero) Falta desarrollar el modulo de ordenes
         //salesLabels y salesData para el gráfico
 
+
         return "layout";  // Usa el archivo layout.html
     }
 }
