@@ -22,17 +22,15 @@ public class ClaimService {
     private final ClaimRepository claimRepository;
     private final SaleRepository saleRepository;
     private final SaleDetailsRepository saleDetailsRepository;
-    private final ProductService productService;
 
     @Autowired
     public ClaimService(ClaimRepository claimRepository,
                         SaleRepository saleRepository,
-                        SaleDetailsRepository saleDetailsRepository,
-                        ProductService productService) {
+                        SaleDetailsRepository saleDetailsRepository
+                        ) {
         this.claimRepository = claimRepository;
         this.saleRepository = saleRepository;
         this.saleDetailsRepository = saleDetailsRepository;
-        this.productService = productService;
     }
 
     // Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
@@ -115,38 +113,21 @@ public class ClaimService {
         Claim claim = getClaimById(claimId);
         claim.approveRefund();
 
-
-
         //Actualizamos los detalles
 
         claim.getClaimDetails().forEach(claimDetail -> {
-            //Actualizamos la cantidad
-            claimDetail.getSaleDetails().setQuantity(claimDetail.getSaleDetails().getQuantity() - claimDetail.getQuantity());
 
             //Actualizamos ahora el subtotal
             claimDetail.getSaleDetails().setSubtotal(claimDetail.getSaleDetails().getSubtotal() - claimDetail.getSaleDetails().getProduct().getPrice() * claimDetail.getQuantity());
-
-            if(claimDetail.getQuantity() == 0){
-                saleDetailsRepository.delete(claimDetail.getSaleDetails());
-            }
-
-            if(claimDetail.getSaleDetails().getQuantity() < 0){
-                throw new IllegalArgumentException("La cantidad reclamada no puede ser mayor a la comprada");
-            }
 
         });
 
 
         //Revisamos si la venta quedo sin ninguno de los detalles
-        if(claim.getSaleDetails().isEmpty()) {
-            //En ese caso borramos la venta
-            saleRepository.delete(claim.getSale());
-        }
-        else{
-            //En otro caso Actualizamos ahora la venta, cambiando el total
-            Sale sale = claim.getSale();
-            sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
-        }
+
+        //En otro caso Actualizamos ahora la venta, cambiando el total
+        Sale sale = claim.getSale();
+        sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
 
         return claim;
     }
@@ -160,16 +141,11 @@ public class ClaimService {
         // Actualizar el stock de los productos
         updateProductStock(claim);
 
-
-
         //Actualizamos los detalles
 
         claim.getClaimDetails().forEach(claimDetail -> {
             //Actualizamos la cantidad
             claimDetail.getSaleDetails().setQuantity(claimDetail.getSaleDetails().getQuantity() - claimDetail.getQuantity());
-
-            //Actualizamos ahora el subtotal
-            claimDetail.getSaleDetails().setSubtotal(claimDetail.getSaleDetails().getSubtotal() - claimDetail.getSaleDetails().getProduct().getPrice() * claimDetail.getQuantity());
 
             if(claimDetail.getQuantity() == 0){
                 saleDetailsRepository.delete(claimDetail.getSaleDetails());
@@ -187,17 +163,18 @@ public class ClaimService {
             //En ese caso borramos la venta
             saleRepository.delete(claim.getSale());
         }
-        else{
-            //En otro caso Actualizamos ahora la venta, cambiando el total
-            Sale sale = claim.getSale();
-            sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
-        }
 
         return claim;
 
+    }
 
+    public Claim getClaimById(Long id) {
+        return claimRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reclamo no encontrado"));
+    }
 
-
+    public List<Claim> getClaimsByState(Claim.State state) {
+        return claimRepository.findByState(state);
     }
 
     private void updateProductStock(Claim claim) {
@@ -213,24 +190,11 @@ public class ClaimService {
 
     }
 
-    private void updateSaleDetailsSubtotals(Claim claim) {
-
-    }
-
     private BigDecimal calculateRefundAmount(Claim claim) {
         BigDecimal total = BigDecimal.ZERO;
         for (ClaimDetails detail : claim.getClaimDetails()) {
             total = total.add(BigDecimal.valueOf(detail.getQuantity()).multiply(BigDecimal.valueOf(detail.getSaleDetails().getProduct().getPrice())));
         }
         return total;
-    }
-
-    public Claim getClaimById(Long id) {
-        return claimRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reclamo no encontrado"));
-    }
-
-    public List<Claim> getClaimsByState(Claim.State state) {
-        return claimRepository.findByState(state);
     }
 }
