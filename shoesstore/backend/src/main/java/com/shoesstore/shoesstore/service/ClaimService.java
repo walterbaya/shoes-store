@@ -66,8 +66,7 @@ public class ClaimService {
 
         claim.setClaimDetails(claimDetails);
 
-        // Guardar el reclamo primero
-        Claim savedClaim = claimRepository.save(claim);
+        return claimRepository.save(claim);
 
         // Procesar cada item reclamado
         /*List<SaleDetails> claimedDetails = new ArrayList<>();*/
@@ -97,8 +96,6 @@ public class ClaimService {
                 saleDetailsRepository.save(detail);
             }
         });*/
-
-        return claimRepository.save(savedClaim);
     }
 
     //Obtener todos los reclamos
@@ -118,19 +115,40 @@ public class ClaimService {
         Claim claim = getClaimById(claimId);
         claim.approveRefund();
 
-        // Procesar reembolso financiero (implementar esta lógica)
-        // Tenemos que actualizar el stock de los productos(va a fallar ahora porque la logica esta mal implementada de momento)
-
-        // Actualizamos ahora la venta, cambiando el total
-        Sale sale = claim.getSale();
-        sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
-
-        //Tendria que actualizar los stocks de los details y en caso de que se borren todos borrarlos
 
 
-        //Actualizo los valores en cada detalle
+        //Actualizamos los detalles
 
-        return claimRepository.save(claim);
+        claim.getClaimDetails().forEach(claimDetail -> {
+            //Actualizamos la cantidad
+            claimDetail.getSaleDetails().setQuantity(claimDetail.getSaleDetails().getQuantity() - claimDetail.getQuantity());
+
+            //Actualizamos ahora el subtotal
+            claimDetail.getSaleDetails().setSubtotal(claimDetail.getSaleDetails().getSubtotal() - claimDetail.getSaleDetails().getProduct().getPrice() * claimDetail.getQuantity());
+
+            if(claimDetail.getQuantity() == 0){
+                saleDetailsRepository.delete(claimDetail.getSaleDetails());
+            }
+
+            if(claimDetail.getSaleDetails().getQuantity() < 0){
+                throw new IllegalArgumentException("La cantidad reclamada no puede ser mayor a la comprada");
+            }
+
+        });
+
+
+        //Revisamos si la venta quedo sin ninguno de los detalles
+        if(claim.getSaleDetails().isEmpty()) {
+            //En ese caso borramos la venta
+            saleRepository.delete(claim.getSale());
+        }
+        else{
+            //En otro caso Actualizamos ahora la venta, cambiando el total
+            Sale sale = claim.getSale();
+            sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
+        }
+
+        return claim;
     }
 
     // Recibir paquete y actualizar stock
@@ -139,28 +157,73 @@ public class ClaimService {
         Claim claim = getClaimById(claimId);
         claim.receivePackage();
 
-        // Actualizar stock de productos
+        // Actualizar el stock de los productos
         updateProductStock(claim);
 
-        return claimRepository.save(claim);
+
+
+        //Actualizamos los detalles
+
+        claim.getClaimDetails().forEach(claimDetail -> {
+            //Actualizamos la cantidad
+            claimDetail.getSaleDetails().setQuantity(claimDetail.getSaleDetails().getQuantity() - claimDetail.getQuantity());
+
+            //Actualizamos ahora el subtotal
+            claimDetail.getSaleDetails().setSubtotal(claimDetail.getSaleDetails().getSubtotal() - claimDetail.getSaleDetails().getProduct().getPrice() * claimDetail.getQuantity());
+
+            if(claimDetail.getQuantity() == 0){
+                saleDetailsRepository.delete(claimDetail.getSaleDetails());
+            }
+
+            if(claimDetail.getSaleDetails().getQuantity() < 0){
+                throw new IllegalArgumentException("La cantidad reclamada no puede ser mayor a la comprada");
+            }
+
+        });
+
+
+        //Revisamos si la venta quedo sin ninguno de los detalles
+        if(claim.getSaleDetails().isEmpty()) {
+            //En ese caso borramos la venta
+            saleRepository.delete(claim.getSale());
+        }
+        else{
+            //En otro caso Actualizamos ahora la venta, cambiando el total
+            Sale sale = claim.getSale();
+            sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
+        }
+
+        return claim;
+
+
+
+
     }
 
     private void updateProductStock(Claim claim) {
-        for (SaleDetails detail : claim.getSaleDetails()) {
-            Product product = productService.getProductById(detail.getProduct().getId());
-            product.setStock(product.getStock() + detail.getQuantity());
-            productService.saveProduct(product);
-        }
+// Actualizar el stock de los productos
+        //Obtengo los detalles del claim
+        claim.getClaimDetails().forEach(detail -> {
+            //se obtiene el producto que se debe actualizar
+            detail.getSaleDetails().getProduct()
+                    //le seteamos el stock
+                    .setStock(detail.getSaleDetails().getProduct().getStock() + detail.getQuantity());
+
+        });
+
+    }
+
+    private void updateSaleDetailsSubtotals(Claim claim) {
+
     }
 
     private BigDecimal calculateRefundAmount(Claim claim) {
         BigDecimal total = BigDecimal.ZERO;
         for (ClaimDetails detail : claim.getClaimDetails()) {
-            total = total.add(detail.getQuantity().multiply(claim.getSaleDetails().get(detail.getId()).getProduct().getPrice()));
+            total = total.add(BigDecimal.valueOf(detail.getQuantity()).multiply(BigDecimal.valueOf(detail.getSaleDetails().getProduct().getPrice())));
         }
         return total;
     }
-
 
     public Claim getClaimById(Long id) {
         return claimRepository.findById(id)

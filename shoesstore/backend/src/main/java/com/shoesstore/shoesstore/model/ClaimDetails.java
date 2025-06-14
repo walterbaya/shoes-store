@@ -17,9 +17,9 @@ public class ClaimDetails {
         @JoinColumn(name = "claim_id", referencedColumnName = "id")
         private Claim claim;
 
-        @OneToOne(optional = false)
-        @JoinColumn(name = "sale_details_id", nullable = false, unique = true)
-        private SaleDetails SaleDetails;
+        @ManyToOne(optional = false)
+        @JoinColumn(name = "sale_details_id", nullable = false)
+        private SaleDetails saleDetails;
 
         private Integer quantity;
 }

@@ -32,7 +32,3 @@ public class SaleDetails {
     private int quantity;
     private double subtotal;
 }
-
-
-
-
