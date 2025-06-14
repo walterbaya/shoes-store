@@ -1,0 +1,196 @@
+package com.shoesstore.shoesstore;
+
+import com.shoesstore.shoesstore.model.*;
+import com.shoesstore.shoesstore.repository.ClaimRepository;
+import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
+import com.shoesstore.shoesstore.repository.SaleRepository;
+import com.shoesstore.shoesstore.service.ClaimService;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ClaimServiceTest {
+
+    @Mock
+    private ClaimRepository claimRepository;
+    @Mock
+    private SaleRepository saleRepository;
+    @Mock
+    private SaleDetailsRepository saleDetailsRepository;
+
+    @InjectMocks
+    private ClaimService claimService;
+
+    private Sale sale;
+    private SaleDetails saleDetail;
+    private Product product;
+
+    @BeforeEach
+    void setUp() {
+        product = new Product();
+        product.setId(1L);
+        product.setPrice(100.0);
+        product.setStock(10);
+
+        saleDetail = new SaleDetails();
+        saleDetail.setId(1L);
+        saleDetail.setQuantity(5);
+        saleDetail.setSubtotal(500.0);
+        saleDetail.setProduct(product);
+
+        sale = new Sale();
+        sale.setId(1L);
+        sale.setTotal(500.0);
+    }
+
+    @Test
+    void testCreateClaim_success() {
+        // Arrange
+        Long saleId = 1L;
+        Map<Long, Integer> items = new HashMap<>();
+        items.put(1L, 2);
+
+        when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
+        when(saleDetailsRepository.findById(1L)).thenReturn(Optional.of(saleDetail));
+        when(claimRepository.save(any(Claim.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Claim claim = claimService.createClaim(saleId, "Desc", items);
+
+        // Assert
+        assertNotNull(claim);
+        assertEquals(sale, claim.getSale());
+        assertEquals("Desc", claim.getDescription());
+        assertEquals(Claim.State.INITIATED, claim.getState());
+        assertEquals(1, claim.getClaimDetails().size());
+        ClaimDetails detail = claim.getClaimDetails().get(0);
+        assertEquals(2, detail.getQuantity());
+        assertEquals(saleDetail, detail.getSaleDetails());
+        verify(claimRepository, times(1)).save(claim);
+    }
+
+    @Test
+    void testCreateClaim_saleNotFound() {
+        // Arrange
+        when(saleRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> claimService.createClaim(99L, "X", Collections.emptyMap()));
+        assertTrue(ex.getMessage().contains("Venta no encontrada"));
+    }
+
+    @Test
+    void testUploadProof() {
+        // Arrange
+        Claim claim = new Claim();
+        claim.setId(1L);
+        when(claimRepository.findById(1L)).thenReturn(Optional.of(claim));
+        when(claimRepository.save(claim)).thenReturn(claim);
+
+        // Act
+        Claim result = claimService.uploadProof(1L, "file.jpg");
+
+        // Assert
+        assertEquals(result.getState(), Claim.State.PROOF_UPLOADED);
+        verify(claimRepository).save(claim);
+    }
+
+    @Test
+    void testApproveRefund() {
+        // Arrange
+        Claim claim = new Claim();
+        claim.setId(1L);
+        claim.setSale(sale);
+        ClaimDetails cd = new ClaimDetails();
+        cd.setQuantity(1);
+        cd.setSaleDetails(saleDetail);
+        claim.setClaimDetails(Arrays.asList(cd));
+
+
+        when(claimRepository.findById(1L)).thenReturn(Optional.of(claim));
+
+        claimService.uploadProof(1L, "file.jpg");
+        // Act
+        Claim result = claimService.approveRefund(1L);
+
+        // Assert
+        assertEquals(Claim.State.REFUND_PROCESSED, result.getState());
+        assertEquals(400.0, sale.getTotal());
+    }
+
+/*    @Test
+    void testReceivePackage_deleteSale() {
+        // Arrange
+        Claim claim = new Claim();
+        claim.setId(1L);
+        claim.setSale(sale);
+        claim.setState(Claim.State.PROOF_UPLOADED); // Estado necesario para receivePackage
+
+        ClaimDetails cd = new ClaimDetails();
+        cd.setQuantity(5);
+        cd.setSaleDetails(saleDetail);
+        claim.setClaimDetails(Collections.singletonList(cd));
+
+        when(claimRepository.findById(1L)).thenReturn(Optional.of(claim));
+
+        // Configuración crítica: simula que no quedan detalles de venta
+        when(saleDetailsRepository.findBySaleId(sale.getId()))
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        Claim result = claimService.receivePackage(1L);
+
+        // Assert
+        verify(saleRepository).delete(sale);
+        assertEquals(Claim.State.PACKAGE_RECEIVED, result.getState());
+    }*/
+
+
+    @Test
+    void testGetAllClaims() {
+        // Arrange
+        List<Claim> list = Arrays.asList(new Claim(), new Claim());
+        when(claimRepository.findAll()).thenReturn(list);
+
+        // Act
+        List<Claim> result = claimService.getAllClaims();
+
+        // Assert
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void testGetClaimById_notFound() {
+        // Arrange
+        when(claimRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        EntityNotFoundException ex = assertThrows(EntityNotFoundException.class,
+                () -> claimService.getClaimById(1L));
+        assertTrue(ex.getMessage().contains("Reclamo no encontrado"));
+    }
+
+    @Test
+    void testGetClaimsByState() {
+        // Arrange
+        Claim.State state = Claim.State.INITIATED;
+        List<Claim> list = Collections.singletonList(new Claim());
+        when(claimRepository.findByState(state)).thenReturn(list);
+
+        // Act
+        List<Claim> result = claimService.getClaimsByState(state);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(state, result.get(0).getState());
+    }
+}

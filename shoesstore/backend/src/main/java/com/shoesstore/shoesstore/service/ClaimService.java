@@ -159,7 +159,7 @@ public class ClaimService {
 
 
         //Revisamos si la venta quedo sin ninguno de los detalles
-        if(claim.getSaleDetails().isEmpty()) {
+        if(claim.getSaleDetails() == null || claim.getSaleDetails().isEmpty() ) {
             //En ese caso borramos la venta
             saleRepository.delete(claim.getSale());
         }

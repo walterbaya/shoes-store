@@ -38,9 +38,6 @@ public class DashboardController {
         model.addAttribute("dailyEarnings", dailyEarnings);
         model.addAttribute("ultimasCompras", pastFiveDaysFromNowSales);
 
-        //pendingOrders (entero) Falta desarrollar el modulo de ordenes
-        //salesLabels y salesData para el gráfico
-
         return "layout";  // Usa el archivo layout.html
     }
 }
