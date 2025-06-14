@@ -116,10 +116,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="detail : ${claim.saleDetails}">
-                    <td th:text="${detail.product.name}"></td>
+                <tr th:each="detail : ${claim.claimDetails}">
+                    <td th:text="${detail.saleDetails.product.name}"></td>
                     <td th:text="${detail.quantity}"></td>
-                    <td th:text="${#numbers.formatDecimal(detail.product.price, 1, 2)}"></td>
+                    <td th:text="${#numbers.formatDecimal(detail.saleDetails.product.price,1,2)}"></td>
                 </tr>
                 </tbody>
             </table>

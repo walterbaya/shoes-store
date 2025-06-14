@@ -66,48 +66,17 @@ public class ClaimService {
 
         return claimRepository.save(claim);
 
-        // Procesar cada item reclamado
-        /*List<SaleDetails> claimedDetails = new ArrayList<>();*/
-
-       /* claimItems.forEach((saleDetailId, quantity) -> {
-            SaleDetails detail = saleDetailsRepository.findById(saleDetailId)
-                    .orElseThrow(() -> new EntityNotFoundException("Detalle de venta no encontrado"));
-
-            // Validar que la cantidad reclamada no exceda la comprada
-            if (quantity > detail.getQuantity()) {
-                throw new IllegalArgumentException("La cantidad reclamada no puede ser mayor a la comprada");
-            }
-
-            // Si se reclama la cantidad completa
-            if (quantity == detail.getQuantity()) {
-                //Borramos el detalle de venta, porque es una venta que se elimina
-                saleDetailsRepository.delete(detail);
-            }
-            // Si es un reclamo parcial
-            else {
-                // Crear un nuevo detalle para el reclamo parcial
-
-                //Hay que actualizar los saleDetails unicamente, sus cantidades
-                detail.setQuantity(detail.getQuantity() - quantity);
-                detail.setSubtotal(detail.getSubtotal() - detail.getProduct().getPrice() * detail.getQuantity());
-
-                saleDetailsRepository.save(detail);
-            }
-        });*/
-    }
-
-    //Obtener todos los reclamos
-    public List<Claim> getAllClaims() {
-        return claimRepository.findAll();
     }
 
     // Subir comprobante de despacho
+    @Transactional
     public Claim uploadProof(Long claimId, String fileName) {
         Claim claim = getClaimById(claimId);
         claim.uploadProof(fileName); // Solo almacena el nombre del archivo
         return claimRepository.save(claim);
     }
     // Aprobar devolución y procesar reembolso
+
     @Transactional
     public Claim approveRefund(Long claimId) {
         Claim claim = getClaimById(claimId);
@@ -135,6 +104,7 @@ public class ClaimService {
     // Recibir paquete y actualizar stock
     @Transactional
     public Claim receivePackage(Long claimId) {
+        System.out.println("El claim id en receive package es: " + claimId);
         Claim claim = getClaimById(claimId);
         claim.receivePackage();
 
@@ -159,13 +129,18 @@ public class ClaimService {
 
 
         //Revisamos si la venta quedo sin ninguno de los detalles
-        if(claim.getSaleDetails().isEmpty()) {
+        if(claim.getSaleDetails() == null || claim.getSaleDetails().isEmpty() ) {
             //En ese caso borramos la venta
             saleRepository.delete(claim.getSale());
         }
 
         return claim;
 
+    }
+
+    //Obtener todos los reclamos
+    public List<Claim> getAllClaims() {
+        return claimRepository.findAll();
     }
 
     public Claim getClaimById(Long id) {

@@ -14,7 +14,7 @@ public class ClaimDetails {
         private Long id;
 
         @ManyToOne(optional = false)
-        @JoinColumn(name = "claim_id", referencedColumnName = "id")
+        @JoinColumn(name = "claim_id", nullable = false)
         private Claim claim;
 
         @ManyToOne(optional = false)

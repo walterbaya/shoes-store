@@ -20,10 +20,6 @@ public class Claim {
     @JoinColumn(name = "sale_id", nullable = false, unique = true)
     private Sale sale;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    @JoinColumn(name = "sale_detail_id", referencedColumnName = "id")
-    private List<SaleDetails> saleDetails;
-
     @OneToMany(mappedBy = "claim", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<ClaimDetails> claimDetails;
 
