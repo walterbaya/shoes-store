@@ -1,0 +1,72 @@
+package com.shoesstore.shoesstore.service;
+
+import com.shoesstore.shoesstore.model.Product;
+import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.repository.ProductRepository;
+import com.shoesstore.shoesstore.repository.SupplierRepository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class SupplierService {
+
+    private final SupplierRepository supplierRepo;
+    private final ProductRepository productRepo;
+
+    public SupplierService(SupplierRepository supplierRepo,
+                           ProductRepository productRepo) {
+        this.supplierRepo = supplierRepo;
+        this.productRepo  = productRepo;
+    }
+
+    @Transactional
+    public Supplier registerSupplier(Supplier supplier) {
+        // Extract product IDs from the incoming Supplier entity
+        Set<Long> ids = supplier.getProducts()
+                .stream()
+                .map(Product::getId)
+                .collect(Collectors.toSet());
+        // Load the real Product entities
+        List<Product> products = productRepo.findAllById(ids);
+
+        // Clear any stub references and re-associate
+        supplier.getProducts().clear();
+        products.forEach(supplier::addProduct);
+
+        return supplierRepo.save(supplier);
+    }
+
+    @Transactional
+    public Supplier updateSupplier(Long supplierId, Supplier supplierData) {
+        Supplier existing = supplierRepo.findById(supplierId)
+                .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
+
+        // Extract new product IDs
+        Set<Long> newIds = supplierData.getProducts()
+                .stream()
+                .map(Product::getId)
+                .collect(Collectors.toSet());
+        List<Product> newProducts = productRepo.findAllById(newIds);
+
+        // Remove old associations
+        existing.getProducts().forEach(p -> p.getSuppliers().remove(existing));
+        existing.getProducts().clear();
+
+        // Add new ones
+        newProducts.forEach(existing::addProduct);
+        // Optionally update name
+        existing.setName(supplierData.getName());
+
+        return supplierRepo.save(existing);
+    }
+}
+
+

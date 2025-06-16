@@ -1,0 +1,4 @@
+package com.shoesstore.shoesstore.controller;
+
+public class SupplierController {
+}

@@ -50,7 +50,7 @@ public class Product {
         }
     }
 
-    @ManyToMany(mappedBy = "productos", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(mappedBy = "products", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private Set<Supplier> suppliers;
 
     public String getFormattedPrice() {
