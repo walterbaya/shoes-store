@@ -1,36 +1,62 @@
 package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @Table(name = "product")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "suppliers")
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     @Column(name = "id")
     private Long id;
 
     @NotNull(message = "El nombre es obligatorio")
+    @Column(nullable = false)
     private String name;
 
-    private String description;  // Campo nuevo
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "La talla es obligatoria")
+    @Column(nullable = false)
     private ShoeSize size;
 
     @Min(value = 0, message = "El precio no puede ser negativo")
-    private double price;  // Campo nuevo
+    @Column(nullable = false)
+    private Double price = 0.0;  // Valor por defecto asignado
 
     @Min(value = 0, message = "El stock no puede ser negativo")
-    private int stock;
+    @Column(nullable = false)
+    private Integer stock = 0;   // Valor por defecto asignado
+
+    @Min(value = 0, message = "El nivel de reorden no puede ser negativo")
+    @Column(nullable = false)
+    private Integer reorderLevel = 0;  // Valor por defecto asignado
+
+    @Min(value = 0, message = "La cantidad de reorden no puede ser negativa")
+    @Column(nullable = false)
+    private Integer reorderQuantity = 0;  // Valor por defecto asignado
+
+    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de compra debe ser positivo")
+    @Column(nullable = false)
+    private BigDecimal purchasePrice = BigDecimal.ZERO;  // Valor por defecto asignado
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -50,8 +76,11 @@ public class Product {
         }
     }
 
-    @ManyToMany(mappedBy = "productos", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    private Set<Supplier> suppliers;
+    @ManyToMany(mappedBy = "products", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    private Set<Supplier> suppliers = new HashSet<>();
+
+    @OneToMany(mappedBy="product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SupplierProduct> supplierProducts = new HashSet<>();
 
     public String getFormattedPrice() {
         return String.format("$%.2f", this.price);

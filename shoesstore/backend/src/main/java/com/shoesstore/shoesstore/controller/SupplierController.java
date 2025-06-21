@@ -1,39 +1,64 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.service.SupplierService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.util.List;
 
-@RestController
-@RequestMapping("/api/suppliers")
+@Controller
+@RequestMapping("/suppliers")
 public class SupplierController {
-
     private final SupplierService supplierService;
+    private final ProductRepository productRepository;
 
-    public SupplierController(SupplierService supplierService) {
+    public SupplierController(SupplierService supplierService, ProductRepository productRepository) {
         this.supplierService = supplierService;
+        this.productRepository = productRepository;
     }
 
-    // Only ADMIN can create a supplier
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    public ResponseEntity<Supplier> createSupplier(@RequestBody @Valid Supplier supplier) {
-        Supplier created = supplierService.registerSupplier(supplier);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    @GetMapping
+    public String list(Model model) {
+        model.addAttribute("suppliers", supplierService.findAll());
+        model.addAttribute("view", "suppliers/view");
+        return "layout";
     }
 
-    // Only ADMIN can update a supplier
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<Supplier> updateSupplier(
-            @PathVariable Long id,
-            @RequestBody @Valid Supplier supplier) {
-        Supplier updated = supplierService.updateSupplier(id, supplier);
-        return ResponseEntity.ok(updated);
+    @GetMapping("/new")
+    public String newSupplier(Model model) {
+        model.addAttribute("supplier", new Supplier());
+        model.addAttribute("products", productRepository.findAll());
+        model.addAttribute("view", "suppliers/new");
+        return "layout";
+    }
+
+    @PostMapping("/save")
+    public String save(@ModelAttribute Supplier supplier,
+                       @RequestParam("productIds") List<Long> productIds,
+                       @RequestParam("prices") List<BigDecimal> prices) {
+        supplierService.save(supplier, productIds, prices);
+        return "redirect:/suppliers";
+    }
+
+    @GetMapping("/update/{id}")
+    public String edit(@PathVariable Long id, Model model) {
+        model.addAttribute("supplier", supplierService.findById(id));
+        model.addAttribute("products", productRepository.findAll());
+        model.addAttribute("view", "suppliers/new");
+        return "layout";
+    }
+
+    @PostMapping("/update/{id}")
+    public String update(@PathVariable Long id,
+                         @ModelAttribute Supplier supplier,
+                         @RequestParam("productIds") List<Long> productIds,
+                         @RequestParam("prices") List<BigDecimal> prices) {
+        supplierService.update(id, supplier, productIds, prices);
+        return "redirect:/suppliers";
     }
 }
+

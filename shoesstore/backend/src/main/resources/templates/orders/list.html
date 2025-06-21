@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Órdenes de Compra</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Órdenes de Compra</h1>
+    <a href="/orders/create" class="btn btn-primary mb-3">Crear Orden de Compra</a>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Proveedor</th>
+            <th>Fecha Generada</th>
+            <th>Completada</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.supplier.name}"></td>
+            <td th:text="${order.generatedDate}"></td>
+            <td th:text="${order.completed} ? 'Sí' : 'No'"></td>
+            <td>
+                <a th:href="@{'/orders/' + ${order.id}}" class="btn btn-info btn-sm">Detalle</a>
+                <form th:action="@{'/orders/' + ${order.id} + '/complete'}" method="post" th:if="${!order.completed}" style="display:inline-block">
+                    <button type="submit" class="btn btn-success btn-sm">Completar</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

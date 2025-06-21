@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Proveedores</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4" th:fragment="content">
+    <h2>Lista de Proveedores (<span th:text="${#lists.size(suppliers)}">0</span>)</h2>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Productos</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="supplier : ${suppliers}">
+                <td th:text="${supplier.id}">1</td>
+                <td th:text="${supplier.name}">Proveedor X</td>
+                <td>
+                    <ul>
+                        <li th:each="prod : ${supplier.products}" th:text="${prod.name}"></li>
+                    </ul>
+                </td>
+                <td>
+                    <a th:href="@{/suppliers/update/{id}(id=${supplier.id})}" class="btn btn-sm btn-warning">Editar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/suppliers/new}" class="btn btn-primary mt-3">Registrar Nuevo Proveedor</a>
+</div>
+</body>
+</html>

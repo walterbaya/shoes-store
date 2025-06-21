@@ -2,79 +2,78 @@ package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.model.SupplierProduct;
+import com.shoesstore.shoesstore.model.SupplierProductId;
 import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.repository.SupplierRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Map;
 
 import jakarta.persistence.EntityNotFoundException;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class SupplierService {
+    private final SupplierRepository supplierRepository;
+    private final ProductRepository productRepository;
 
-    private final SupplierRepository supplierRepo;
-    private final ProductRepository productRepo;
-
-    public SupplierService(SupplierRepository supplierRepo,
-                           ProductRepository productRepo) {
-        this.supplierRepo = supplierRepo;
-        this.productRepo  = productRepo;
+    public SupplierService(SupplierRepository supplierRepository, ProductRepository productRepository) {
+        this.supplierRepository = supplierRepository;
+        this.productRepository = productRepository;
     }
 
     @Transactional
-    public Supplier registerSupplier(Supplier supplier) {
-        // Extract product IDs from the incoming Supplier entity
-        Set<Long> ids = supplier.getProducts()
-                .stream()
-                .map(Product::getId)
-                .collect(Collectors.toSet());
-        // Load the real Product entities
-        List<Product> products = productRepo.findAllById(ids);
-
-        // Clear any stub references and re-associate
+    public Supplier save(Supplier supplier, List<Long> productIds, List<BigDecimal> prices) {
         supplier.getProducts().clear();
-        products.forEach(supplier::addProduct);
-
-        return supplierRepo.save(supplier);
+        supplier.getProductPrices().clear();
+        for (int i = 0; i < productIds.size(); i++) {
+            Long pid = productIds.get(i);
+            BigDecimal pr = prices.get(i);
+            productRepository.findById(pid).ifPresent(prod -> {
+                supplier.getProducts().add(prod);
+                supplier.getProductPrices().put(pid, pr);
+            });
+        }
+        return supplierRepository.save(supplier);
     }
 
     @Transactional
-    public Supplier updateSupplier(Long supplierId, Supplier supplierData) {
-        Supplier existing = supplierRepo.findById(supplierId)
-                .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
-
-        // Extract new product IDs
-        Set<Long> newIds = supplierData.getProducts()
-                .stream()
-                .map(Product::getId)
-                .collect(Collectors.toSet());
-        List<Product> newProducts = productRepo.findAllById(newIds);
-
-        // Remove old associations
-        existing.getProducts().forEach(p -> p.getSuppliers().remove(existing));
-        existing.getProducts().clear();
-
-        // Add new ones
-        newProducts.forEach(existing::addProduct);
-        // Optionally update name
-        existing.setName(supplierData.getName());
-
-        return supplierRepo.save(existing);
+    public Supplier saveWithPrices(Supplier supplier, List<Long> prodIds, Map<String,String> params){
+        supplierRepository.save(supplier);
+        for(Long pid : prodIds){
+            String key = "price_" + pid;
+            BigDecimal price = new BigDecimal(params.get(key));
+            SupplierProduct sp = new SupplierProduct(new SupplierProductId(supplier.getId(), pid), supplier, productRepository.findById(pid).get(), price);
+            supplier.getSupplierProducts().add(sp);
+        }
+        return supplierRepository.save(supplier);
     }
+
+
+    @Transactional
+    public void update(Long id, Supplier datos, List<Long> productIds, List<BigDecimal> prices) {
+        Supplier existing = supplierRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
+        existing.setName(datos.getName());
+        existing.setEmail(datos.getEmail());
+        existing.getProducts().clear();
+        existing.getProductPrices().clear();
+        for (int i = 0; i < productIds.size(); i++) {
+            Long pid = productIds.get(i);
+            BigDecimal pr = prices.get(i);
+            productRepository.findById(pid).ifPresent(prod -> {
+                existing.getProducts().add(prod);
+                existing.getProductPrices().put(pid, pr);
+            });
+        }
+        supplierRepository.save(existing);
+    }
+
+    public List<Supplier> findAll() { return supplierRepository.findAll(); }
+    public Supplier findById(Long id) { return supplierRepository.findById(id).orElse(null); }
 }
 
 

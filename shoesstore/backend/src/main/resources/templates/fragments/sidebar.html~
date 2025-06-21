@@ -32,6 +32,7 @@
                     <span class="fw-medium text-secondary">Compras</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','SELLER')">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
                    th:href="@{/sales}">

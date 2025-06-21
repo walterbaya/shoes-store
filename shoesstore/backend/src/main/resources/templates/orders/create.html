@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Orden de Compra</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Crear Orden de Compra</h1>
+    <a href="/orders" class="btn btn-secondary mb-3">Volver a Órdenes</a>
+    <form th:action="@{/orders/create}" method="post">
+        <div class="form-group">
+            <label for="supplierSelect">Proveedor</label>
+            <select id="supplierSelect" name="supplierId" class="form-control" required>
+                <option value="" disabled selected>Seleccione un proveedor</option>
+                <option th:each="supplier : ${productsToBuyBySupplier.keySet()}"
+                        th:value="${supplier.id}"
+                        th:text="${supplier.name}">Proveedor</option>
+            </select>
+        </div>
+
+        <div id="productsContainer" class="mt-3">
+            <div th:each="entry : ${productsToBuyBySupplier.entrySet()}"
+                 th:attr="data-supplier-id=${entry.key.id}"
+                 style="display:none;">
+                <h4 th:text="${entry.key.name}">Proveedor</h4>
+                <table class="table table-sm">
+                    <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock Actual</th>
+                        <th>Nivel Mínimo</th>
+                        <th>Cantidad a Comprar</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="prod : ${entry.value}">
+                        <td th:text="${prod.name}"></td>
+                        <td th:text="${prod.stock}"></td>
+                        <td th:text="${prod.reorderLevel}"></td>
+                        <td>
+                            <input type="number" min="0"
+                                   th:name="${'product_' + prod.id}"
+                                   value="0"
+                                   class="form-control"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generar Orden</button>
+    </form>
+</div>
+
+<script>
+    const supplierSelect = document.getElementById('supplierSelect');
+    const productsContainer = document.getElementById('productsContainer');
+
+    supplierSelect.addEventListener('change', () => {
+        const selectedId = supplierSelect.value;
+        productsContainer.querySelectorAll('div[data-supplier-id]').forEach(div => {
+            div.style.display = (div.getAttribute('data-supplier-id') === selectedId) ? '' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
+
