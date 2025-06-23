@@ -13,6 +13,8 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @Embeddable
+@AllArgsConstructor
+@Embeddable
 public class SupplierProductId implements Serializable {
     @Column(name="supplier_id")
     private Long supplierId;

@@ -1,6 +1,7 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.model.SupplierProduct;
 import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.service.SupplierService;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/suppliers")
@@ -37,20 +40,29 @@ public class SupplierController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute Supplier supplier,
-                       @RequestParam("productIds") List<Long> productIds,
-                       @RequestParam("prices") List<BigDecimal> prices) {
+    public String save(@ModelAttribute Supplier supplier, @RequestParam("productIds") List<Long> productIds, @RequestParam("prices") List<BigDecimal> prices) {
         supplierService.save(supplier, productIds, prices);
         return "redirect:/suppliers";
     }
 
     @GetMapping("/update/{id}")
     public String edit(@PathVariable Long id, Model model) {
-        model.addAttribute("supplier", supplierService.findById(id));
+        Supplier supplier = supplierService.findById(id);
+        model.addAttribute("supplier", supplier);
         model.addAttribute("products", productRepository.findAll());
+
+        // Extraemos precios por producto
+        Map<Long, BigDecimal> priceMap = supplier.getSupplierProducts().stream()
+                .collect(Collectors.toMap(
+                        sp -> sp.getProduct().getId(),
+                        SupplierProduct::getPrice
+                ));
+        model.addAttribute("productPrices", priceMap);
+
         model.addAttribute("view", "suppliers/new");
         return "layout";
     }
+
 
     @PostMapping("/update/{id}")
     public String update(@PathVariable Long id,

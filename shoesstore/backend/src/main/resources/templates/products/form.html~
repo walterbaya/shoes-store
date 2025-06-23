@@ -6,7 +6,7 @@
     <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
 </head>
 <body>
-<div th:fragment="content" class="container mt-4">
+<div th:fragment="content">
     <h1 class="h2 mb-4" th:text="${product.id} ? 'Editar Producto' : 'Nuevo Producto'"></h1>
 
     <form th:action="@{/products/save}" th:object="${product}" method="post">

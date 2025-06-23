@@ -7,11 +7,10 @@ import com.shoesstore.shoesstore.model.Supplier;
 import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.repository.PurchaseOrderRepository;
 import com.shoesstore.shoesstore.repository.SupplierRepository;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class PurchaseOrderService {
                     item.setOrder(po);
                     item.setProduct(p);
                     item.setQuantity(e.getValue());
-                    item.setPurchasePrice(p.getPurchasePrice());
+                    item.setPurchasePrice(BigDecimal.valueOf(p.getPrice()]));
                     return item;
                 }).collect(Collectors.toList());
 

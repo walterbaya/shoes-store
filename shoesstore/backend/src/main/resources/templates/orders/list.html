@@ -1,21 +1,24 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Órdenes de Compra</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container mt-3">
-    <h1>Órdenes de Compra</h1>
-    <a href="/orders/create" class="btn btn-primary mb-3">Crear Orden de Compra</a>
-    <table class="table table-bordered">
-        <thead>
+<div th:fragment="content card shadow">
+    <div class="card-header bg-primary text-white">
+        <h1 class="h4 mb-0">Órdenes de Compra</h1>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+
+        <div></div>
+        <a href="/orders/create" class="btn btn-primary btn-lg"><i class="bi bi-plus-circle me-2"></i>Crear Orden de Compra</a>
+
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+        <thead class="table-light">
         <tr>
-            <th>ID</th>
-            <th>Proveedor</th>
-            <th>Fecha Generada</th>
-            <th>Completada</th>
-            <th>Acciones</th>
+            <th class="py-3">ID</th>
+            <th class="py-3">Proveedor</th>
+            <th class="py-3">Fecha Generada</th>
+            <th class="py-3">Completada</th>
+            <th class="py-3">Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -33,6 +36,39 @@
         </tr>
         </tbody>
     </table>
+    </div>
 </div>
-</body>
-</html>
+
+<style>
+    .card.shadow {
+        border-radius: 0.75rem;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .card.shadow:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .card-header.bg-primary {
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .card-text.display-5 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+    }
+
+    #salesChart {
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+</style>

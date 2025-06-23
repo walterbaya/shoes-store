@@ -6,6 +6,8 @@
 </head>
 <body>
 <div class="container mt-3">
+    <a href="/orders" class="btn btn-secondary mb-3">Volver a Órdenes</a>
+
     <h1>Detalle Orden #<span th:text="${order.id}"></span></h1>
     <p><strong>Proveedor:</strong> <span th:text="${order.supplier.name}"></span></p>
     <p><strong>Fecha Generada:</strong> <span th:text="${order.generatedDate}"></span></p>
@@ -21,17 +23,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="item : ${order.items}">
+        <tr th:each="item : ${filteredItems}">
             <td th:text="${item.product.name}"></td>
             <td th:text="${item.quantity}"></td>
-            <td th:text="${item.purchasePrice}"></td>
-            <td th:text="${#numbers.formatDecimal(item.purchasePrice * item.quantity, 2, 'POINT',  ',',  'NONE')}"></td>
+            <td th:text="${#numbers.formatDecimal(item.purchasePrice, 1, 2)}"></td>
+            <td th:text="${#numbers.formatDecimal(item.purchasePrice * item.quantity, 1, 2)}"></td>
         </tr>
         </tbody>
         <tfoot>
         <tr>
             <td colspan="3"><strong>Total</strong></td>
-            <td th:text="${#numbers.formatDecimal(order.items.stream().mapToDouble(i->i.purchasePrice*i.quantity).sum(), 2, 'POINT', ',', 'NONE')}"></td>
+            <td th:text="${#numbers.formatDecimal(total, 1, 2)}"></td>
         </tr>
         </tfoot>
     </table>

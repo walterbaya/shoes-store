@@ -1,8 +1,6 @@
-<div class="card shadow-lg border-0">
+<div th:fragment="content card shadow">
   <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
     <h1 class="h4 mb-0">Reporte de Ventas</h1>
-
-
 	<div class="d-flex align-items-center gap-2">
 	    <!-- Contenedor de fechas -->
 	    <div id="dateSelectors" class="d-flex align-items-center gap-2">
@@ -71,40 +69,9 @@
     --text-color: #212529;
   }
 
-  /* Contenedor */
-  .container.mt-4 {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  /* Tarjeta */
-  .card.shadow {
-    border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  }
-
   .card-header.bg-primary {
-    background-color: var(--primary-color) !important;
-    border-radius: 0.75rem 0.75rem 0 0;
-    padding: 1.25rem 1.5rem;
-  }
-
-  .card-header h4.mb-0 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #fff;
-  }
-
-  .card-body {
-    padding: 1.5rem;
-  }
-
-  /* Form labels y controles */
-  .form-label.fw-bold {
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-    display: block;
+      border-radius: 0.75rem 0.75rem 0 0;
+      padding: 1.25rem 1.5rem;
   }
 
   .form-select.form-select-lg,
@@ -126,36 +93,6 @@
   }
 
   /* Productos seleccionados */
-  .border-top.pt-3 {
-    border-top: 2px solid var(--border-color);
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .card.mb-3.product-card {
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    transition: transform 0.2s ease-in-out;
-  }
-
-  .card.mb-3.product-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-  }
-
-  .card-body .row.align-items-center {
-    padding: 1rem 0;
-  }
-
-  .card-title.mb-1 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-color);
-  }
-
-  .text-muted.small {
-    font-size: 0.9rem;
-  }
 
   .input-group {
     border-radius: 0.5rem;
@@ -177,45 +114,12 @@
     color: #aaa;
   }
 
-  /* Pie de formulario */
-  .card-footer.bg-light {
-    background-color: var(--light-bg) !important;
-    border-radius: 0 0 0.75rem 0.75rem;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .btn.btn-primary.btn-lg.w-100 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    box-shadow: 0 0.25rem 0.5rem rgba(var(--primary-color-rgb), 0.25);
-    transition: filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-
-  .btn.btn-primary.btn-lg.w-100:hover {
-    filter: brightness(0.9);
-    box-shadow: 0 0.3rem 0.7rem rgba(var(--primary-color-rgb), 0.3);
-  }
 
   .btn.btn-primary.btn-lg.w-100 i {
     font-size: 1.2rem;
     vertical-align: middle;
   }
 
-  /* Buscador de productos */
-  #searchProducts {
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-  }
-
-  #searchProducts:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
-  }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

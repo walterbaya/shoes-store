@@ -9,8 +9,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "supplier_product")
 public class SupplierProduct {
     @EmbeddedId
@@ -28,5 +28,15 @@ public class SupplierProduct {
 
     @Column(nullable = false)
     private BigDecimal price;
+
+    // Constructor sin args necesario
+    public SupplierProduct() {}
+
+    public SupplierProduct(Supplier supplier, Product product, BigDecimal price) {
+        this.id = new SupplierProductId(supplier.getId(), product.getId());
+        this.supplier = supplier;
+        this.product = product;
+        this.price = price;
+    }
 }
 

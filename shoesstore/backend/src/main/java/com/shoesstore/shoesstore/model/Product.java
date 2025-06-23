@@ -46,18 +46,6 @@ public class Product {
     @Column(nullable = false)
     private Integer stock = 0;   // Valor por defecto asignado
 
-    @Min(value = 0, message = "El nivel de reorden no puede ser negativo")
-    @Column(nullable = false)
-    private Integer reorderLevel = 0;  // Valor por defecto asignado
-
-    @Min(value = 0, message = "La cantidad de reorden no puede ser negativa")
-    @Column(nullable = false)
-    private Integer reorderQuantity = 0;  // Valor por defecto asignado
-
-    @DecimalMin(value = "0.0", inclusive = false, message = "El precio de compra debe ser positivo")
-    @Column(nullable = false)
-    private BigDecimal purchasePrice = BigDecimal.ZERO;  // Valor por defecto asignado
-
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum ShoeSize {
@@ -79,7 +67,7 @@ public class Product {
     @ManyToMany(mappedBy = "products", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     private Set<Supplier> suppliers = new HashSet<>();
 
-    @OneToMany(mappedBy="product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product")
     private Set<SupplierProduct> supplierProducts = new HashSet<>();
 
     public String getFormattedPrice() {

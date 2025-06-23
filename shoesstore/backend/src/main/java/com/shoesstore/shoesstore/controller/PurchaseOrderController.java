@@ -1,7 +1,6 @@
 package com.shoesstore.shoesstore.controller;
 
-import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.PurchaseOrderService;
 import com.shoesstore.shoesstore.service.SupplierService;
@@ -9,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,16 +41,15 @@ public class PurchaseOrderController {
     public String createForm(Model model) {
         List<Supplier> suppliers = supplierService.findAll();
 
-        Map<Supplier, List<Product>> productsToBuyBySupplier = suppliers.stream()
+        Map<Supplier, List<SupplierProduct>> productsToBuyBySupplier = suppliers.stream()
                 .collect(Collectors.toMap(
                         s -> s,
-                        s -> s.getProducts().stream()
-                                .filter(p -> p.getStock() <= p.getReorderLevel())
-                                .collect(Collectors.toList())
+                        s -> new ArrayList<>(s.getSupplierProducts())
                 ));
 
         model.addAttribute("productsToBuyBySupplier", productsToBuyBySupplier);
         model.addAttribute("view", "orders/create");
+
         return "layout";
     }
 
@@ -68,11 +68,26 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        model.addAttribute("order", purchaseOrderService.findById(id));
+    public String viewOrder(@PathVariable Long id, Model model) {
+        PurchaseOrder order = purchaseOrderService.findById(id);
+
+        // Filtrar items con cantidad > 0 y calcular total
+        List<PurchaseOrderItem> filteredItems = order.getItems().stream()
+                .filter(item -> item.getQuantity() > 0)
+                .collect(Collectors.toList());
+
+        BigDecimal total = filteredItems.stream()
+                .map(item -> item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("order", order);
+        model.addAttribute("filteredItems", filteredItems);
+        model.addAttribute("total", total);
         model.addAttribute("view", "orders/detail");
+
         return "layout";
     }
+
 
     @PostMapping("/{id}/complete")
     public String complete(@PathVariable Long id) {

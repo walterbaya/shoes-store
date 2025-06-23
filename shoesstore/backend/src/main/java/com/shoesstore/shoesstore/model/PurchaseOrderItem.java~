@@ -29,5 +29,4 @@ public class PurchaseOrderItem {
     private int quantity;
     private BigDecimal purchasePrice;
 
-    // getters/setters
 }

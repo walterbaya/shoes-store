@@ -29,18 +29,18 @@
                     <tr>
                         <th>Producto</th>
                         <th>Stock Actual</th>
-                        <th>Nivel Mínimo</th>
+                        <th>Precio de Compra</th>
                         <th>Cantidad a Comprar</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="prod : ${entry.value}">
-                        <td th:text="${prod.name}"></td>
-                        <td th:text="${prod.stock}"></td>
-                        <td th:text="${prod.reorderLevel}"></td>
+                        <td th:text="${prod.product.name}"></td>
+                        <td th:text="${prod.price}"></td>
+                        <td th:text="${prod.product.stock}"></td>
                         <td>
                             <input type="number" min="0"
-                                   th:name="${'product_' + prod.id}"
+                                   th:name="${'product_' + prod.product.id}"
                                    value="0"
                                    class="form-control"/>
                         </td>
