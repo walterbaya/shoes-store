@@ -7,7 +7,7 @@
         <div class="card-body">
 
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${success}" class="alert alert-danger" th:text="${success}"></div>
 
             <div class="row">
                 <!-- Canal de Venta -->

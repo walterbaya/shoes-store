@@ -27,7 +27,6 @@ public class SupplierController {
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("title", "Proveedores");
         model.addAttribute("suppliers", supplierService.findAll());
         model.addAttribute("view", "suppliers/view");
         return "layout";

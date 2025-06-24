@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +42,7 @@ public class SalesController {
         });
 
         // Agregar datos al modelo
+        model.addAttribute("title", "Ventas");
         model.addAttribute("saleForm", saleForm);
         model.addAttribute("channels", List.of("ONLINE", "TIENDA"));
         model.addAttribute("products", products);
@@ -50,27 +52,38 @@ public class SalesController {
     }
 
     @PostMapping
-    public String registerSale(@ModelAttribute("saleForm") SaleForm saleForm, BindingResult result, Model model) {
+    public String registerSale(
+            @ModelAttribute("saleForm") SaleForm saleForm,
+            BindingResult result,
+            RedirectAttributes redirectAttrs,    // ← inyectamos RedirectAttributes
+            Model model) {
+
         if (result.hasErrors()) {
             model.addAttribute("channels", Sale.SaleChannel.values());
             model.addAttribute("products", productService.getAllProducts());
-            return "sales/newSale";
+            redirectAttrs.addFlashAttribute("error", "Hubo un error al procesar la venta."); // ← flash
+            return "redirect:/sales";  // ← redirect igual
         }
 
-        // Procesar el formulario: Filtrar los ítems con cantidad > 0
+        // Filtrar ítems con qty > 0
+
         List<SaleItemForm> itemsToProcess = saleForm.getSaleItems().stream()
                 .filter(item -> item.getQuantity() != null && item.getQuantity() > 0)
                 .collect(Collectors.toList());
 
-        // Crear el objeto Sale (puedes ajustar según tu entidad)
-        Sale sale = new Sale();
-        sale.setChannel(Sale.SaleChannel.valueOf(saleForm.getChannel()));
-        sale.setSaleDate(LocalDateTime.now());
+        if (!itemsToProcess.isEmpty()) {
+            Sale sale = new Sale();
+            sale.setChannel(Sale.SaleChannel.valueOf(saleForm.getChannel()));
+            sale.setSaleDate(LocalDateTime.now());
 
-        // Asumiendo que tienes un método en saleService que construye la venta a partir del DTO
-        saleService.processSale(sale, itemsToProcess);
+            saleService.processSale(sale, itemsToProcess);
 
-        return "redirect:/sales"; // O redirigir a una vista de confirmación o listado de ventas
+            redirectAttrs.addFlashAttribute("success", "Venta registrada exitosamente."); // ← flash
+        }
+        else{
+            redirectAttrs.addFlashAttribute("error", "No se pueden vender 0 o menos productos."); // ← flash
+        }
+        return "redirect:/sales";
     }
 }
 

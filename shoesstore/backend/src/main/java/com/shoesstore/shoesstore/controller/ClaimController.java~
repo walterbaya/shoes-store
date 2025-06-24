@@ -34,7 +34,6 @@ public class ClaimController {
 
     @GetMapping
     public String listClaims(Model model) {
-        model.addAttribute("title", "Reclamos");
         model.addAttribute("claims", claimService.getAllClaims());
         model.addAttribute("view", "claims/list");
         return "layout";

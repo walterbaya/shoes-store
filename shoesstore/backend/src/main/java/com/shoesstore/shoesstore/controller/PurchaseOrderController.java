@@ -32,6 +32,7 @@ public class PurchaseOrderController {
 
     @GetMapping
     public String list(Model model) {
+        model.addAttribute("title", "Compras");
         model.addAttribute("orders", purchaseOrderService.findAll());
         model.addAttribute("view", "orders/list");
         return "layout";
