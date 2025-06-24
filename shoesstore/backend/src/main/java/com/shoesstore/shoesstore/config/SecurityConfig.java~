@@ -25,7 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,22 +41,23 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/dashboard", true)
+                        .defaultSuccessUrl("/dashboard")
                         .failureUrl("/login?error=true")
-                        .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
+                        .logoutUrl("/logout") // URL para cerrar sesión
+                        .logoutSuccessUrl("/login?logout") // Redirige al login tras logout
+                        .invalidateHttpSession(true) // Invalida la sesión actual
+                        .clearAuthentication(true) // Borra la autenticación
+                        .deleteCookies("JSESSIONID") // Elimina la cookie de sesión
                         .permitAll()
                 )
+
+
+                .userDetailsService(customUserDetailsService)
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/access-denied")
-                )
-                .userDetailsService(customUserDetailsService);
+                );
 
         return http.build();
     }
@@ -66,3 +67,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

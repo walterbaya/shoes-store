@@ -3,9 +3,12 @@ package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "claim_details")
 public class ClaimDetails {
 

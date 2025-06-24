@@ -129,7 +129,7 @@ public class ClaimService {
 
 
         //Revisamos si la venta quedo sin ninguno de los detalles
-        if(claim.getSaleDetails() == null || claim.getSaleDetails().isEmpty() ) {
+        if(claim.getSale().getDetails() == null || claim.getSale().getDetails().isEmpty() ) {
             //En ese caso borramos la venta
             saleRepository.delete(claim.getSale());
         }
@@ -140,7 +140,8 @@ public class ClaimService {
 
     //Obtener todos los reclamos
     public List<Claim> getAllClaims() {
-        return claimRepository.findAll();
+        List<Claim> res = claimRepository.findAll();
+        return res;
     }
 
     public Claim getClaimById(Long id) {

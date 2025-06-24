@@ -1,5 +1,6 @@
 package com.shoesstore.shoesstore.controller;
 
+import com.shoesstore.shoesstore.dto.ProductDto;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
@@ -24,30 +25,39 @@ public class SaleApiController {
     @Autowired
     private SaleService saleService;
 
-
     @GetMapping("/{saleId}/details")
     public List<SaleDetailResponse> getSaleDetails(@PathVariable Long saleId) {
-
         Sale sale = saleService.getSaleById(saleId);
-
         return sale.getDetails().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     private SaleDetailResponse convertToResponse(SaleDetails detail) {
-        SaleDetailResponse response = new SaleDetailResponse();
-        response.setId(detail.getId());
-        response.setProduct(detail.getProduct());
-        response.setQuantity(detail.getQuantity());
-        response.setSubtotal(detail.getSubtotal());
-        return response;
+        // Mapeo SaleDetails → SaleDetailResponse
+        SaleDetailResponse resp = new SaleDetailResponse();
+        resp.setId(detail.getId());
+        resp.setQuantity(detail.getQuantity());
+        resp.setSubtotal(detail.getSubtotal());
+
+        // Mapeo Product → ProductDto
+        var p = detail.getProduct();
+        ProductDto dto = new ProductDto();
+        dto.setId(p.getId());
+        dto.setName(p.getName());
+        dto.setDescription(p.getDescription());
+        dto.setSize(p.getSize().name());
+        dto.setPrice(p.getPrice());
+        dto.setStock(p.getStock());
+
+        resp.setProduct(dto);
+        return resp;
     }
 
     @Data
     private static class SaleDetailResponse {
         private Long id;
-        private Product product;
+        private ProductDto product;
         private int quantity;
         private double subtotal;
     }
