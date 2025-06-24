@@ -24,13 +24,6 @@ public class ReportRestController {
         return reportService.generateSalesReport("period", startDate, endDate);
     }
 
-    @GetMapping("/weekly-user-sales")
-    public Map<String, Object> weeklyUserSales(@RequestParam String startDate,
-                                        @RequestParam String endDate) {
-        return reportService.generateSalesReport("weekly-user-sales", startDate, endDate);
-    }
-
-
 
     @GetMapping("/daily")
     public Map<String, Object> daily(@RequestParam String startDate,

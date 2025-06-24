@@ -50,26 +50,32 @@ public class ReportService {
             endDate = parsedEnd.atTime(LocalTime.MAX);
         }
 
+        // Ajuste especial: si es daily, igualamos inicio y fin
+        if ("daily".equals(reportType)) {
+            LocalDate day = startDate.toLocalDate();
+            startDate = day.atStartOfDay();
+            endDate = day.atTime(LocalTime.MAX);
+        }
+
         // Ajustes de rango según tipo
         switch (reportType) {
             case "byUser":
             case "byProduct":
-                // Mes actual completo
                 startDate = endDate.minusMonths(1)
                         .withDayOfMonth(1)
                         .with(LocalTime.MIN);
                 break;
             case "period":
-                // Se usan startDate/endDate tal cual
                 break;
             case "weekly":
             case "weekly-user-sales":
-                // Última semana
                 startDate = endDate.minusWeeks(1)
                         .with(LocalTime.MIN);
                 break;
+            case "daily":
+                // ya está ajustado
+                break;
             default:
-                // Por defecto: última semana
                 reportType = "weekly";
                 startDate = endDate.minusWeeks(1)
                         .with(LocalTime.MIN);
@@ -77,19 +83,16 @@ public class ReportService {
 
         Map<String, Object> result = new HashMap<>();
 
-        // Reportes byUser / byProduct / weekly-user-sales reutilizan consultas agrupadas
-        if ("byUser".equals(reportType) || "weekly-user-sales".equals(reportType)) {
+        if ("byUser".equals(reportType)) {
             List<Object[]> raw = saleRepository.fetchSalesByUser(startDate, endDate);
             List<String> labels = new ArrayList<>();
             List<Number> values = new ArrayList<>();
             List<Map<String, Object>> rows = new ArrayList<>();
-
             for (Object[] o : raw) {
                 labels.add((String) o[0]);
                 values.add((Number) o[1]);
-                rows.add(Map.of("Usuario", o[0], "Ventas", o[1]));
+                rows.add(Map.of("Usuario", o[0], "Ventas", "$ " +  String.format("%.2f", o[1])));
             }
-
             result.put("labels", labels);
             result.put("datasets", List.of(
                     Map.of("label", "Ventas por Usuario", "data", values, "borderWidth", 1)
@@ -103,17 +106,15 @@ public class ReportService {
             List<String> labels = new ArrayList<>();
             List<Number> quantities = new ArrayList<>();
             List<Map<String, Object>> rows = new ArrayList<>();
-
             for (Object[] o : raw) {
                 labels.add((String) o[0]);
                 quantities.add((Number) o[1]);
                 rows.add(Map.of(
                         "Producto", o[0],
                         "Cantidad", o[1],
-                        "Total", String.format("%.2f", o[2])
+                        "Total", "$ " + String.format("%.2f", o[2])
                 ));
             }
-
             result.put("labels", labels);
             result.put("datasets", List.of(
                     Map.of("label", "Top Productos", "data", quantities, "borderWidth", 1)
@@ -122,29 +123,22 @@ public class ReportService {
             return result;
         }
 
-        // Reporte semanal genérico (weekly) o por defecto
         List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
         Map<String, Double> agg = new LinkedHashMap<>();
         List<Map<String, Object>> rows = new ArrayList<>();
-
         for (Sale s : sales) {
             String key = formatPeriod(s.getSaleDate(), reportType);
             agg.put(key, agg.getOrDefault(key, 0.0) + s.getTotal());
         }
-
-        // Preparamos labels y data para el gráfico
         List<String> labels = new ArrayList<>(agg.keySet());
         List<Number> data = new ArrayList<>(agg.values());
-
-        // Filas de la tabla
         for (Map.Entry<String, Double> e : agg.entrySet()) {
             rows.add(Map.of(
                     "periodo", e.getKey(),
-                    "Total en Ventas", e.getValue(),
+                    "Total en Ventas", "$ " + String.format("%.2f", e.getValue()),
                     "Cantidad de Ventas", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())
             ));
         }
-
         result.put("labels", labels);
         result.put("datasets", List.of(
                 Map.of("label", "Total de Ventas", "data", data, "borderWidth", 1)
@@ -164,6 +158,8 @@ public class ReportService {
                 LocalDate startOfWeek = date.toLocalDate()
                         .with(WeekFields.ISO.getFirstDayOfWeek());
                 return startOfWeek.format(DMY);
+            case "daily":
+                return date.format(DMY);
             default:
                 return date.format(DMY);
         }
