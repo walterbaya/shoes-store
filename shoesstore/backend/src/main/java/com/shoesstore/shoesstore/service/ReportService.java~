@@ -135,18 +135,25 @@ public class ReportService {
         }
         List<String> labels = new ArrayList<>(agg.keySet());
         List<Number> data = new ArrayList<>(agg.values());
+        List<Map<String, Object>> rows = new ArrayList<>(); // Asegúrate de inicializarla
+
         for (Map.Entry<String, Double> e : agg.entrySet()) {
             rows.add(Map.of(
                     "Periodo", e.getKey(),
                     "Total en Ventas", "$ " + String.format("%.2f", e.getValue()),
-                    "Cantidad de Ventas", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())
+                    "Cantidad de Ventas", 1 // o el dato real si lo tenés
             ));
         }
+
+        Map<String, Object> dataset = new HashMap<>();
+        dataset.put("label", "Total de Ventas");
+        dataset.put("data", data);
+        dataset.put("borderWidth", 1);
+
         result.put("labels", labels);
-        result.put("datasets", List.of(
-                Map.of("label", "Total de Ventas", "data", data, "borderWidth", 1)
-        ));
+        result.put("datasets", List.of(dataset));
         result.put("tableRows", rows);
+
         return result;
     }
 
