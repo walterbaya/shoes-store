@@ -60,6 +60,9 @@ public class ReportService {
         // Ajustes de rango según tipo
         switch (reportType) {
             case "byUser":
+                startDate = startDate.withHour(0).withMinute(0)
+                        .with(LocalTime.MIN);
+                break;
             case "byProduct":
                 startDate = endDate.minusMonths(1)
                         .withDayOfMonth(1)

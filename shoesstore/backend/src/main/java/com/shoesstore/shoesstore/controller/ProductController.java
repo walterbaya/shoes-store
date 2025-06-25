@@ -32,7 +32,8 @@ public class ProductController {
     public String showProductForm(Model model) {
         model.addAttribute("product", new Product());
         model.addAttribute("shoeSizes", Product.ShoeSize.values()); // Pasa los valores del enum
-        return "products/form";
+        model.addAttribute("view", "products/form");
+        return "layout";
     }
 
     @PostMapping("/save")
@@ -52,7 +53,8 @@ public class ProductController {
         Product product = productService.getProductById(id);
         model.addAttribute("product", product);
         model.addAttribute("allSizes", Product.ShoeSize.values()); // Si usas el enum de tallas
-        return "products/form"; // Reutiliza el mismo formulario para crear/editar
+        model.addAttribute("view", "products/form");
+        return "layout"; // Reutiliza el mismo formulario para crear/editar
     }
 
     @PostMapping("/update/{id}")

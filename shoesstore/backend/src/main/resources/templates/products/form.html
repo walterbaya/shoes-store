@@ -1,12 +1,4 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Nuevo Producto</title>
-    <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
-</head>
-<body>
-<div th:fragment="content" class="container mt-4">
+<div th:fragment="content card shadow" class="container mt-4">
     <h1 class="h2 mb-4" th:text="${product.id} ? 'Editar Producto' : 'Nuevo Producto'"></h1>
 
     <form th:action="@{/products/save}" th:object="${product}" method="post">
@@ -50,5 +42,3 @@
         <a th:href="@{/products}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
-</body>
-</html>

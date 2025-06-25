@@ -42,4 +42,11 @@ public class ReportRestController {
                                          @RequestParam String endDate) {
         return reportService.generateSalesReport("byProduct", startDate, endDate);
     }
+
+    @GetMapping("/weekly-user-sales")
+    public Map<String, Object> weeklyUserSales(@RequestParam String startDate,
+                                               @RequestParam String endDate) {
+        return reportService.generateSalesReport("weekly-user-sales", startDate, endDate);
+    }
+
 }
