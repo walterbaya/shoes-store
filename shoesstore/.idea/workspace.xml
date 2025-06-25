@@ -6,12 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ReportRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ReportRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ReportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ReportService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/new.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/new.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,7 +214,7 @@
       <workItem from="1750607669402" duration="22268000" />
       <workItem from="1750716191360" duration="11098000" />
       <workItem from="1750775101625" duration="8280000" />
-      <workItem from="1750853585779" duration="4243000" />
+      <workItem from="1750853585779" duration="5293000" />
     </task>
     <servers />
   </component>
