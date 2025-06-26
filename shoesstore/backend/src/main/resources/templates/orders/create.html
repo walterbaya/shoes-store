@@ -3,12 +3,23 @@
 <head>
     <title>Crear Orden de Compra</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table thead th {
+            background-color: #e3f2fd;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-3">
     <h1>Crear Orden de Compra</h1>
     <a href="/orders" class="btn btn-secondary mb-3">Volver a Órdenes</a>
+
     <form th:action="@{/orders/create}" method="post">
+        <!-- Selector de proveedor -->
         <div class="form-group">
             <label for="supplierSelect">Proveedor</label>
             <select id="supplierSelect" name="supplierId" class="form-control" required>
@@ -19,12 +30,13 @@
             </select>
         </div>
 
+        <!-- Productos agrupados por proveedor -->
         <div id="productsContainer" class="mt-3">
             <div th:each="entry : ${productsToBuyBySupplier.entrySet()}"
                  th:attr="data-supplier-id=${entry.key.id}"
                  style="display:none;">
-                <h4 th:text="${entry.key.name}">Proveedor</h4>
-                <table class="table table-sm">
+                <h4 th:text="${entry.key.name}" class="mt-4 mb-3"></h4>
+                <table class="table table-bordered table-sm">
                     <thead>
                     <tr>
                         <th>Producto</th>
@@ -35,9 +47,9 @@
                     </thead>
                     <tbody>
                     <tr th:each="prod : ${entry.value}">
-                        <td th:text="${prod.product.name}"></td>
-                        <td th:text="${prod.price}"></td>
-                        <td th:text="${prod.product.stock}"></td>
+                        <td th:text="${prod.product.name}">Producto</td>
+                        <td th:text="${prod.product.stock}">0</td>
+                        <td th:text="${prod.price}">$0.00</td>
                         <td>
                             <input type="number" min="0"
                                    th:name="${'product_' + prod.product.id}"
@@ -65,7 +77,5 @@
         });
     });
 </script>
-
 </body>
 </html>
-
