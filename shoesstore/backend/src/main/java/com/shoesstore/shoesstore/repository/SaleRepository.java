@@ -17,7 +17,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query("SELECT u.username, SUM(s.total) FROM Sale s JOIN s.user u WHERE s.saleDate BETWEEN :start AND :end GROUP BY u.username")
     List<Object[]> fetchSalesByUser(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT p.code, SUM(d.quantity), SUM(d.subtotal) FROM SaleDetails d JOIN d.product p WHERE d.sale.saleDate BETWEEN :start AND :end GROUP BY p.code ORDER BY SUM(d.quantity) DESC")
+    @Query("SELECT p.id, SUM(d.quantity), SUM(d.subtotal) FROM SaleDetails d JOIN d.product p WHERE d.sale.saleDate BETWEEN :start AND :end GROUP BY p.id ORDER BY SUM(d.quantity) DESC")
     List<Object[]> fetchSalesByProduct(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 	
 	@Query("SELECT s FROM Sale s WHERE s.saleDate BETWEEN :start AND :end")

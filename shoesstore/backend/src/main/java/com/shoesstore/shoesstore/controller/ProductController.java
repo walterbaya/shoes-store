@@ -37,14 +37,28 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    public String saveProduct(@Valid @ModelAttribute Product product,
-                              BindingResult result,
-                              Model model) {
-        if(result.hasErrors()) {
-            model.addAttribute("allSizes", Product.ShoeSize.values());
-            return "products/form";
+    public String saveProduct(
+            @Valid @ModelAttribute("product") Product product,
+            BindingResult result,
+            Model model) {
+
+        // repoblamos tallas y la vista
+        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("view", "products/form");
+
+        // errores de validación estándar
+        if (result.hasErrors()) {
+            return "layout";
         }
-        productService.saveProduct(product);
+
+        try {
+            productService.saveProduct(product);
+        } catch (IllegalArgumentException ex) {
+            // pasamos el mensaje de excepción al modelo
+            model.addAttribute("error", ex.getMessage());
+            return "layout";
+        }
+
         return "redirect:/products";
     }
 
@@ -53,19 +67,32 @@ public class ProductController {
         Product product = productService.getProductById(id);
         model.addAttribute("product", product);
         model.addAttribute("allSizes", Product.ShoeSize.values()); // Si usas el enum de tallas
-        model.addAttribute("view", "products/form");
-        return "layout"; // Reutiliza el mismo formulario para crear/editar
+        model.addAttribute("view", "products/edit");
+        return "layout";
     }
 
-    @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable Long id,
-                                @Valid @ModelAttribute Product product,
-                                BindingResult result) {
-        if(result.hasErrors()) {
-            return "products/form";
+    @PutMapping("/update/{id}")
+    public String updateProduct(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("product") Product product,
+            BindingResult result,
+            Model model) {
+
+        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("view", "products/edit");
+
+        if (result.hasErrors()) {
+            return "layout";
         }
-        product.setId(id);
-        productService.saveProduct(product);
+
+        try {
+            product.setId(id);  // aseguramos que venga el mismo ID de la URL
+            productService.updateProduct(product);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            return "layout";
+        }
+
         return "redirect:/products";
     }
 

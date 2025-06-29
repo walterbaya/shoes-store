@@ -6,23 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ProductController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SaleApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SaleApiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/dto/ProductDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/dto/ProductDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/model/Product.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/model/Product.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/repository/SaleRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/repository/SaleRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/EmailServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ReportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ReportService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/new.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/new.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/ProductService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/auth/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/auth/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/fragments/header.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/create.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/create.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/newSale.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/newSale.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/new.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/new.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/view.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,15 +78,15 @@
     "Spring Boot.ShoesstoreApplication.executor": "Run",
     "com.codeium.enabled": "true",
     "data.sources.detected.do.not.suggest.again": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "productos",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Documentos/GitHub/shoes-store/shoesstore",
+    "last_opened_file_path": "D:/Documentos/GitHub/shoes-store/shoesstore/backend/src/main/resources/templates/products",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "preferences.lookFeel",
@@ -101,6 +95,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Documentos\GitHub\shoes-store\shoesstore\backend\src\main\resources\templates\products" />
       <recent name="C:\Users\walte\Documents\GitHub\shoes-store\shoesstore\backend\src\main\resources\templates\sales" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -240,7 +235,8 @@
       <workItem from="1751036148813" duration="3474000" />
       <workItem from="1751067036673" duration="2000" />
       <workItem from="1751068021051" duration="366000" />
-      <workItem from="1751142134866" duration="20436000" />
+      <workItem from="1751142134866" duration="22165000" />
+      <workItem from="1751219838743" duration="9794000" />
     </task>
     <servers />
   </component>

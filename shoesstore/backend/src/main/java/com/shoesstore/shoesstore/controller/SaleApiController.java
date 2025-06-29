@@ -43,7 +43,7 @@ public class SaleApiController {
         // Mapeo Product → ProductDto
         var p = detail.getProduct();
         ProductDto dto = new ProductDto();
-        dto.setCode(p.getCode());
+        dto.setId(p.getId());
         dto.setDescription(p.getDescription());
         dto.setSize(p.getSize().name());
         dto.setPrice(p.getPrice());

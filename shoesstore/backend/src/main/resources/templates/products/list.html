@@ -34,7 +34,7 @@
         </thead>
         <tbody>
         <tr th:each="product : ${products}" class="hover-shadow">
-          <td th:text="${product.code}" class="fw-semibold"></td> <!-- Nuevo campo -->
+          <td th:text="${product.id}" class="fw-semibold"></td> <!-- Nuevo campo -->
           <td th:text="${product.description}" class="text-muted small"></td>
           <td th:text="${product.color}" class="text-muted small"></td> <!-- Nuevo campo -->
           <td th:text="${product.type}" class="text-muted small"></td> <!-- Nuevo campo -->
