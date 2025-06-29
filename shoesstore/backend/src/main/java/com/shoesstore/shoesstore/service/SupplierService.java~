@@ -10,6 +10,8 @@ import com.shoesstore.shoesstore.repository.SupplierRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -62,10 +64,10 @@ public class SupplierService {
 
         // Mapa temporal para buscar asociaciones existentes por ID de producto
         Map<Long, SupplierProduct> existingProductsMap = existing.getSupplierProducts().stream()
-                .collect(Collectors.toMap(sp -> sp.getProduct().getId(), Function.identity()));
+                .collect(Collectors.toMap(sp -> sp.getProduct().getCode(), Function.identity()));
 
         // Eliminar asociaciones que ya no están en la nueva lista
-        existing.getSupplierProducts().removeIf(sp -> !productIds.contains(sp.getProduct().getId()));
+        existing.getSupplierProducts().removeIf(sp -> !productIds.contains(sp.getProduct().getCode()));
 
         for (int i = 0; i < productIds.size(); i++) {
             Long pid = productIds.get(i);

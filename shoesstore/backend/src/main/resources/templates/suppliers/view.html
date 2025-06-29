@@ -24,7 +24,7 @@
                 <td th:text="${supplier.name}">Proveedor X</td>
                 <td>
                     <ul>
-                        <li th:each="prod : ${supplier.products}" th:text="${prod.name}"></li>
+                        <li th:each="prod : ${supplier.products}" th:text="${prod.code}"></li>
                     </ul>
                 </td>
                 <td>

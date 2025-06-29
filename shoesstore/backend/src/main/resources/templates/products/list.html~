@@ -44,11 +44,11 @@
           <td th:text="${product.stock}" class="text-center"></td>
           <td class="text-end">
             <div class="gap-2">
-              <a th:href="@{/products/edit/{id}(id=${product.id})}"
+              <a th:href="@{/products/edit/{code}(code=${product.code})}"
                  class="btn btn-sm btn-warning px-3">
                 Editar
               </a>
-              <form th:action="@{/products/{id}(id=${product.id})}" method="post"
+              <form th:action="@{/products/{code}(code=${product.code})}" method="post"
                     class="d-inline">
                 <input type="hidden" name="_method" value="DELETE">
                 <button type="submit"

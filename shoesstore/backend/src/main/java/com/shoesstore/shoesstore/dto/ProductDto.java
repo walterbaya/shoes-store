@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductDto {
     private Long id;
-    private String name;
+    private String code;
     private String description;
     private String size;     // o ShoeSize si quieres el enum
     private Double price;

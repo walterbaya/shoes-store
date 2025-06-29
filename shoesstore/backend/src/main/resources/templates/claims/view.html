@@ -117,7 +117,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="detail : ${claim.claimDetails}">
-                    <td th:text="${detail.saleDetails.product.name}"></td>
+                    <td th:text="${detail.saleDetails.product.code}"></td>
                     <td th:text="${detail.quantity}"></td>
                     <td th:text="${#numbers.formatDecimal(detail.saleDetails.product.price,1,2)}"></td>
                 </tr>

@@ -84,7 +84,7 @@
                     const maxQ = detail.quantity;
                     tableBody.innerHTML += `
                         <tr>
-                            <td>${detail.product.name} ${detail.product.size ? '(' + detail.product.size + ')' : ''}</td>
+                            <td>${detail.product.code} ${detail.product.size ? '(' + detail.product.size + ')' : ''}</td>
                             <td>${maxQ}</td>
                             <td>$${detail.product.price.toFixed(2)}</td>
                             <td>$${detail.subtotal.toFixed(2)}</td>

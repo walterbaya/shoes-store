@@ -47,7 +47,7 @@
                     </thead>
                     <tbody>
                     <tr th:each="prod : ${entry.value}">
-                        <td th:text="${prod.product.name}">Producto</td>
+                        <td th:text="${prod.product.code}">Producto</td>
                         <td th:text="${prod.product.stock}">0</td>
                         <td th:text="${prod.price}">$0.00</td>
                         <td>

@@ -30,7 +30,7 @@
                                    th:checked="${supplier.products.contains(product)}"
                                    th:data-index="${stat.index}" />
                             <label class="form-check-label me-1" th:for="'product_' + ${product.id}"
-                                   th:text="${product.name}">Producto</label>
+                                   th:text="${product.code}">Producto</label>
 
                             <input type="number" step="0.01" min="0"
                                    name="prices"

@@ -24,7 +24,7 @@
         </thead>
         <tbody>
         <tr th:each="item : ${filteredItems}">
-            <td th:text="${item.product.name}"></td>
+            <td th:text="${item.product.code}"></td>
             <td th:text="${item.quantity}"></td>
             <td th:text="${#numbers.formatDecimal(item.purchasePrice, 1, 2)}"></td>
             <td th:text="${#numbers.formatDecimal(item.purchasePrice * item.quantity, 1, 2)}"></td>

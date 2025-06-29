@@ -18,7 +18,7 @@ public class EmailServiceImpl implements EmailService {
                 .append(" (").append(order.getSupplier().getEmail()).append("): ");
         for (PurchaseOrderItem item : order.getItems()) {
             sb.append(" - ")
-                    .append(item.getProduct().getName())
+                    .append(item.getProduct().getCode())
                     .append(": qty=").append(item.getQuantity())
                     .append(", price=").append(item.getPurchasePrice())
                     .append(" ");
