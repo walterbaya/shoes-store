@@ -14,10 +14,12 @@
 
             <form th:action="@{/products/update/{id}(id=${product.id})}"
                   th:object="${product}"
-                  method="put"
+                  method="post"
                   class="needs-validation"
                   novalidate>
                 <!-- 1) Eliminamos el hidden y dejamos solo este input -->
+                <input type="hidden" name="_method" value="put">
+
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="idInput" class="form-label">Código producto (ID)</label>
@@ -120,23 +122,20 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <label for="priceInput" class="form-label">Precio</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number"
-                                   id="priceInput"
-                                   class="form-control"
-                                   th:field="*{price}"
-                                   step="0.01"
-                                   min="0"
-                                   placeholder="0.00"
-                                   required>
-                        </div>
+                        <label for="genderSelect" class="form-label fw-bold">Género</label>
+                        <select class="form-select" id="genderSelect" th:field="*{gender}" required>
+                            <option value="">Seleccionar género</option>
+                            <option th:each="gender : ${T(com.tuapp.model.Product.Gender).values()}"
+                                    th:value="${gender}"
+                                    th:text="${gender.displayValue}">
+                            </option>
+                        </select>
                         <div class="invalid-feedback">
-                            Por favor ingrese un precio válido
+                            Por favor seleccione un género
                         </div>
-                    </div>
+                </div>
 
+                <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="stockInput" class="form-label">Stock</label>
                         <input type="number"
@@ -151,6 +150,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
                     <a th:href="@{/products}" class="btn btn-outline-secondary">

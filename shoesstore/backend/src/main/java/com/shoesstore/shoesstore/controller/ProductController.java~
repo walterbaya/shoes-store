@@ -71,7 +71,6 @@ public class ProductController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Product product = productService.getProductById(id);
-        model.addAttribute("allGenders", Product.Gender.values());
         model.addAttribute("product", product);
         model.addAttribute("allSizes", Product.ShoeSize.values()); // Si usas el enum de tallas
         model.addAttribute("view", "products/edit");

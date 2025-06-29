@@ -49,13 +49,11 @@ public class Supplier {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
-    @ManyToMany
-    @JoinTable(
-            name = "supplier_product",
+    @ManyToMany(cascade = { PERSIST, MERGE })
+    @JoinTable(name = "supplier_product",
             joinColumns = @JoinColumn(name = "supplier_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id")
-    )
-    private Set<Product> products = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private List<Product> products = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "supplier_product_price", joinColumns = @JoinColumn(name = "supplier_id"))

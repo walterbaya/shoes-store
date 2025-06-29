@@ -1,5 +1,6 @@
 package com.shoesstore.shoesstore.service;
 
+import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.exception.InsufficientStockException;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.repository.ProductRepository;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -15,6 +17,10 @@ public class ProductService {
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @Transactional
@@ -30,8 +36,12 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    @Transactional
+    public List<ProductWithSuppliersDTO> getAllProductsWithSuppliers() {
+        List<Product> products = productRepository.findAllWithSuppliers();
+        return products.stream()
+                .map(ProductWithSuppliersDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Product getProductById(Long id) {

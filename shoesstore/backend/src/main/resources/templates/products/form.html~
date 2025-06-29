@@ -23,6 +23,7 @@
                   class="needs-validation"
                   novalidate>
                 <!-- 1) Eliminamos el hidden y dejamos solo este input -->
+
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="idInput" class="form-label">Código producto (ID)</label>

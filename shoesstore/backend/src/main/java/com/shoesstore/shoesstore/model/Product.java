@@ -19,13 +19,36 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "suppliers")
+@ToString(exclude = {"suppliers", "supplierProducts"})
 public class Product {
 
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
+
+    public enum Gender {
+        HOMBRE("Hombre"),
+        MUJER("Mujer"),
+        UNISEX("Unisex"),
+        NIÑO("Niño"),
+        NIÑA("Niña");
+
+        private final String displayValue;
+
+        Gender(String displayValue) {
+            this.displayValue = displayValue;
+        }
+
+        public String getDisplayValue() {
+            return displayValue;
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "El género es obligatorio")
+    private Gender gender = Gender.UNISEX;
 
     private String description;
 
@@ -76,7 +99,12 @@ public class Product {
         }
     }
 
-    @ManyToMany(mappedBy = "products", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany
+    @JoinTable(
+            name = "supplier_product",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "supplier_id")
+    )
     private Set<Supplier> suppliers = new HashSet<>();
 
     @OneToMany(mappedBy = "product")

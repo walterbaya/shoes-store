@@ -61,6 +61,11 @@ public class SupplierService {
                 .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
         existing.setName(datos.getName());
         existing.setEmail(datos.getEmail());
+        existing.setCuit(datos.getCuit());
+        existing.setAddress(datos.getAddress());
+        existing.setPhone(datos.getPhone());
+        existing.setPaymentConditions(datos.getPaymentConditions());
+
 
         // Mapa temporal para buscar asociaciones existentes por ID de producto
         Map<Long, SupplierProduct> existingProductsMap = existing.getSupplierProducts().stream()

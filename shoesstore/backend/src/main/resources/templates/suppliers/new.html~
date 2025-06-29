@@ -87,7 +87,7 @@
                                        th:checked="${supplier.products.contains(product)}"
                                        th:data-index="${stat.index}" />
                                 <label class="form-check-label fw-medium me-2" th:for="'product_' + ${product.id}"
-                                       th:text="${product.id} + ' - ' + ${product.description}">Producto</label>
+                                       th:text="${product.ID} + ' - ' + ${product.description}">Producto</label>
                             </div>
 
                             <div class="mt-2 d-flex align-items-center">
