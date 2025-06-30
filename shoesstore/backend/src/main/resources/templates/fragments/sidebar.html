@@ -3,7 +3,7 @@
 <div th:fragment="sidebar" class="sidebar">
     <div class="sidebar-sticky pt-4">
         <ul class="nav flex-column gap-2 px-3">
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                 <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
                    th:href="@{/dashboard}">
                     <i class="bi bi-speedometer2 fs-5 text-primary"></i>

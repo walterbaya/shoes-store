@@ -1,24 +1,27 @@
 <div th:fragment="content card shadow" class="container mt-4">
 
+    <div class="alert alert-danger" th:if="${error}" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+    </div>
+
     <div class="card shadow border-0">
         <div class="card-header bg-gradient-primary text-white py-3">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0"
-                    th:text="'Editar Producto'">
-                </h1>
+                <h1 class="h3 mb-0">Editar Producto</h1>
                 <i class="fas fa-shoe-prints fa-lg"></i>
             </div>
         </div>
 
         <div class="card-body">
-
             <form th:action="@{/products/update/{id}(id=${product.id})}"
                   th:object="${product}"
                   method="post"
                   class="needs-validation"
                   novalidate>
-                <!-- 1) Eliminamos el hidden y dejamos solo este input -->
+
                 <input type="hidden" name="_method" value="put">
+                <input type="hidden" th:field="*{id}">
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
@@ -28,7 +31,7 @@
                                class="form-control"
                                th:field="*{id}"
                                placeholder="EJ: 1001"
-                               required>
+                               disabled>
                         <div class="invalid-feedback">
                             Por favor ingrese un ID para el producto
                         </div>
@@ -48,7 +51,6 @@
                     </div>
                 </div>
 
-                <!-- resto de campos igual -->
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="typeInput" class="form-label">Categoría</label>
@@ -77,9 +79,9 @@
                     </div>
                 </div>
 
-                <!-- campos originales reorganizados -->
+                <!-- Fila para Talla, Género y Marca -->
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-4 mb-4">
                         <label for="sizeSelect" class="form-label">Talla</label>
                         <select class="form-select"
                                 id="sizeSelect"
@@ -96,7 +98,25 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 mb-4">
+                    <!-- Campo de Género -->
+                    <div class="col-md-4 mb-4">
+                        <label for="genderSelect" class="form-label">Género</label>
+                        <select class="form-select"
+                                id="genderSelect"
+                                th:field="*{gender}"
+                                required>
+                            <option value="">Seleccionar género</option>
+                            <option th:each="gender : ${allGenders}"
+                                    th:value="${gender}"
+                                    th:text="${gender.displayValue}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor seleccione un género
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
                         <label for="brandInput" class="form-label">Marca</label>
                         <input type="text"
                                id="brandInput"
@@ -116,44 +136,28 @@
                               id="descriptionTextarea"
                               th:field="*{description}"
                               rows="4"
-                              placeholder="Detalles del producto, características...">
-          </textarea>
+                              placeholder="Detalles del producto, características..."></textarea>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <label for="genderSelect" class="form-label fw-bold">Género</label>
-                        <select class="form-select" id="genderSelect" th:field="*{gender}" required>
-                            <option value="">Seleccionar género</option>
-                            <option th:each="gender : ${T(com.tuapp.model.Product.Gender).values()}"
-                                    th:value="${gender}"
-                                    th:text="${gender.displayValue}">
-                            </option>
-                        </select>
+                        <label for="priceInput" class="form-label">Precio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number"
+                                   id="priceInput"
+                                   class="form-control"
+                                   th:field="*{price}"
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="0.00"
+                                   required>
+                        </div>
                         <div class="invalid-feedback">
-                            Por favor seleccione un género
+                            Por favor ingrese un precio válido
                         </div>
+                    </div>
 
-                        <div class="col-md-6 mb-4">
-                            <label for="priceInput" class="form-label">Precio</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number"
-                                       id="priceInput"
-                                       class="form-control"
-                                       th:field="*{price}"
-                                       step="0.01"
-                                       min="0"
-                                       placeholder="0.00"
-                                       required>
-                            </div>
-                            <div class="invalid-feedback">
-                                Por favor ingrese un precio válido
-                            </div>
-                        </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="stockInput" class="form-label">Stock</label>
                         <input type="number"
@@ -169,46 +173,48 @@
                     </div>
                 </div>
 
-
-
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
                     <a th:href="@{/products}" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i> Guardar Producto
+                        <i class="fas fa-save me-2"></i> Actualizar Producto
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
 </div>
-
 
 <style>
     :root {
         --primary-color: #4361ee;
         --primary-dark: #3a0ca3;
         --border-radius: 12px;
+        --shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
     }
 
     .card.shadow {
         border-radius: var(--border-radius);
         overflow: hidden;
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+        box-shadow: var(--shadow) !important;
         border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card.shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
     }
 
     .card-header.bg-gradient-primary {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         border-radius: 0 !important;
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem 2rem;
     }
 
-    .form-group {
-        margin-bottom: 1.5rem;
-        position: relative;
+    .card-body {
+        padding: 2.5rem;
     }
 
     .form-label {
@@ -222,7 +228,7 @@
     .form-control, .form-select {
         border-radius: 8px;
         border: 1px solid #e2e8f0;
-        padding: 0.85rem 1rem;
+        padding: 0.85rem 1.25rem;
         height: auto;
         transition: all 0.3s ease;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -251,17 +257,18 @@
         align-items: center;
         justify-content: center;
         font-size: 1rem;
-        min-width: 120px;
+        min-width: 140px;
     }
 
     .btn-primary {
         background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
         border: none;
+        box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
     }
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
     }
 
     .btn-outline-secondary {
@@ -280,9 +287,6 @@
         font-size: 0.85rem;
         margin-top: 0.25rem;
         color: #dc3545;
-        position: absolute;
-        bottom: -22px;
-        left: 0;
     }
 
     .needs-validation .form-control:invalid,
@@ -300,14 +304,18 @@
         border: 1px solid #e2e8f0;
         color: #495057;
         padding: 0 15px;
-    }
-
-    .card-body {
-        padding: 2rem;
+        border-radius: 8px 0 0 8px !important;
     }
 
     .border-top {
         border-top: 1px solid #eee !important;
+        padding-top: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
     }
 </style>
 
@@ -322,7 +330,6 @@
                     event.preventDefault();
                     event.stopPropagation();
                 }
-
                 form.classList.add('was-validated');
             }, false);
         });
@@ -339,6 +346,7 @@
         }
 
         // Enfocar el primer campo al cargar la página
-        document.getElementById('codeInput')?.focus();
+        const firstField = document.querySelector('input:not([type="hidden"]), select');
+        if (firstField) firstField.focus();
     });
 </script>
