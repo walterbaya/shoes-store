@@ -359,13 +359,6 @@
                             <td class="text-center fw-bold"
                                 th:text="'$' + ${#numbers.formatDecimal(prod.product.price,1,2)}">$0</td>
                             <!-- Cantidad a comprar (input) -->
-                            <td>
-                                <input type="number" min="0"
-                                       th:name="${'product_' + prod.product.id}"
-                                       value="0"
-                                       class="form-control"/>
-                            </td>
-
                             <!-- Cantidad a comprar -->
                             <td>
                                 <div class="input-group" style="max-width: 120px;">
@@ -373,12 +366,13 @@
                                     <input type="number"
                                            class="form-control text-center"
                                            th:name="${'product_' + prod.product.id}"
-                                           min="0">
+                                           min="0"
+                                    value="0">
                                     <button class="btn btn-outline-secondary" type="button">+</button>
                                 </div>
                             </td>
                             <!-- Subtotal dinámico -->
-                            <td class="text-end fw-bold td-subtotal">$0</td>
+                            <td class="text-start fw-bold td-subtotal">$0</td>
                             <!-- Botón borrar (opcional) -->
                         </tr>
                         </tbody>
@@ -470,24 +464,69 @@
         </div>
     </form>
 </div>
+<!-- 0) CSS para ocultar flechitas del input[type=number] -->
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
 
 <script>
+    /**
+     * Parsea un string en formato ARS (ej. "89.900,00", "89900,00", "89900")
+     * y devuelve un Number correcto.
+     */
+    function parseARPeso(str) {
+        let s = (str || '').replace(/[^\d.,-]/g, '').trim();
+        if (!s) return 0;
+
+        // Si tiene miles y decimales
+        if (s.includes('.') && s.includes(',')) {
+            s = s.replace(/\./g, '').replace(/,/g, '.');
+        }
+        // Si solo tiene coma, es decimal
+        else if (s.includes(',')) {
+            s = s.replace(/,/g, '.');
+        }
+        // Si solo tiene punto, lo dejamos para parseFloat
+        return parseFloat(s) || 0;
+    }
+
+    /**
+     * Formatea un número en ARS con separador de miles y
+     * siempre 2 decimales: ej. 89900 → "89.900,00"
+     */
+    function formatAR(value) {
+        return value.toLocaleString('es-AR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
     // —— 1) Configuración de fechas (hoy+2 / hoy+5) ——
     (function configureDates() {
-        const today = new Date();
-        const minDate = new Date(today);
+        const today       = new Date();
+        const minDate     = new Date(today);
         minDate.setDate(today.getDate() + 2);
-        document.getElementById('deliveryDate').min = minDate.toISOString().split('T')[0];
+        document.getElementById('deliveryDate').min =
+            minDate.toISOString().split('T')[0];
 
         const defaultDate = new Date(today);
         defaultDate.setDate(today.getDate() + 5);
-        document.getElementById('deliveryDate').value = defaultDate.toISOString().split('T')[0];
+        document.getElementById('deliveryDate').value =
+            defaultDate.toISOString().split('T')[0];
     })();
 
-    // —— 2) Mostrar solo el card del proveedor elegido y ocultar los demás ——
+    // —— 2) Mostrar solo el card del proveedor elegido ——
     function updateProductCards() {
         const selectedId = document.getElementById('supplierSelect').value;
-        // Todos los cards con data-supplier-id
         document.querySelectorAll('div.card[data-supplier-id]').forEach(card => {
             if (card.getAttribute('data-supplier-id') === selectedId) {
                 card.style.display = 'block';
@@ -504,7 +543,7 @@
         if (card.dataset.inited === 'true') return;
         card.dataset.inited = 'true';
 
-        const table = card.querySelector('table');
+        const table    = card.querySelector('table');
         const theadRow = table.querySelector('thead tr');
 
         // Añadir <th> Subtotal
@@ -515,64 +554,112 @@
             theadRow.appendChild(th);
         }
 
-        // Para cada fila, añadir td.subtotal y listener al input
         table.querySelectorAll('tbody tr').forEach(row => {
-            // Crear celda subtotal si no existe
             if (!row.querySelector('.td-subtotal')) {
                 const td = document.createElement('td');
                 td.classList.add('td-subtotal', 'text-end', 'fw-bold');
                 row.appendChild(td);
             }
-            // Listener al input numérico
+
             const input = row.querySelector('input[type="number"]');
+
+            // listener “change” para recalcular subtotal
             input.addEventListener('change', () => {
-                // columna 2 = precio unitario (índice 2)
-                const priceText = row.cells[2].textContent || row.cells[2].querySelector('input')?.value;
-                const price = parseFloat(priceText.replace(/[^0-9.-]+/g, '')) || 0;
+                const priceText = row.cells[2].textContent
+                    || row.cells[2].querySelector('input')?.value
+                    || '';
+                const price = parseARPeso(priceText);
                 const qty   = parseInt(input.value, 10) || 0;
                 const total = price * qty;
-                row.querySelector('.td-subtotal').textContent = '$' + total.toLocaleString('es-CL');
+
+                row.querySelector('.td-subtotal').textContent =
+                    '$' + formatAR(total);
                 updateOrderSummary();
             });
+
+            // prevenir negativos al escribir
+            input.addEventListener('input', () => {
+                if (parseInt(input.value, 10) < 0) input.value = 0;
+            });
+
+            // botones + / –
+            const group = input.closest('.input-group');
+            if (group) {
+                const btnDec = group.querySelector('.btn:first-of-type');
+                const btnInc = group.querySelector('.btn:last-of-type');
+
+                btnDec.addEventListener('click', () => {
+                    let current = parseInt(input.value, 10) || 0;
+                    if (current > 0) {
+                        input.value = current - 1;
+                        input.dispatchEvent(new Event('change'));
+                    }
+                });
+                btnInc.addEventListener('click', () => {
+                    let current = parseInt(input.value, 10) || 0;
+                    input.value = current + 1;
+                    input.dispatchEvent(new Event('change'));
+                });
+            }
+
+            // cálculo inicial para que no quede vacío
+            input.dispatchEvent(new Event('change'));
         });
     }
 
     // —— 4) Recalcular resumen de la orden ——
     function updateOrderSummary() {
         let subtotal = 0;
-        // Busca el card visible
-        const visible = Array.from(document.querySelectorAll('div.card[data-supplier-id]'))
-            .find(c => c.style.display === 'block');
+        const visible = Array.from(
+            document.querySelectorAll('div.card[data-supplier-id]')
+        ).find(c => c.style.display === 'block');
+
         if (visible) {
             visible.querySelectorAll('.td-subtotal').forEach(td => {
-                subtotal += parseFloat(td.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+                subtotal += parseARPeso(td.textContent) || 0;
             });
         }
+
         const discount = subtotal * 0.05;
-        const iva      = (subtotal - discount) * 0.19;
+        const iva      = (subtotal - discount) * 0.21;  // IVA 21% en AR
         const shipping = 45990;
         const total    = subtotal - discount + iva + shipping;
 
-        const spans = document.querySelectorAll('.summary-item span:last-child');
-        if (spans.length >= 4) {
-            spans[0].textContent = '$' + subtotal.toLocaleString('es-CL');
-            spans[1].textContent = '-$' + discount.toLocaleString('es-CL');
-            spans[2].textContent = '$' + iva.toLocaleString('es-CL');
-            spans[3].textContent = '$' + shipping.toLocaleString('es-CL');
-            document.querySelector('.summary-total span:last-child')
-                .textContent = '$' + total.toLocaleString('es-CL');
+        // Actualizar cada línea dentro de .summary-card
+        const items = document.querySelectorAll('.summary-card .summary-item');
+        if (items.length >= 4) {
+            // Subtotal
+            items[0].querySelector('span:last-child').textContent =
+                '$' + formatAR(subtotal);
+            // Descuento
+            items[1].querySelector('span:last-child').textContent =
+                '-$' + formatAR(discount);
+            // IVA (21%)
+            items[2].querySelector('span:first-child').textContent =
+                'IVA (21%):';
+            items[2].querySelector('span:last-child').textContent =
+                '$' + formatAR(iva);
+            // Envío
+            items[3].querySelector('span:last-child').textContent =
+                '$' + formatAR(shipping);
+        }
+
+        // Total final
+        const totalEl = document.querySelector('.summary-card .summary-total span:last-child');
+        if (totalEl) {
+            totalEl.textContent = '$' + formatAR(total);
         }
     }
 
-    // —— 5) Rellenar supplier-info (si lo usás) ——
+    // —— 5) Rellenar supplier-info ——
     function updateSupplierInfo() {
         const sel = document.getElementById('supplierSelect');
         const opt = sel.selectedOptions[0] || {};
         const fields = {
-            contact:  document.querySelector('.supplier-info .contact'),
-            email:    document.querySelector('.supplier-info .email'),
-            phone:    document.querySelector('.supplier-info .phone'),
-            address:  document.querySelector('.supplier-info .address')
+            contact: document.querySelector('.supplier-info .contact'),
+            email:   document.querySelector('.supplier-info .email'),
+            phone:   document.querySelector('.supplier-info .phone'),
+            address: document.querySelector('.supplier-info .address')
         };
         if (!opt.value) {
             Object.values(fields).forEach(el => el.textContent = '–');
@@ -584,14 +671,13 @@
         }
     }
 
-    // —— 6) Inicialización de listeners al cargar la página ——
+    // —— 6) Inicialización al cargar la página ——
     document.addEventListener('DOMContentLoaded', () => {
         const sel = document.getElementById('supplierSelect');
         sel.addEventListener('change', () => {
             updateSupplierInfo();
             updateProductCards();
         });
-        // disparos iniciales
         updateSupplierInfo();
         updateProductCards();
     });
