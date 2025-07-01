@@ -1,12 +1,11 @@
 package com.shoesstore.shoesstore.service;
 
-import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.model.PurchaseOrder;
-import com.shoesstore.shoesstore.model.PurchaseOrderItem;
-import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.repository.PurchaseOrderRepository;
 import com.shoesstore.shoesstore.repository.SupplierRepository;
+import com.shoesstore.shoesstore.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,13 +22,15 @@ public class PurchaseOrderService {
     private final PurchaseOrderRepository orderRepo;
     private final ProductRepository productRepo;
     private final SupplierRepository supplierRepo;
+    private final UserRepository userRepository;
 
     public PurchaseOrderService(PurchaseOrderRepository orderRepo,
                                 ProductRepository productRepo,
-                                SupplierRepository supplierRepo) {
+                                SupplierRepository supplierRepo, UserRepository userRepository) {
         this.orderRepo = orderRepo;
         this.productRepo = productRepo;
         this.supplierRepo = supplierRepo;
+        this.userRepository = userRepository;
     }
 
     public List<PurchaseOrder> findAll() {
@@ -73,7 +75,14 @@ public class PurchaseOrderService {
                     return item;
                 }).collect(Collectors.toList());
 
-        po.setItems(items);
-        orderRepo.save(po);
+        Optional<User> user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        if(user.isPresent()){
+            po.setUser(user.get());
+            po.setItems(items);
+            orderRepo.save(po);
+        }else{
+            throw new RuntimeException("Error al crear la orden de compra, no se puede obtener el usuario", new Throwable());
+        }
     }
 }

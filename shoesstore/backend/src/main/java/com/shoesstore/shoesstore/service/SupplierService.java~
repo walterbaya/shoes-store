@@ -65,7 +65,6 @@ public class SupplierService {
         existing.setAddress(datos.getAddress());
         existing.setPhone(datos.getPhone());
         existing.setPaymentConditions(datos.getPaymentConditions());
-        existing.setContactName(datos.getContactName());
 
 
         // Mapa temporal para buscar asociaciones existentes por ID de producto

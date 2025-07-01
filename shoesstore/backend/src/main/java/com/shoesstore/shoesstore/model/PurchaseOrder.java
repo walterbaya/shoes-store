@@ -32,6 +32,19 @@ public class PurchaseOrder {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PurchaseOrderItem> items = new ArrayList<>();
 
+    @ManyToOne(optional = true)
+    @JoinColumn(
+            name = "users_id",
+            nullable = true,
+            foreignKey = @ForeignKey(
+                    name = "fk_orden_usuario",
+                    foreignKeyDefinition =
+                            "FOREIGN KEY (users_id) REFERENCES users(id) ON DELETE SET NULL"
+            )
+    )
+    private User user;
+
+
     public BigDecimal getTotalOrder() {
         return items.stream()
                 .map(PurchaseOrderItem::getTotal)

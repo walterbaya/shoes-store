@@ -17,6 +17,11 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="name" class="form-label fw-bold">Nombre de contacto <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="contactName" th:field="*{contactName}" required>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="cuit" class="form-label fw-bold">CUIT/CUIL <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="cuit" th:field="*{cuit}" placeholder="Formato: XX-XXXXXXXX-X" required>
                         </div>

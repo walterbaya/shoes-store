@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,6 +31,13 @@ public class User {
     private Role role;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(
+            mappedBy = "user",
+            cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH },
+            orphanRemoval = false
+    )
+    private List<PurchaseOrder> ordenes = new ArrayList<>();
 
     public enum Role {
         ROLE_ADMIN, ROLE_SELLER, ROLE_STOCK_MANAGER

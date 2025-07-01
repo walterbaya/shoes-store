@@ -30,6 +30,9 @@ public class Supplier {
     @Email @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String contactName;
+
     @Column(name = "cuit_cuil", nullable = false, unique = true, length = 13)
     private String cuit;  // Formato: XX-XXXXXXXX-X
 

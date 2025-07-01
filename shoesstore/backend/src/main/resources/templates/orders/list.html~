@@ -27,7 +27,7 @@
             <td th:text="${order.id}"></td>
             <td th:text="${order.supplier.name}"></td>
             <td th:text="${order.generatedDate}"></td>
-            <td th:text="${order.user.username}"></td>
+            <td th:text="${order.user.name}"></td>
             <td th:text="${order.completed} ? 'Sí' : 'No'"></td>
             <td>
                 <a th:href="@{'/orders/' + ${order.id}}" class="btn btn-info btn-sm">Detalle</a>

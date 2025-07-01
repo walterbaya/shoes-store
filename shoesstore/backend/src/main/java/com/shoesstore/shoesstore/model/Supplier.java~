@@ -30,6 +30,9 @@ public class Supplier {
     @Email @Column(nullable = false)
     private String email;
 
+    @Email @Column(nullable = false)
+    private String contactName;
+
     @Column(name = "cuit_cuil", nullable = false, unique = true, length = 13)
     private String cuit;  // Formato: XX-XXXXXXXX-X
 
@@ -49,11 +52,13 @@ public class Supplier {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private boolean active = true;
 
-    @ManyToMany(cascade = { PERSIST, MERGE })
-    @JoinTable(name = "supplier_product",
+    @ManyToMany
+    @JoinTable(
+            name = "supplier_product",
             joinColumns = @JoinColumn(name = "supplier_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private List<Product> products = new ArrayList<>();
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> products = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "supplier_product_price", joinColumns = @JoinColumn(name = "supplier_id"))
