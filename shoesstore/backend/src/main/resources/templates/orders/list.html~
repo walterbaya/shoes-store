@@ -334,8 +334,8 @@
 
                     <!-- Paginación -->
                     <nav class="d-flex justify-content-between align-items-center mt-4">
-                        <div class="text-muted" th:text="'Mostrando ' + ${orders.size()} + ' de ' + ${orders.totalElements} + ' resultados'">>
-                         
+                        <div class="text-muted" th:text="'Mostrando ' + ${orders.size()} + ' de ' + ${orders.size()} + ' resultados'">>
+
                         </div>
                         <ul class="pagination mb-0">
                             <li class="page-item disabled"><a class="page-link" href="#"><i class="bi bi-chevron-left"></i></a></li>
