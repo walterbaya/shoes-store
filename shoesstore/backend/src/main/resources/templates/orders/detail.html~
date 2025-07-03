@@ -38,11 +38,11 @@
         </tfoot>
     </table>
 
-<!--    <div th:if="${!order.completed}">-->
-<!--        <form th:action="@{'/orders/' + ${order.id} + '/complete'}" method="post">-->
-<!--            <button type="submit" class="btn btn-success">Marcar como Completada</button>-->
-<!--        </form>-->
-<!--    </div>-->
+    <div th:if="${!order.completed}">
+        <form th:action="@{'/orders/' + ${order.id} + '/complete'}" method="post">
+            <button type="submit" class="btn btn-success">Marcar como Completada</button>
+        </form>
+    </div>
 
     <a href="/orders" class="btn btn-secondary mt-3">Volver a lista</a>
 </div>

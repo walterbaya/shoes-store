@@ -3,6 +3,7 @@ package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.model.Product;
+import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -17,17 +18,19 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     // Inyección de dependencias
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CustomUserDetailsService customUserDetailsService) {
         this.productService = productService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @GetMapping
     public String listarProductos(Model model) {
         List<ProductWithSuppliersDTO> products = productService.getAllProductsWithSuppliers();
         model.addAttribute("products", products);
-
+        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         model.addAttribute("title", "Productos");
         model.addAttribute("view", "products/list");
         return "layout";

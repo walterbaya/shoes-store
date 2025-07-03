@@ -297,7 +297,7 @@
                                     <a href="#" class="action-btn btn btn-sm btn-info"
                                        title="Ver detalle"
                                        data-bs-toggle="tooltip"
-                                       th:href="@{'/orders/' + ${order.id}}">
+                                       th:href="@{'/orders/' + ${order.id} + '/detail'}">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     <a href="#" class="action-btn btn btn-sm btn-outline-secondary"
