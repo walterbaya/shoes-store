@@ -37,6 +37,8 @@ public class PurchaseOrderController {
     public String list(Model model) {
         model.addAttribute("title", "Compras");
         model.addAttribute("orders", purchaseOrderService.findAll());
+        model.addAttribute("completedOrders", purchaseOrderService.findAll().stream().filter(PurchaseOrder::isCompleted).toList());
+        model.addAttribute("sumOfTotals", purchaseOrderService.findAll().stream().map(PurchaseOrder::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
         model.addAttribute("view", "orders/list");
         return "layout";
     }

@@ -41,7 +41,7 @@
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <input type="hidden" th:field="*{saleItems[__${iterStat.index}__].productId}" th:value="${product.id}" />
-                                <h6 class="card-title mb-1" th:text="${product.code}"></h6>
+                                <h6 class="card-title mb-1" th:text="${product.id}"></h6>
                                 <div class="d-flex gap-3 text-muted small">
                                     <span th:text="|$${#numbers.formatDecimal(product.price, 1, 2)}|"></span>
                                     <span th:text="|Stock: ${product.stock}|"></span>
