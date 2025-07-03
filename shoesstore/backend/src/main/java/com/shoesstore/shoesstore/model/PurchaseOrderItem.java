@@ -28,6 +28,7 @@ public class PurchaseOrderItem {
 
     private int quantity;
     private BigDecimal purchasePrice;
+    private BigDecimal subtotal;
 
     public BigDecimal getTotal() {
         return purchasePrice.multiply(BigDecimal.valueOf(quantity));

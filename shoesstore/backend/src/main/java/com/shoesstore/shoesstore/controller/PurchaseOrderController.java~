@@ -43,15 +43,14 @@ public class PurchaseOrderController {
 
     @GetMapping("/create")
     public String createForm(Model model) {
-        List<Supplier> suppliers = supplierService.findAll();
-        Map<Supplier, List<?>> map = suppliers.stream()
+        var suppliers = supplierService.findAll();
+        var map = suppliers.stream()
                 .collect(Collectors.toMap(
                         s -> s,
                         s -> new ArrayList<>(s.getSupplierProducts())
                 ));
         model.addAttribute("productsToBuyBySupplier", map);
         model.addAttribute("order", new PurchaseOrder());
-        model.addAttribute("priorities", PriorityCondition.values());
         model.addAttribute("view", "orders/create");
         return "layout";
     }
