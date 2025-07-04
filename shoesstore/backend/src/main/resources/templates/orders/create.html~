@@ -163,7 +163,7 @@
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-exclamation-circle"></i></span>
                             <select class="form-select" id="priority" th:field="*{priorityCondition}">
-                                <option selected value="NORMAL">Normal</option>
+                                <option value="NORMAL">Normal</option>
                                 <option value="ALTA">Alta</option>
                                 <option value="URGENTE">Urgente</option>
                             </select>

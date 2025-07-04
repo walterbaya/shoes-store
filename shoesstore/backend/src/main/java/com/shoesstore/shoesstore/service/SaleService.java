@@ -84,8 +84,14 @@ public class SaleService {
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
     }
 
+    @Transactional
     public void deleteSale(Long id) {
-        saleRepository.deleteById(id);
+        Sale sale = getSaleById(id);
+        sale.getDetails().forEach(saleDetails -> {
+            productService.updateStock(saleDetails.getProduct().getId(), saleDetails.getQuantity());
+            saleDetailsRepository.delete(saleDetails);
+        });
+        saleRepository.delete(sale);
     }
     
     public List<Object[]> getDailySalesData(LocalDateTime start, LocalDateTime end) {

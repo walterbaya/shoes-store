@@ -131,7 +131,7 @@
         </div>
     </div>
 
-    <form th:action="@{/orders/create}" method="post" enctype="multipart/form-data" th:object="${order}">
+    <form th:action="@{/orders/update}" method="post" enctype="multipart/form-data" th:object="${order}">
         <!-- Campos ocultos para descuento y envío -->
         <input type="hidden" name="discountPct" id="discountPctInput" value="5">
         <input type="hidden" name="shippingCost" id="shippingCostInput" value="45990">
@@ -224,7 +224,7 @@
                             <td><strong th:text="${prod.product.brand}">Marca</strong></td>
                             <td class="text-center" th:text="${prod.product.stock}">0</td>
                             <td class="text-center fw-bold"
-                                th:text="'$'+${#numbers.formatDecimal(prod.price,1,2)}"
+                                th:text="'$'+${#numbers.formatDecimal(prod.product.price,1,2)}"
 
                             >$0</td>
                             <td>

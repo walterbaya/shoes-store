@@ -95,7 +95,7 @@ public class PurchaseOrderService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         purchaseOrder.setUser(user);
 
-
+        
         // Creo ítems filtrando cantidades > 0
         PurchaseOrder finalPurchaseOrder = purchaseOrder;
         List<PurchaseOrderItem> items = productsAndQuantities.entrySet().stream()

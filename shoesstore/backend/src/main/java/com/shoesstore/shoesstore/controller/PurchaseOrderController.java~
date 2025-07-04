@@ -99,7 +99,7 @@ public class PurchaseOrderController {
         if (order == null) {
             return "redirect:/orders";
         }
-
+        
         var filtered = order.getItems().stream()
                 .filter(i -> i.getQuantity()>0)
                 .toList();

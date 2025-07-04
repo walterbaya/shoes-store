@@ -33,6 +33,17 @@ public class SalesController {
         List<Sale> sales = saleService.getAllSales();       // o findAll(), como lo tengas
         model.addAttribute("title", "Listado de Ventas");
         model.addAttribute("sales", sales);
+        double totalSalesSum = sales.stream().mapToDouble(Sale::getTotal).sum();
+        long onlineSalesCount = sales.stream()
+                                     .filter(sale -> "ONLINE".equalsIgnoreCase(sale.getChannel().toString()))
+                                     .count();
+        model.addAttribute("onlineSalesCount", onlineSalesCount);
+        long storeSalesCount = sales.stream()
+                                    .filter(sale -> "TIENDA".equalsIgnoreCase(sale.getChannel().toString()))
+                                    .count();
+        model.addAttribute("totalSalesCount",onlineSalesCount + storeSalesCount);
+        model.addAttribute("storeSalesCount", storeSalesCount);
+        model.addAttribute("totalRevenue", String.format("%.2f", totalSalesSum));
         // Indica a layout.html qué fragmento renderizar
         model.addAttribute("view", "sales/list");
         return "layout";
@@ -99,6 +110,17 @@ public class SalesController {
         }
         else{
             redirectAttrs.addFlashAttribute("error", "No se pueden vender 0 o menos productos."); // ← flash
+        }
+        return "redirect:/sales";
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteSale(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            saleService.deleteSale(id);
+            redirectAttributes.addFlashAttribute("success", "Venta eliminada correctamente");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar venta: " + e.getMessage());
         }
         return "redirect:/sales";
     }
