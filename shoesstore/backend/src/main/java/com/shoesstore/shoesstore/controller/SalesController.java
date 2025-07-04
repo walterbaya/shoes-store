@@ -3,6 +3,7 @@ package com.shoesstore.shoesstore.controller;
 import com.shoesstore.shoesstore.model.PaymentMethod;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
+import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
@@ -55,6 +56,34 @@ public class SalesController {
         model.addAttribute("view", "sales/list");
         return "layout";
     }
+
+    // Agrega esto al SalesController
+    @GetMapping("/{id}")
+    public String getSaleDetail(@PathVariable Long id, Model model) {
+        Sale sale = saleService.getSaleById(id);
+        if (sale == null) {
+            return "redirect:/sales";
+        }
+
+        // Calcular valores para el resumen
+        double subtotal = sale.getDetails().stream()
+                .mapToDouble(SaleDetails::getSubtotal)
+                .sum();
+        double discountAmount = subtotal * (sale.getDiscountPercentage() / 100);
+        double taxableAmount = subtotal - discountAmount;
+        double taxAmount = taxableAmount * 0.21; // IVA 21%
+
+        model.addAttribute("sale", sale);
+        model.addAttribute("subtotal", subtotal);
+        model.addAttribute("discountAmount", discountAmount);
+        model.addAttribute("taxableAmount", taxableAmount);
+        model.addAttribute("taxAmount", taxAmount);
+        model.addAttribute("title", "Detalle de Venta #" + sale.getId());
+
+        model.addAttribute("view", "sales/detail");
+        return "layout";
+    }
+
 
     @GetMapping("/create")
     public String showNewSaleForm(Model model) {

@@ -311,7 +311,7 @@
                                 <td data-label="Usuario" th:text="${sale.user.username}"></td>
                                 <td data-label="Total" class="text-end fw-bold total-cell" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></td>
                                 <td data-label="Acciones" class="action-cell">
-                                    <a th:href="@{'/sales/' + ${sale.id}}"
+                                    <a th:href="@{'api/sales/' + ${sale.id} + '/details'}"
                                        class="action-btn view-btn"
                                        title="Ver detalle"
                                        data-bs-toggle="tooltip">
