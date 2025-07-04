@@ -13,7 +13,7 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
-@Table(name = "reclamos")
+@Table(name = "claim")
 public class Claim {
 
     @Id

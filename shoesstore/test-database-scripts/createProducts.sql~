@@ -2,7 +2,7 @@
 USE shoes_store;
 
 -- Inserta varios productos de ejemplo en una sola operación
-INSERT INTO products
+INSERT INTO productos
 (id, brand, color, created_at, description, gender, material, price, size, stock, type)
 VALUES
     (1, 'Nike',       'Negro', NOW(), 'Zapatilla running ligera',            'HOMBRE', 'Mesh',      120.00, 'S42',  50, 'Sneakers'),

@@ -8,10 +8,11 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+
 @Entity
 @Getter
 @Setter
-@Table(name = "productos_proveedores")
+@Table(name = "supplier_product")
 public class SupplierProduct {
     @EmbeddedId
     private SupplierProductId id;
@@ -39,4 +40,3 @@ public class SupplierProduct {
         this.price = price;
     }
 }
-

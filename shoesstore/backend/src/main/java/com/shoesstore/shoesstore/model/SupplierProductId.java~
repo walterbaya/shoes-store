@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @Embeddable
-@Table(name = "supplier_product_id")
+@Table(name = "proveedor_producto")
 public class SupplierProductId implements Serializable {
     @Column(name="supplier_id")
     private Long supplierId;
