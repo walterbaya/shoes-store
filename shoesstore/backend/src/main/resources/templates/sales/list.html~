@@ -340,8 +340,8 @@
         </div>
 
         <!-- Tabla de ventas -->
-        <div class="sales-card">
-            <table class="sales-table">
+        <div>
+            <table >
                 <thead>
                 <tr>
                     <th>ID</th>

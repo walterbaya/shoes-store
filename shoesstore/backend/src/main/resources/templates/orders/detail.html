@@ -1,50 +1,397 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle Orden de Compra</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #06d6a0;
+            --warning-color: #ffd166;
+            --danger-color: #ef476f;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .order-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header-card {
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            border: none;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .header-card .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+        }
+
+        .info-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-completed {
+            background-color: rgba(6, 214, 160, 0.15);
+            color: #06d6a0;
+        }
+
+        .badge-pending {
+            background-color: rgba(255, 159, 67, 0.15);
+            color: #ff9f43;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .info-card h6 {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .products-table {
+            background-color: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .products-table .table {
+            margin-bottom: 0;
+        }
+
+        .products-table .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+
+        .products-table .table tbody td {
+            padding: 1rem 1.25rem;
+            vertical-align: middle;
+        }
+
+        .products-table .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image i {
+            font-size: 1.5rem;
+            color: #adb5bd;
+        }
+
+        .summary-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-top: 2rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .total-section {
+            background-color: rgba(67, 97, 238, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .total-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            transform: translateX(-3px);
+        }
+
+        .attachment-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .attachment-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background-color: rgba(67, 97, 238, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .attachment-info {
+            flex: 1;
+        }
+
+        .attachment-info h5 {
+            margin-bottom: 0.25rem;
+        }
+
+        .attachment-info p {
+            color: #6c757d;
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .total-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-3">
-    <a href="/orders" class="btn btn-secondary mb-3">Volver a Órdenes</a>
+<div class="order-detail-container">
+    <a href="/orders" class="btn-back btn btn-light mb-4">
+        <i class="bi bi-arrow-left"></i> Volver a Órdenes
+    </a>
 
-    <h1>Detalle Orden #<span th:text="${order.id}"></span></h1>
-    <p><strong>Proveedor:</strong> <span th:text="${order.supplier.name}"></span></p>
-    <p><strong>Fecha Generada:</strong> <span th:text="${order.generatedDate}"></span></p>
-    <p><strong>Estado:</strong> <span th:text="${order.completed} ? 'Completada' : 'Pendiente'"></span></p>
+    <div class="header-card card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="h4 mb-0">Orden de Compra #<span th:text="${order.id}"></span></h2>
+            </div>
+            <span class="info-badge" th:classappend="${order.completed} ? 'badge-completed' : 'badge-pending'">
+                <i class="bi" th:class="${order.completed} ? 'bi-check-circle' : 'bi-clock'"></i>
+                <span th:text="${order.completed} ? 'Completada' : 'Pendiente'"></span>
+            </span>
+        </div>
 
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Precio de Compra</th>
-            <th>Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="item : ${filteredItems}">
-            <td th:text="${item.product.id}"></td>
-            <td th:text="${item.quantity}"></td>
-            <td th:text="${#numbers.formatDecimal(item.purchasePrice, 1, 2)}"></td>
-            <td th:text="${#numbers.formatDecimal(item.purchasePrice * item.quantity, 1, 2)}"></td>
-        </tr>
-        </tbody>
-        <tfoot>
-        <tr>
-            <td colspan="3"><strong>Total</strong></td>
-            <td th:text="${#numbers.formatDecimal(total, 1, 2)}"></td>
-        </tr>
-        </tfoot>
-    </table>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h6><i class="bi bi-building me-2"></i>Proveedor</h6>
+                    <p th:text="${order.supplier.name}"></p>
+                </div>
 
-<!--    <div th:if="${!order.completed}">-->
-<!--        <form th:action="@{'/orders/' + ${order.id} + '/complete'}" method="post">-->
-<!--            <button type="submit" class="btn btn-success">Marcar como Completada</button>-->
-<!--        </form>-->
-<!--    </div>-->
+                <div class="info-card">
+                    <h6><i class="bi bi-person me-2"></i>Usuario Responsable</h6>
+                    <p th:text="${order.user.username}"></p>
+                </div>
 
-    <a href="/orders" class="btn btn-secondary mt-3">Volver a lista</a>
+                <div class="info-card">
+                    <h6><i class="bi bi-calendar me-2"></i>Fecha de Solicitud</h6>
+                    <p th:text="${order.generatedDate}"></p>
+                </div>
+
+                <div class="info-card">
+                    <h6><i class="bi bi-calendar-check me-2"></i>Fecha de Despacho</h6>
+                    <p th:text="${order.dispatchDate}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="products-table card">
+        <div class="card-header bg-light">
+            <h3 class="h5 mb-0"><i class="bi bi-box-seam me-2"></i>Productos</h3>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th class="text-end">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${filteredItems}">
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="product-image">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <div>
+                                <div class="fw-medium" th:text="${item.product.id}"></div>
+                                <small class="text-muted" th:text="${item.product.brand} ? ${item.product.brand} : 'Sin marca'"></small>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${item.quantity}"></td>
+                    <td th:text="${'$' + #numbers.formatDecimal(item.purchasePrice, 1, 2)}"></td>
+                    <td class="text-end fw-medium" th:text="${'$' + #numbers.formatDecimal(item.purchasePrice * item.quantity, 1, 2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-grid">
+
+            <div class="summary-item">
+                <span class="summary-label">Descuento</span>
+                <span class="summary-value" th:text="${'$' + #numbers.formatDecimal(order.discount, 1, 2)}"></span>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label">IVA (21%)</span>
+                <span class="summary-value" th:text="${'$' + #numbers.formatDecimal(order.iva, 1, 2)}"></span>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label">Envío</span>
+                <span class="summary-value" th:text="${'$' + #numbers.formatDecimal(order.shippingCost, 1, 2)}"></span>
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="total-label">TOTAL DE LA ORDEN</div>
+            <div class="total-value" th:text="${'$' + #numbers.formatDecimal(order.total, 1, 2)}"></div>
+        </div>
+    </div>
+
+    <div th:if="${order.attachment}" class="attachment-card">
+        <div class="attachment-icon">
+            <i class="bi bi-file-earmark-text"></i>
+        </div>
+        <div class="attachment-info">
+            <h5 th:text="${order.attachment.fileName}"></h5>
+            <p th:text="${#strings.format('%s MB', #numbers.formatDecimal(order.attachment.size / (1024*1024), 1, 2))}"></p>
+        </div>
+        <a href="#" class="btn-download btn btn-primary">
+            <i class="bi bi-download me-1"></i> Descargar
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="/orders" class="btn-back btn btn-light">
+            <i class="bi bi-arrow-left me-1"></i> Volver a lista
+        </a>
+
+        <div th:if="${!order.completed}">
+            <form th:action="@{'/orders/' + ${order.id} + '/complete'}" method="post">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-1"></i> Marcar como Completada
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

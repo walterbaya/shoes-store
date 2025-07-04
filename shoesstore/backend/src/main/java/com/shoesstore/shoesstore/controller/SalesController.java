@@ -1,5 +1,6 @@
 package com.shoesstore.shoesstore.controller;
 
+import com.shoesstore.shoesstore.model.PaymentMethod;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.service.ProductService;
@@ -28,6 +29,16 @@ public class SalesController {
     private SaleService saleService;
 
     @GetMapping
+    public String listSales(Model model) {
+        List<Sale> sales = saleService.getAllSales();       // o findAll(), como lo tengas
+        model.addAttribute("title", "Listado de Ventas");
+        model.addAttribute("sales", sales);
+        // Indica a layout.html qué fragmento renderizar
+        model.addAttribute("view", "sales/list");
+        return "layout";
+    }
+
+    @GetMapping("/create")
     public String showNewSaleForm(Model model) {
         // Obtener la lista de productos
         List<Product> products = productService.getAllProducts();
@@ -46,12 +57,14 @@ public class SalesController {
         model.addAttribute("saleForm", saleForm);
         model.addAttribute("channels", List.of("ONLINE", "TIENDA"));
         model.addAttribute("products", products);
+
         model.addAttribute("view", "sales/newSale");
 
         return "layout";  // Vista Thymeleaf para nueva venta
     }
 
-    @PostMapping
+
+    @PostMapping("/create")
     public String registerSale(
             @ModelAttribute("saleForm") SaleForm saleForm,
             BindingResult result,
@@ -61,6 +74,7 @@ public class SalesController {
         if (result.hasErrors()) {
             model.addAttribute("channels", Sale.SaleChannel.values());
             model.addAttribute("products", productService.getAllProducts());
+            model.addAttribute("view", "sales/list");
             redirectAttrs.addFlashAttribute("error", "Hubo un error al procesar la venta."); // ← flash
             return "redirect:/sales";  // ← redirect igual
         }
@@ -75,7 +89,10 @@ public class SalesController {
             Sale sale = new Sale();
             sale.setChannel(Sale.SaleChannel.valueOf(saleForm.getChannel()));
             sale.setSaleDate(LocalDateTime.now());
-
+            sale.setTotal(saleForm.getTotal());
+            sale.setDiscountPercentage(saleForm.getDiscountPercentage());
+            sale.setShippingCost(saleForm.getShippingCost());
+            sale.setPaymentMethod(PaymentMethod.valueOf(saleForm.getPaymentMethod()));
             saleService.processSale(sale, itemsToProcess);
 
             redirectAttrs.addFlashAttribute("success", "Venta registrada exitosamente."); // ← flash

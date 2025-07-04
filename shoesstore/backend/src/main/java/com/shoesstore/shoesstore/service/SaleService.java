@@ -96,6 +96,10 @@ public class SaleService {
         return saleRepository.findTopSellers(start, end);
     }
 
+    public List<Sale> getAllSales() {
+        return saleRepository.findAll();
+    }
+
     public List<Sale> getSalesWithoutClaims() {
         return saleRepository.findSalesWithoutClaims();
     }
