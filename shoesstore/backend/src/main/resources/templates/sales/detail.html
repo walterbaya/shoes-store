@@ -248,17 +248,13 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h1 class="h4 mb-0">
-                                <i class="bi bi-receipt me-2"></i>
-                                Detalle de Venta #VS-2023-00158
+                                <i class="bi bi-receipt me-2" th:text="'Detalle de Venta #' + ${sale.id}"></i>
                             </h1>
                             <div class="d-flex align-items-center mt-2">
-                                <span class="status-badge status-completed me-2">
-                                    <i class="bi bi-check-circle me-1"></i> Completada
-                                </span>
                                 <span class="channel-badge badge-online">
-                                    <i class="bi bi-globe me-1"></i> Venta Online
+                                    <i class="bi bi-globe me-1"></i> <span th:text="${sale.channel.name == 'ONLINE' ? 'Venta Online' : 'Venta en Tienda'}"></span>
                                 </span>
-                                <span class="ms-3 text-light"><i class="bi bi-calendar me-1"></i> 15/07/2023 14:35</span>
+                                <span class="ms-3 text-light"><i class="bi bi-calendar me-1"></i> <span th:text="${#temporals.format(sale.saleDate, 'dd MMMM yyyy, HH:mm')}"></span></span>
                             </div>
                         </div>
                         <div class="d-flex">
@@ -275,183 +271,74 @@
                 <div class="card-body">
                     <!-- Información del cliente -->
                     <div class="row mb-4">
-                        <div class="col-md-8">
-                            <div class="sale-detail-section">
-                                <h5 class="section-title"><i class="bi bi-person me-2"></i>Información del Cliente</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Nombre</label>
-                                        <p class="mb-0">María Rodríguez</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Teléfono</label>
-                                        <p class="mb-0">+34 612 345 678</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Email</label>
-                                        <p class="mb-0">maria.rodriguez@example.com</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">ID de Cliente</label>
-                                        <p class="mb-0">CL-2023-00125</p>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label text-muted small mb-1">Dirección de Envío</label>
-                                        <p class="mb-0">Calle Gran Vía, 28, 3ºB, 28013 Madrid, España</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="sale-detail-section h-100">
-                                <h5 class="section-title"><i class="bi bi-credit-card me-2"></i>Información de Pago</h5>
-                                <div class="payment-method mb-3">
-                                    <div class="payment-icon">
-                                        <i class="bi bi-credit-card"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium">Tarjeta de Crédito</div>
-                                        <div class="text-muted small">Terminada en **** 4242</div>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Método de Pago:</span>
-                                        <span class="fw-medium">Visa</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span class="text-muted">Autorización:</span>
-                                        <span class="fw-medium">AUTH-789456</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span class="text-muted">Estado del Pago:</span>
-                                        <span class="fw-medium text-success">Completado</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Productos -->
-                    <div class="sale-detail-section mb-4">
-                        <h5 class="section-title"><i class="bi bi-cart me-2"></i>Productos</h5>
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th class="text-center">Precio Unitario</th>
-                                    <th class="text-center">Cantidad</th>
-                                    <th class="text-end">Subtotal</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr class="product-row">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="product-img me-3">
-                                                <i class="bi bi-laptop"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium">Portátil UltraSlim Pro</div>
-                                                <div class="text-muted small">Ref: LT-2023-001</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">€1,299.00</td>
-                                    <td class="text-center">1</td>
-                                    <td class="text-end fw-medium">€1,299.00</td>
-                                </tr>
-                                <tr class="product-row">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="product-img me-3">
-                                                <i class="bi bi-mouse"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium">Ratón Inalámbrico Ergonómico</div>
-                                                <div class="text-muted small">Ref: AC-2023-045</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">€45.90</td>
-                                    <td class="text-center">2</td>
-                                    <td class="text-end fw-medium">€91.80</td>
-                                </tr>
-                                <tr class="product-row">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="product-img me-3">
-                                                <i class="bi bi-usb-drive"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium">Disco Duro Externo 1TB</div>
-                                                <div class="text-muted small">Ref: AC-2023-128</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center">€89.99</td>
-                                    <td class="text-center">1</td>
-                                    <td class="text-end fw-medium">€89.99</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Resumen de la venta -->
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="sale-detail-section">
-                                <h5 class="section-title"><i class="bi bi-truck me-2"></i>Información de Envío</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Transportista</label>
-                                        <p class="mb-0">Correos Express</p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Número de Seguimiento</label>
-                                        <p class="mb-0">ES345678901234567890</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted small mb-1">Estado del Envío</label>
-                                        <p class="mb-0"><span class="badge bg-success">Entregado</span></p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label text-muted small mb-1">Fecha de Entrega</label>
-                                        <p class="mb-0">17/07/2023</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-lg-4">
                             <div class="sale-detail-section">
                                 <h5 class="section-title"><i class="bi bi-receipt me-2"></i>Resumen de la Venta</h5>
-                                <div class="summary-item">
-                                    <span>Subtotal:</span>
-                                    <span>€1,480.79</span>
+                                <div class="payment-method mb-3">
+                                    <div class="payment-icon">
+                                        <i class="bi" th:class="${sale.paymentMethod.name == 'TARJETA' ? 'bi-credit-card' : sale.paymentMethod.name == 'EFECTIVO' ? 'bi-cash' : 'bi-bank'}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium" th:text="${sale.paymentMethod.name}"></div>
+                                    </div>
                                 </div>
+
                                 <div class="summary-item">
-                                    <span>Descuento (5%):</span>
-                                    <span class="text-danger">-€74.04</span>
+                                    <span>Porcentaje de Descuento:</span>
+                                    <span th:text="${#numbers.formatDecimal(sale.discountPercentage, 1, 2) + ' %'}"></span>
                                 </div>
+                                <div class="summary-item"><span>Descuento:</span> <span th:text="${'$' + #numbers.formatDecimal(sale.total * (sale.discountPercentage / 100), 1, 2)}"></span></div>
                                 <div class="summary-item">
                                     <span>Envío:</span>
-                                    <span>€9.99</span>
+                                    <span th:text="${'$' + #numbers.formatDecimal(sale.shippingCost, 1, 2)}"></span>
                                 </div>
                                 <div class="summary-item">
                                     <span>IVA (21%):</span>
-                                    <span>€297.40</span>
+                                    <span th:text="${'$' + #numbers.formatDecimal(sale.total * 0.21, 1, 2)}"></span>
                                 </div>
                                 <div class="summary-item mb-3">
                                     <span class="summary-total">Total:</span>
-                                    <span class="summary-total">€1,714.14</span>
+                                    <span class="summary-total" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></span>
                                 </div>
                                 <div class="d-grid mt-3">
                                     <button class="btn btn-primary no-print">
                                         <i class="bi bi-download me-1"></i> Descargar Factura
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="sale-detail-section mb-4 col-8">
+                            <h5 class="section-title"><i class="bi bi-cart me-2"></i>Productos</h5>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>ID </th>
+                                        <th>Tipo</th>
+                                        <th>Marca</th>
+                                        <th>Descripción </th>
+                                        <th>Talle</th>
+                                        <th>Genero</th>
+                                        <th class="text-center">Precio Unitario</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="sp : ${products}" class="product-row">
+                                        <td th:text="${sp.product.id}"></td>
+                                        <td th:text="${sp.product.type}"></td>
+                                        <td th:text="${sp.product.brand}"></td>
+                                        <td th:text="${sp.product.description}"></td>
+                                        <td th:text="${sp.product.size.displayValue}"></td>
+                                        <td th:text="${sp.product.gender.displayValue}"></td>
+                                        <td class="text-center" th:text="${'$' + #numbers.formatDecimal(sp.product.price,1,2)}"></td>
+                                        <td class="text-center" th:text="${sp.quantity}"></td>
+                                        <td class="text-end fw-medium" th:text="${'$' + #numbers.formatDecimal(sp.subtotal, 1, 2)}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

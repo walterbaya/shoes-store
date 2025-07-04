@@ -1,6 +1,8 @@
 package com.shoesstore.shoesstore.service;
 
+import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
+import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -23,9 +25,11 @@ public class ReportService {
 
     private final SaleRepository saleRepository;
     private static final DateTimeFormatter DMY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final ProductRepository productRepository;
 
-    public ReportService(SaleRepository saleRepository) {
+    public ReportService(SaleRepository saleRepository, ProductRepository productRepository) {
         this.saleRepository = saleRepository;
+        this.productRepository = productRepository;
     }
 
     public Map<String, Object> generateSalesReport(String reportType,
@@ -134,15 +138,26 @@ public class ReportService {
             List<String> labels = new ArrayList<>();
             List<Number> quantities = new ArrayList<>();
             List<Map<String, Object>> rows = new ArrayList<>();
+
             for (Object[] o : raw) {
-                labels.add((String) o[0]);
-                quantities.add((Number) o[1]);
+                String producto = String.valueOf(o[0]);                // <- aquí
+                Number cantidad = (Number) o[1];                        // puede ser Long, Integer, etc.
+                double totalDouble = ((Number) o[2]).doubleValue();    // convierto a doble para formatear
+
+
+                Product product = productRepository.findById((Long)o[0]).get();
+                labels.add(product.getType() + " " + product.getBrand() + " " + product.getMaterial());
+                quantities.add(cantidad);
                 rows.add(Map.of(
-                        "Producto", o[0],
-                        "Cantidad", o[1],
-                        "Total", "$ " + String.format("%.2f", o[2])
+                        "Id", producto,
+                        "Tipo", product.getType(),
+                        "Marca", product.getBrand(),
+                        "Material", product.getMaterial(),
+                        "Cantidad", cantidad,
+                        "Total", "$ " + String.format("%.2f", totalDouble)
                 ));
             }
+
             result.put("labels", labels);
             result.put("datasets", List.of(
                     Map.of("label", "Top Productos", "data", quantities, "borderWidth", 1)
@@ -150,6 +165,7 @@ public class ReportService {
             result.put("tableRows", rows);
             return result;
         }
+
 
         // Agregación genérica por periodos (weekly, daily genérico, period, etc.)
         List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);

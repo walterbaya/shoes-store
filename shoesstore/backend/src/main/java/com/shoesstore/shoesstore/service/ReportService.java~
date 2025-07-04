@@ -1,8 +1,11 @@
 package com.shoesstore.shoesstore.service;
 
+import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
+import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,46 +25,42 @@ public class ReportService {
 
     private final SaleRepository saleRepository;
     private static final DateTimeFormatter DMY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final ProductRepository productRepository;
 
-    public ReportService(SaleRepository saleRepository) {
+    public ReportService(SaleRepository saleRepository, ProductRepository productRepository) {
         this.saleRepository = saleRepository;
+        this.productRepository = productRepository;
     }
 
     public Map<String, Object> generateSalesReport(String reportType,
                                                    String startDateString,
                                                    String endDateString) {
 
-        // Rango por defecto: última semana completa
-        LocalDateTime endDate = LocalDateTime.now()
-                .withHour(23)
-                .withMinute(59)
-                .withSecond(59)
-                .withNano(999_999_999);
-        LocalDateTime startDate = endDate.minusWeeks(1)
-                .with(LocalTime.MIN);
+        // 1) Rango por defecto: última semana completa
+        LocalDateTime endDate = LocalDateTime.now().with(LocalTime.MAX);
+        LocalDateTime startDate = endDate.minusWeeks(1).with(LocalTime.MIN);
 
-        // Si vienen fechas por parámetro, las parseamos
-        if (startDateString != null && !startDateString.isEmpty()) {
-            LocalDate parsedStart = LocalDate.parse(startDateString);
-            startDate = parsedStart.atStartOfDay();
+        // 2) Parseo de fechas de parámetro si vienen
+        if (StringUtils.hasText(startDateString)) {
+            startDate = LocalDate.parse(startDateString).atStartOfDay();
         }
-        if (endDateString != null && !endDateString.isEmpty()) {
-            LocalDate parsedEnd = LocalDate.parse(endDateString);
-            endDate = parsedEnd.atTime(LocalTime.MAX);
+        if (StringUtils.hasText(endDateString)) {
+            endDate = LocalDate.parse(endDateString).atTime(LocalTime.MAX);
         }
 
-        // Ajuste especial: si es daily, igualamos inicio y fin
-        if ("daily".equals(reportType)) {
-            LocalDate day = startDate.toLocalDate();
-            startDate = day.atStartOfDay();
-            endDate = day.atTime(LocalTime.MAX);
-        }
-
-        // Ajustes de rango según tipo
+        // 3) Ajustes específicos por tipo de reporte
         switch (reportType) {
+            case "weekly-user-sales":
+                // ya quedan startDate y endDate en la última semana
+                break;
+            case "daily":
+            case "daily-user-sales":
+                LocalDate day = startDate.toLocalDate();
+                startDate = day.atStartOfDay();
+                endDate   = day.atTime(LocalTime.MAX);
+                break;
             case "byUser":
-                startDate = startDate.withHour(0).withMinute(0)
-                        .with(LocalTime.MIN);
+                startDate = startDate.with(LocalTime.MIN);
                 break;
             case "byProduct":
                 startDate = endDate.minusMonths(1)
@@ -69,22 +68,49 @@ public class ReportService {
                         .with(LocalTime.MIN);
                 break;
             case "period":
-                break;
-            case "weekly":
-            case "weekly-user-sales":
-                startDate = endDate.minusWeeks(1)
-                        .with(LocalTime.MIN);
-                break;
-            case "daily":
-                // ya está ajustado
+                // no cambia nada
                 break;
             default:
-                reportType = "weekly";
-                startDate = endDate.minusWeeks(1)
-                        .with(LocalTime.MIN);
+                // fallback a weekly-user-sales
+                reportType = "weekly-user-sales";
+                startDate = endDate.minusWeeks(1).with(LocalTime.MIN);
         }
 
         Map<String, Object> result = new HashMap<>();
+
+        // === NUEVA LÓGICA para weekly-user-sales y daily-user-sales ===
+        if ("weekly-user-sales".equals(reportType) || "daily-user-sales".equals(reportType)) {
+            // fetchSalesByUser devuelve List<Object[]> con { usuario, totalVentas }
+            List<Object[]> raw = saleRepository.fetchSalesByUser(startDate, endDate);
+
+            List<String> labels = new ArrayList<>();
+            List<Number> data  = new ArrayList<>();
+            List<Map<String, Object>> rows = new ArrayList<>();
+
+            for (Object[] fila : raw) {
+                String usuario = (String) fila[0];
+                Number total   = (Number) fila[1];
+                labels.add(usuario);
+                data.add(total);
+                rows.add(Map.of(
+                        "Usuario", usuario,
+                        "TotalVentas", total
+                ));
+            }
+
+            result.put("labels", labels);
+            result.put("datasets", List.of(
+                    Map.of(
+                            "label", "Ventas por Usuario",
+                            "data", data,
+                            "borderWidth", 1
+                    )
+            ));
+            result.put("tableRows", rows);
+            return result;
+        }
+
+        // === CASOS EXISTENTES ===
 
         if ("byUser".equals(reportType)) {
             List<Object[]> raw = saleRepository.fetchSalesByUser(startDate, endDate);
@@ -94,7 +120,10 @@ public class ReportService {
             for (Object[] o : raw) {
                 labels.add((String) o[0]);
                 values.add((Number) o[1]);
-                rows.add(Map.of("Usuario", o[0], "Ventas", "$ " +  String.format("%.2f", o[1])));
+                rows.add(Map.of(
+                        "Usuario", o[0],
+                        "Ventas", "$ " + String.format("%.2f", o[1])
+                ));
             }
             result.put("labels", labels);
             result.put("datasets", List.of(
@@ -109,15 +138,23 @@ public class ReportService {
             List<String> labels = new ArrayList<>();
             List<Number> quantities = new ArrayList<>();
             List<Map<String, Object>> rows = new ArrayList<>();
+
             for (Object[] o : raw) {
-                labels.add((String) o[0]);
-                quantities.add((Number) o[1]);
+                String producto = String.valueOf(o[0]);                // <- aquí
+                Number cantidad = (Number) o[1];                        // puede ser Long, Integer, etc.
+                double totalDouble = ((Number) o[2]).doubleValue();    // convierto a doble para formatear
+
+
+                Product product = productRepository.findById((Long)o[0]).get();
+                labels.add(product.getType() + " " + product.getBrand() + " " + product.getMaterial());
+                quantities.add(cantidad);
                 rows.add(Map.of(
-                        "Producto", o[0],
-                        "Cantidad", o[1],
-                        "Total", "$ " + String.format("%.2f", o[2])
+                        "Id Producto", producto,
+                        "Cantidad", cantidad,
+                        "Total", "$ " + String.format("%.2f", totalDouble)
                 ));
             }
+
             result.put("labels", labels);
             result.put("datasets", List.of(
                     Map.of("label", "Top Productos", "data", quantities, "borderWidth", 1)
@@ -126,42 +163,44 @@ public class ReportService {
             return result;
         }
 
+
+        // Agregación genérica por periodos (weekly, daily genérico, period, etc.)
         List<Sale> sales = saleRepository.findBySaleDateBetween(startDate, endDate);
         Map<String, Double> agg = new LinkedHashMap<>();
-        List<Map<String, Object>> rows = new ArrayList<>();
+        List<Map<String, Object>> periodRows = new ArrayList<>();
         for (Sale s : sales) {
             String key = formatPeriod(s.getSaleDate(), reportType);
             agg.put(key, agg.getOrDefault(key, 0.0) + s.getTotal());
         }
-        List<String> labels = new ArrayList<>(agg.keySet());
-        List<Number> data = new ArrayList<>(agg.values());
+        List<String> periodLabels = new ArrayList<>(agg.keySet());
+        List<Number> periodData = new ArrayList<>(agg.values());
         for (Map.Entry<String, Double> e : agg.entrySet()) {
-            rows.add(Map.of(
+            periodRows.add(Map.of(
                     "Periodo", e.getKey(),
                     "Total en Ventas", "$ " + String.format("%.2f", e.getValue()),
                     "Cantidad de Ventas", Collections.frequency(new ArrayList<>(agg.values()), e.getValue())
             ));
         }
-        result.put("labels", labels);
+        result.put("labels", periodLabels);
         result.put("datasets", List.of(
-                Map.of("label", "Total de Ventas", "data", data, "borderWidth", 1)
+                Map.of("label", "Total de Ventas", "data", periodData, "borderWidth", 1)
         ));
-        result.put("tableRows", rows);
+        result.put("tableRows", periodRows);
         return result;
     }
 
     /**
-     * Formatea cualquier LocalDateTime a DD/MM/YYYY.
-     * En weekly calcula el inicio de la semana ISO (lunes).
+     * Formatea LocalDateTime a DD/MM/YYYY; para weekly pone el lunes ISO.
      */
     private String formatPeriod(LocalDateTime date, String reportType) {
         switch (reportType) {
             case "weekly":
             case "weekly-user-sales":
                 LocalDate startOfWeek = date.toLocalDate()
-                        .with(WeekFields.ISO.getFirstDayOfWeek());
+                        .with(java.time.temporal.WeekFields.ISO.getFirstDayOfWeek());
                 return startOfWeek.format(DMY);
             case "daily":
+            case "daily-user-sales":
                 return date.format(DMY);
             default:
                 return date.format(DMY);

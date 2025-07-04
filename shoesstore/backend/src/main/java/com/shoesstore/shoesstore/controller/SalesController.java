@@ -58,7 +58,7 @@ public class SalesController {
     }
 
     // Agrega esto al SalesController
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/details")
     public String getSaleDetail(@PathVariable Long id, Model model) {
         Sale sale = saleService.getSaleById(id);
         if (sale == null) {
@@ -74,12 +74,8 @@ public class SalesController {
         double taxAmount = taxableAmount * 0.21; // IVA 21%
 
         model.addAttribute("sale", sale);
-        model.addAttribute("subtotal", subtotal);
-        model.addAttribute("discountAmount", discountAmount);
-        model.addAttribute("taxableAmount", taxableAmount);
-        model.addAttribute("taxAmount", taxAmount);
+        model.addAttribute("products", sale.getDetails());
         model.addAttribute("title", "Detalle de Venta #" + sale.getId());
-
         model.addAttribute("view", "sales/detail");
         return "layout";
     }

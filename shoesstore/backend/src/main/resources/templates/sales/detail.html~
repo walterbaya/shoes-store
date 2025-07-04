@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalle de Venta</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -246,23 +248,13 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h1 class="h4 mb-0">
-                                <i class="bi bi-receipt me-2"></i>
-                                Detalle de Venta #<span th:text="'VS-' + ${sale.id}"></span>
+                                <i class="bi bi-receipt me-2" th:text="'Detalle de Venta #' + ${sale.id}"></i>
                             </h1>
                             <div class="d-flex align-items-center mt-2">
-                                <span class="status-badge status-completed me-2">
-                                    <i class="bi bi-check-circle me-1"></i> Completada
+                                <span class="channel-badge badge-online">
+                                    <i class="bi bi-globe me-1"></i> <span th:text="${sale.channel.name == 'ONLINE' ? 'Venta Online' : 'Venta en Tienda'}"></span>
                                 </span>
-                                <span class="channel-badge"
-                                      th:classappend="${sale.channel.name() == 'ONLINE'} ? 'badge-online' : 'badge-store'">
-                                    <i class="bi"
-                                       th:class="${sale.channel.name() == 'ONLINE'} ? 'bi-globe me-1' : 'bi-shop me-1'"></i>
-                                    <span th:text="${sale.channel == 'ONLINE' ? 'Venta Online' : 'Venta en Tienda'}"></span>
-                                </span>
-                                <span class="ms-3 text-light">
-                                    <i class="bi bi-calendar me-1"></i>
-                                    <span th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></span>
-                                </span>
+                                <span class="ms-3 text-light"><i class="bi bi-calendar me-1"></i> <span th:text="${#temporals.format(sale.saleDate, 'dd MMMM yyyy, HH:mm')}"></span></span>
                             </div>
                         </div>
                         <div class="d-flex">
@@ -279,122 +271,30 @@
                 <div class="card-body">
                     <!-- Información del cliente -->
                     <div class="row mb-4">
-                        <div class="col-md-8">
-                            <div class="sale-detail-section">
-                                <h5 class="section-title"><i class="bi bi-person me-2"></i>Información del Cliente</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Nombre</label>
-                                        <p class="mb-0" th:text="${sale.user.username}"></p>
-                                    </div>
-                                    <div class="col-md-6 mb-3" th:if="${sale.user.email != null}">
-                                        <label class="form-label text-muted small mb-1">Email</label>
-                                        <p class="mb-0" th:text="${sale.user.email}"></p>
-                                    </div>
-                                    <div class="col-12" th:if="${sale.channel.name() == 'ONLINE'}">
-                                        <label class="form-label text-muted small mb-1">Dirección de Envío</label>
-                                        <p class="mb-0" th:text="${sale.user.address != null ? sale.user.address : 'No especificada'}"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="sale-detail-section h-100">
-                                <h5 class="section-title"><i class="bi bi-credit-card me-2"></i>Información de Pago</h5>
-                                <div class="payment-method mb-3">
-                                    <div class="payment-icon">
-                                        <i class="bi bi-credit-card"></i>
-                                    </div>
-                                    <div>
-                                        <div class="fw-medium" th:text="${sale.paymentMethod}"></div>
-                                        <div class="text-muted small" th:if="${sale.paymentMethod.name() == 'TARJETA_CREDITO'}">
-                                            Terminada en **** 4242
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="d-flex justify-content-between">
-                                        <span class="text-muted">Estado del Pago:</span>
-                                        <span class="fw-medium text-success">Completado</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Productos -->
-                    <div class="sale-detail-section mb-4">
-                        <h5 class="section-title"><i class="bi bi-cart me-2"></i>Productos</h5>
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th class="text-center">Precio Unitario</th>
-                                    <th class="text-center">Cantidad</th>
-                                    <th class="text-end">Subtotal</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr class="product-row" th:each="detail : ${sale.details}">
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="product-img me-3">
-                                                <i class="bi" th:class="${detail.product.category.name} == 'ELECTRONICA' ? 'bi-laptop' :
-                                                                         ${detail.product.category.name} == 'ROPA' ? 'bi-tshirt' :
-                                                                         ${detail.product.category.name} == 'ALIMENTACION' ? 'bi-cup' :
-                                                                         'bi-box'"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-medium" th:text="${detail.product.name}"></div>
-                                                <div class="text-muted small" th:text="'Ref: ' + ${detail.product.id}"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" th:text="${'$' + #numbers.formatDecimal(detail.product.price, 1, 2)}"></td>
-                                    <td class="text-center" th:text="${detail.quantity}"></td>
-                                    <td class="text-end fw-medium" th:text="${'$' + #numbers.formatDecimal(detail.subtotal, 1, 2)}"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Resumen de la venta -->
-                    <div class="row">
-                        <div class="col-lg-8" th:if="${sale.channel.name() == 'ONLINE'}">
-                            <div class="sale-detail-section">
-                                <h5 class="section-title"><i class="bi bi-truck me-2"></i>Información de Envío</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Estado del Envío</label>
-                                        <p class="mb-0"><span class="badge bg-success">Entregado</span></p>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label text-muted small mb-1">Fecha de Entrega</label>
-                                        <p class="mb-0" th:text="${#temporals.format(sale.saleDate.plusDays(2), 'dd/MM/yyyy')}"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4" th:class="${sale.channel.name() == 'ONLINE'} ? '' : 'offset-lg-8'">
+                        <div class="col-lg-4">
                             <div class="sale-detail-section">
                                 <h5 class="section-title"><i class="bi bi-receipt me-2"></i>Resumen de la Venta</h5>
+                                <div class="payment-method mb-3">
+                                    <div class="payment-icon">
+                                        <i class="bi" th:class="${sale.paymentMethod.name == 'TARJETA' ? 'bi-credit-card' : sale.paymentMethod.name == 'EFECTIVO' ? 'bi-cash' : 'bi-bank'}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium" th:text="${sale.paymentMethod.name}"></div>
+                                    </div>
+                                </div>
+
                                 <div class="summary-item">
-                                    <span>Subtotal:</span>
-                                    <span th:text="${'$' + #numbers.formatDecimal(subtotal, 1, 2)}"></span>
+                                    <span>Porcentaje de Descuento:</span>
+                                    <span th:text="${#numbers.formatDecimal(sale.discountPercentage, 1, 2) + ' %'}"></span>
                                 </div>
-                                <div class="summary-item" th:if="${sale.discountPercentage > 0}">
-                                    <span>Descuento (<span th:text="${sale.discountPercentage}"></span>%):</span>
-                                    <span class="text-danger" th:text="'-$' + #numbers.formatDecimal(discountAmount, 1, 2)"></span>
-                                </div>
-                                <div class="summary-item" th:if="${sale.shippingCost > 0}">
+                                <div class="summary-item"><span>Descuento:</span> <span th:text="${'$' + #numbers.formatDecimal(sale.total * (sale.discountPercentage / 100), 1, 2)}"></span></div>
+                                <div class="summary-item">
                                     <span>Envío:</span>
                                     <span th:text="${'$' + #numbers.formatDecimal(sale.shippingCost, 1, 2)}"></span>
                                 </div>
                                 <div class="summary-item">
                                     <span>IVA (21%):</span>
-                                    <span th:text="${'$' + #numbers.formatDecimal(taxAmount, 1, 2)}"></span>
+                                    <span th:text="${'$' + #numbers.formatDecimal(sale.total * 0.21, 1, 2)}"></span>
                                 </div>
                                 <div class="summary-item mb-3">
                                     <span class="summary-total">Total:</span>
@@ -405,6 +305,39 @@
                                         <i class="bi bi-download me-1"></i> Descargar Factura
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="sale-detail-section mb-4 col-8">
+                            <h5 class="section-title"><i class="bi bi-cart me-2"></i>Productos</h5>
+                            <div class="table-responsive">
+                                <table class="table align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>ID </th>
+                                        <th>Tipo</th>
+                                        <th>Marca</th>
+                                        <th>Descripción </th>
+                                        <th>Talle</th>
+                                        <th>Genero</th>
+                                        <th class="text-center">Precio Unitario</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="sp : ${products}" class="product-row">
+                                        <td th:text="${sp.product.id}"></td>
+                                        <td th:text="${sp.product.type}"></td>
+                                        <td th:text="${sp.product.brand}"></td>
+                                        <td th:text="${sp.product.description}"></td>
+                                        <td th:text="${sp.product.size.displayValue}"></td>
+                                        <td class="text-center" th:text="${'$' + #numbers.formatDecimal(sp.product.price,1,2)}"></td>
+                                        <td class="text-center" th:text="${sp.quantity}"></td>
+                                        <td class="text-end fw-medium" th:text="${'$' + #numbers.formatDecimal(sp.subtotal, 1, 2)}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -422,6 +355,48 @@
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+
+        // Simular datos dinámicos
+        const saleData = {
+            id: "VS-2023-00158",
+            date: "15/07/2023 14:35",
+            status: "Completada",
+            channel: "ONLINE",
+            customer: {
+                name: "María Rodríguez",
+                email: "maria.rodriguez@example.com",
+                phone: "+34 612 345 678",
+                address: "Calle Gran Vía, 28, 3ºB, 28013 Madrid, España"
+            },
+            payment: {
+                method: "Tarjeta de Crédito",
+                type: "Visa",
+                lastDigits: "4242",
+                auth: "AUTH-789456",
+                status: "Completado"
+            },
+            shipping: {
+                carrier: "Correos Express",
+                tracking: "ES345678901234567890",
+                status: "Entregado",
+                deliveryDate: "17/07/2023"
+            },
+            products: [
+                { name: "Portátil UltraSlim Pro", ref: "LT-2023-001", price: 1299.00, quantity: 1, subtotal: 1299.00 },
+                { name: "Ratón Inalámbrico Ergonómico", ref: "AC-2023-045", price: 45.90, quantity: 2, subtotal: 91.80 },
+                { name: "Disco Duro Externo 1TB", ref: "AC-2023-128", price: 89.99, quantity: 1, subtotal: 89.99 }
+            ],
+            summary: {
+                subtotal: 1480.79,
+                discount: 74.04,
+                shipping: 9.99,
+                tax: 297.40,
+                total: 1714.14
+            }
+        };
+
+        // En un entorno real, estos datos vendrían del backend a través de Thymeleaf
+        console.log("Datos de la venta:", saleData);
     });
 </script>
 </body>
