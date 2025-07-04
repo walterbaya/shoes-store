@@ -77,5 +77,11 @@ public class SupplierController {
         supplierService.update(id, supplier, productIds, prices);
         return "redirect:/suppliers";
     }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteSupplier(@PathVariable Long id) {
+        supplierService.delete(id);
+        return "redirect:/suppliers";
+    }
 }
 

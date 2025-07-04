@@ -23,6 +23,7 @@
                 <tr>
                     <th class="py-3">ID</th>
                     <th class="py-3">Nombre</th>
+                    <th class="py-3">Contacto</th>
                     <th class="py-3">CUIT/CUIL</th>
                     <th class="py-3">Telefono</th>
                     <th class="py-3">Estado</th>
@@ -38,6 +39,7 @@
                         <div class="fw-medium" th:text="${supplier.name}">Proveedor X</div>
                         <div class="text-muted small" th:text="${supplier.email}">proveedor@ejemplo.com</div>
                     </td>
+                    <td th:text="${supplier.contactName}">30-12345678-9</td>
                     <td th:text="${supplier.cuit}">30-12345678-9</td>
                     <td>
                         <div th:text="${supplier.phone} ?: 'Sin teléfono'">+54 11 1234-5678</div>
@@ -70,12 +72,20 @@
                                class="btn btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form th:action="@{'/suppliers/delete/' + ${supplier.id}}" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger"
-                                        onclick="return confirm('¿Está seguro de eliminar este proveedor?')">
+                            <form method="post"
+                                  th:action="@{'/suppliers/delete/' + ${supplier.id}}"
+                                  style="display:inline-block"
+                                  >
+                                <input type="hidden" name="_method" value="delete">
+                                <button type="submit"
+                                        class="action-btn btn btn-sm btn-danger"
+                                        title="Eliminar"
+                                        data-bs-toggle="tooltip"
+                                        onclick="return confirm('¿Está seguro de eliminar este proveedor?');">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
+
                         </div>
                     </td>
                 </tr>

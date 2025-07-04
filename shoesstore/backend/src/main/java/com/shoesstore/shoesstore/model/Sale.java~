@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table (name = "ventas")
 public class Sale {
 
     @Id
@@ -30,6 +31,8 @@ public class Sale {
 
 
     private double shippingCost;
+    private double discountPercentage;
+
     private double total;
 
     private LocalDateTime saleDate = LocalDateTime.now();

@@ -70,4 +70,11 @@ public class Supplier {
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SupplierProduct> supplierProducts = new HashSet<>();
 
+    @OneToMany(
+            mappedBy = "supplier",
+            cascade = CascadeType.ALL,       // Propaga persist, merge y remove
+            orphanRemoval = true             // Elimina huérfanos al quitar de la colección
+    )
+    private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
+
 }

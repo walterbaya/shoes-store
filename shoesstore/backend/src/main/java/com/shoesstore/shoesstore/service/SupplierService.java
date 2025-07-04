@@ -93,6 +93,14 @@ public class SupplierService {
 
     public List<Supplier> findAll() { return supplierRepository.findAll(); }
     public Supplier findById(Long id) { return supplierRepository.findById(id).orElse(null); }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!supplierRepository.existsById(id)) {
+            throw new EntityNotFoundException("Supplier not found with ID: " + id);
+        }
+        supplierRepository.deleteById(id);
+    }
 }
 
 
