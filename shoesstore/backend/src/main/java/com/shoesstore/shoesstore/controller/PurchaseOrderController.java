@@ -1,11 +1,15 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.*;
+import com.shoesstore.shoesstore.repository.PurchaseOrderAttachmentRepository;
 import com.shoesstore.shoesstore.service.*;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,16 +27,19 @@ public class PurchaseOrderController {
     private final ProductService       productService;
     private final CustomUserDetailsService customUserDetailsService;
     private final UserService userService;
-
+    private final PurchaseOrderAttachmentRepository purchaseOrderAttachmentRepository;
+    private final FileStorageService fileStorageService;
 
     public PurchaseOrderController(PurchaseOrderService purchaseOrderService,
                                    SupplierService supplierService,
-                                   ProductService productService, CustomUserDetailsService customUserDetailsService, UserService userService) {
+                                   ProductService productService, CustomUserDetailsService customUserDetailsService, UserService userService, PurchaseOrderAttachmentRepository purchaseOrderAttachmentRepository, FileStorageService fileStorageService) {
         this.purchaseOrderService = purchaseOrderService;
         this.supplierService      = supplierService;
         this.productService       = productService;
         this.customUserDetailsService = customUserDetailsService;
         this.userService = userService;
+        this.purchaseOrderAttachmentRepository = purchaseOrderAttachmentRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -146,4 +153,23 @@ public class PurchaseOrderController {
         purchaseOrderService.completeOrder(id);
         return list(model);
     }
+
+    @GetMapping("/download/{attachmentId}")
+    public ResponseEntity<Resource> downloadAttachment(@PathVariable Long attachmentId) {
+        // Buscá la entidad Attachment por ID (asumo que tiene orderId y relativePath)
+        PurchaseOrderAttachment att = purchaseOrderAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        Resource resource = fileStorageService.loadFileAsResource(att.getStoragePath());
+        String filename = att.getFileName(); // o extraelo desde la entidad
+
+        return ResponseEntity.ok()
+                .contentType(MediaTypeFactory.getMediaType(filename)
+                        .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + filename + "\"")
+                .body(resource);
+    }
+
+
 }

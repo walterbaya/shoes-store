@@ -344,7 +344,7 @@
 
             <div class="summary-item">
                 <span class="summary-label">Porcentaje de Descuento</span>
-                <span class="summary-value" th:text="${#numbers.formatDecimal(order.discount, 1, 2) + ' %'}"></span>
+                <span class="summary-value" th:text="${'%' + #numbers.formatDecimal(order.discount, 1, 2)}"></span>
             </div>
 
             <div class="summary-item">

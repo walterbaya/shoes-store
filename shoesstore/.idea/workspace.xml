@@ -7,11 +7,9 @@
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/PurchaseOrderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/PurchaseOrderController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ReportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/ReportController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SalesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SalesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SupplierController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/SupplierController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/create.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/create.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/PurchaseOrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/PurchaseOrderService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uploads/2/72cf4298-e02b-4254-ad8f-08f0767c46e6_RptViewer.pdf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -243,7 +241,7 @@
       <workItem from="1751379129473" duration="7201000" />
       <workItem from="1751399041307" duration="16057000" />
       <workItem from="1751568891031" duration="28293000" />
-      <workItem from="1751634989678" duration="16300000" />
+      <workItem from="1751634989678" duration="20873000" />
     </task>
     <servers />
   </component>
@@ -262,15 +260,6 @@
     </option>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/service/PurchaseOrderService.java</url>
-          <line>49</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="SpringBootApplicationConfigurationType">
         <watch expression="order.shippingCost" />

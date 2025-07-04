@@ -59,6 +59,7 @@ public class PurchaseOrderService {
         orderRepo.save(po);
     }
 
+    //products and quantities tiene el id y la cantidad de cada producto
     @Transactional
     public void createOrder(
             PurchaseOrder purchaseOrder,
@@ -95,19 +96,26 @@ public class PurchaseOrderService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         purchaseOrder.setUser(user);
 
-
         // Creo ítems filtrando cantidades > 0
         PurchaseOrder finalPurchaseOrder = purchaseOrder;
         List<PurchaseOrderItem> items = productsAndQuantities.entrySet().stream()
                 .filter(e -> e.getValue() > 0)
                 .map(e -> {
-                    Product p = productRepo.findById(e.getKey())
+
+                    //de los supplier products obtengo
+
+                    SupplierProduct sp = supplier.getSupplierProducts().stream()
+                            .filter(sup -> sup.getProduct().getId().equals(e.getKey()))
+                            .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("Producto no existe"));
+                    Product p = sp.getProduct();
                     PurchaseOrderItem item = new PurchaseOrderItem();
                     item.setOrder(finalPurchaseOrder);
                     item.setProduct(p);
                     item.setQuantity(e.getValue());
-                    item.setPurchasePrice(BigDecimal.valueOf(p.getPrice()));
+                    //Este precio no se obtiene del producto directamente sino que es el precio al que lo vende el proveedor
+                    item.setPurchasePrice(sp.getPrice());
+                    item.setSubtotal(item.getPurchasePrice().multiply(BigDecimal.valueOf(item.getQuantity())));
                     return item;
                 })
                 .collect(Collectors.toList());
