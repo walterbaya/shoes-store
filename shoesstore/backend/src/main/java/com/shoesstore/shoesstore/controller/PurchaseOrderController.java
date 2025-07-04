@@ -1,15 +1,14 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.*;
-import com.shoesstore.shoesstore.service.ProductService;
-import com.shoesstore.shoesstore.service.PurchaseOrderService;
-import com.shoesstore.shoesstore.service.SupplierService;
+import com.shoesstore.shoesstore.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,18 +21,24 @@ public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
     private final SupplierService      supplierService;
     private final ProductService       productService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final UserService userService;
+
 
     public PurchaseOrderController(PurchaseOrderService purchaseOrderService,
                                    SupplierService supplierService,
-                                   ProductService productService) {
+                                   ProductService productService, CustomUserDetailsService customUserDetailsService, UserService userService) {
         this.purchaseOrderService = purchaseOrderService;
         this.supplierService      = supplierService;
         this.productService       = productService;
+        this.customUserDetailsService = customUserDetailsService;
+        this.userService = userService;
     }
 
     @GetMapping
     public String list(Model model) {
         model.addAttribute("title", "Compras");
+        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         model.addAttribute("orders", purchaseOrderService.findAll());
         model.addAttribute("completedOrders", purchaseOrderService.findAll().stream().filter(PurchaseOrder::isCompleted).toList());
         model.addAttribute("sumOfTotals", purchaseOrderService.findAll().stream().map(PurchaseOrder::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
@@ -60,14 +65,23 @@ public class PurchaseOrderController {
     public String createOrder(
             @RequestParam Long supplierId,
             @RequestParam Map<String,String> allParams,
-            @ModelAttribute("order") PurchaseOrder purchaseOrder,
+            @ModelAttribute("order") PurchaseOrder order,
             @RequestParam(name="attachmentFile", required=false) MultipartFile attachment,
             @RequestParam(name="discountPct") BigDecimal discountPct,
             @RequestParam(name="shippingCost") BigDecimal shippingCost,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            // Extraigo cantidades de productos
+            // Completar campos que no vienen del form directamente o que requieren lógica
+            order.setDiscount(discountPct);
+            order.setShippingCost(shippingCost);
+            order.setGeneratedDate(LocalDate.now());
+
+            // Usuario autenticado
+            User user = userService.getUserByUsername(customUserDetailsService.getCurrentUserName()).orElseThrow();
+            order.setUser(user);
+
+            // Mapear productos
             Map<Long,Integer> qtys = allParams.entrySet().stream()
                     .filter(e -> e.getKey().startsWith("product_"))
                     .collect(Collectors.toMap(
@@ -75,16 +89,17 @@ public class PurchaseOrderController {
                             e -> Integer.parseInt(e.getValue())
                     ));
 
-            // Llamo al servicio pasando el objeto completo
             purchaseOrderService.createOrder(
-                    purchaseOrder,
+                    order,
                     supplierId,
                     qtys,
                     discountPct,
                     shippingCost,
                     attachment
             );
+
             return "redirect:/orders";
+
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Error al crear orden: " + e.getMessage());
             return "redirect:/orders/create";
@@ -127,8 +142,8 @@ public class PurchaseOrderController {
     }
 
     @PostMapping("/{id}/complete")
-    public String complete(@PathVariable Long id) {
+    public String complete(@PathVariable Long id, Model model) {
         purchaseOrderService.completeOrder(id);
-        return "redirect:/orders/{id}";
+        return list(model);
     }
 }

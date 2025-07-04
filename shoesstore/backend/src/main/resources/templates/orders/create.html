@@ -135,6 +135,8 @@
         <!-- Campos ocultos para descuento y envío -->
         <input type="hidden" name="discountPct" id="discountPctInput" value="5">
         <input type="hidden" name="shippingCost" id="shippingCostInput" value="45990">
+        <input type="hidden" name="iva" id="ivaInput" value="0">
+        <input type="hidden" name="total" id="totalInput" value="0">
 
         <!-- Información Básica -->
         <div class="card">
@@ -251,7 +253,7 @@
                     <div class="form-section">
                         <div class="mb-3">
                             <label class="form-label">Notas</label>
-                            <textarea class="form-control" rows="3" name="additionalInfo" th:value="${additionalInformation}"    placeholder="Agregue notas adicionales..."></textarea>
+                            <textarea class="form-control" rows="3" name="additionalInfo" th:field="*{additionalInformation}"    placeholder="Agregue notas adicionales..."></textarea>
                         </div>
                         <div class="mb-3">
                                 <div class="form-group">
@@ -276,12 +278,12 @@
                     <div class="form-section">
                         <div class="summary-item"><span>Subtotal:</span><span id="subtotalValue">$0,00</span></div>
                         <div class="summary-item"><span>Descuento:</span>
-                            <span class="text-success" id="discountValue" th:value="${discount}">-$0,00</span>
+                            <span class="text-success" id="discountValue" th:field="*{discount}">-$0,00</span>
                         </div>
-                        <div class="summary-item"><span>IVA (21%):</span><span id="ivaValue" th:value="${iva}">$0,00</span></div>
-                        <div class="summary-item"><span>Envío:</span><span id="shippingValue" th:value="${shippingCost}">$0,00</span></div>
+                        <div class="summary-item"><span>IVA (21%):</span><span id="ivaValue" th:field="*{iva}">$0,00</span></div>
+                        <div class="summary-item"><span>Envío:</span><span id="shippingValue" th:field="*{shippingCost}">$0,00</span></div>
                         <div class="summary-item summary-total">
-                            <span>Total:</span><span id="totalValue" th:value="${total}">$0,00</span>
+                            <span>Total:</span><span id="totalValue" th:field="*{total}">$0,00</span>
                         </div>
                         <div class="mt-3">
                             <div class="d-grid gap-2">
@@ -417,6 +419,8 @@
         document.getElementById('ivaValue').textContent = '$' + formatAR(iva);
         document.getElementById('shippingValue').textContent = '$' + formatAR(ship);
         document.getElementById('totalValue').textContent = '$' + formatAR(tot);
+        document.getElementById('ivaInput').value = iva;
+        document.getElementById('totalInput').value = tot;
 
         // Actualizar campos ocultos
         document.getElementById('discountPctInput').value = currentDiscountRate * 100;

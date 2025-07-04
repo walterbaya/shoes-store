@@ -60,101 +60,63 @@ public class PurchaseOrderService {
     }
 
     @Transactional
-    public void createOrder(
-            PurchaseOrder purchaseOrder,
-            Long supplierId,
-            Map<Long, Integer> productsAndQuantities,
-            BigDecimal discountPct,
-            BigDecimal shippingCost,
-            MultipartFile file
-    ) throws IOException {
-        // Validaciones básicas
-        if (discountPct.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("El descuento no puede ser negativo");
-        }
-        if (shippingCost.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("El costo de envío no puede ser negativo");
-        }
-
-        // Busco proveedor
+    public PurchaseOrder createOrder(PurchaseOrder order,
+                                     Long supplierId,
+                                     Map<Long,Integer> qtys,
+                                     BigDecimal discountPctPercent,
+                                     BigDecimal shippingCost,
+                                     MultipartFile attachment) throws Exception {
         Supplier supplier = supplierRepo.findById(supplierId)
-                .orElseThrow(() -> new IllegalArgumentException("Proveedor no existe"));
+                .orElseThrow(() -> new IllegalArgumentException("Proveedor no encontrado"));
 
-        // Completo campos bindeados desde el formulario
-        purchaseOrder.setSupplier(supplier);
-        purchaseOrder.setGeneratedDate(LocalDate.now());
-        purchaseOrder.setCompleted(false);
-        purchaseOrder.setDispatchDate(purchaseOrder.getDispatchDate());
-        purchaseOrder.setPriorityCondition(purchaseOrder.getPriorityCondition());
-        purchaseOrder.setDiscount(discountPct);
-        purchaseOrder.setShippingCost(shippingCost);
+        // 1) Calcular subtotal y crear líneas de detalle
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (Map.Entry<Long,Integer> e : qtys.entrySet()) {
+            if (e.getValue() <= 0) continue;
+            Product prod = productRepo.findById(e.getKey())
+                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+            BigDecimal linePrice = prod.getPrice();
+            BigDecimal lineTotal = linePrice.multiply(BigDecimal.valueOf(e.getValue()));
+            subtotal = subtotal.add(lineTotal);
 
-        // Usuario actual
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        purchaseOrder.setUser(user);
-
-        
-        // Creo ítems filtrando cantidades > 0
-        PurchaseOrder finalPurchaseOrder = purchaseOrder;
-        List<PurchaseOrderItem> items = productsAndQuantities.entrySet().stream()
-                .filter(e -> e.getValue() > 0)
-                .map(e -> {
-                    Product p = productRepo.findById(e.getKey())
-                            .orElseThrow(() -> new IllegalArgumentException("Producto no existe"));
-                    PurchaseOrderItem item = new PurchaseOrderItem();
-                    item.setOrder(finalPurchaseOrder);
-                    item.setProduct(p);
-                    item.setQuantity(e.getValue());
-                    item.setPurchasePrice(BigDecimal.valueOf(p.getPrice()));
-                    return item;
-                })
-                .collect(Collectors.toList());
-
-        if (items.isEmpty()) {
-            throw new IllegalArgumentException("La orden debe contener al menos un producto");
+            PurchaseOrderLine line = new PurchaseOrderLine();
+            line.setProduct(prod);
+            line.setQuantity(e.getValue());
+            line.setUnitPrice(linePrice);
+            line.setLineTotal(lineTotal);
+            line.setPurchaseOrder(order);
+            order.getLines().add(line);
         }
-        purchaseOrder.setItems(items);
 
-        // Cálculos de resumen
-        BigDecimal subtotal = items.stream()
-                .map(i -> i.getPurchasePrice().multiply(BigDecimal.valueOf(i.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 2) Descuento
+        BigDecimal discountRate = discountPctPercent
+                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        BigDecimal discountAmount = subtotal.multiply(discountRate);
 
-        BigDecimal discountAmt = subtotal.multiply(discountPct)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-
-        BigDecimal ivaAmt = subtotal.subtract(discountAmt)
-                .multiply(BigDecimal.valueOf(0.21))
+        // 3) IVA (21%)
+        BigDecimal baseImponible = subtotal.subtract(discountAmount);
+        BigDecimal iva = baseImponible.multiply(BigDecimal.valueOf(0.21))
                 .setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal total = subtotal
-                .subtract(discountAmt)
-                .add(ivaAmt)
-                .add(shippingCost)
-                .setScale(2, RoundingMode.HALF_UP);
+        // 4) Total final
+        BigDecimal total = baseImponible.add(iva).add(shippingCost);
 
-        purchaseOrder.setIva(ivaAmt);
-        purchaseOrder.setTotal(total);
+        // 5) Asignar todo a la entidad
+        order.setSupplier(supplier);
+        order.setOrderDate(LocalDate.now());
+        order.setSubtotal(subtotal.setScale(2, RoundingMode.HALF_UP));
+        order.setDiscountPct(discountPctPercent);
+        order.setDiscountAmount(discountAmount.setScale(2, RoundingMode.HALF_UP));
+        order.setIva(iva);
+        order.setShippingCost(shippingCost.setScale(2, RoundingMode.HALF_UP));
+        order.setTotal(total.setScale(2, RoundingMode.HALF_UP));
 
-        // 1. Guardar la orden PRIMERO (para generar ID)
-        purchaseOrder.setAttachment(null); // Asegurar que no hay adjunto inicial
-        purchaseOrder = orderRepo.save(purchaseOrder); // ¡Persiste y genera ID!
-
-        // 2. Procesar archivo DESPUÉS de tener ID
-        if (file != null && !file.isEmpty()) {
-            String relativePath = fileStorageService.storeFileForOrder(purchaseOrder.getId(), file);
-            PurchaseOrderAttachment att = new PurchaseOrderAttachment(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    relativePath,
-                    file.getSize(),
-                    purchaseOrder
-            );
-            purchaseOrder.setAttachment(att);
-            orderRepo.save(purchaseOrder); // Actualiza con adjunto
+        // 6) (Opcional) Guardar adjunto en disco/Base64 en BD...
+        if (attachment != null && !attachment.isEmpty()) {
+            // Ejemplo: order.setAttachment(attachment.getBytes());
         }
+
+        return orderRepo.save(order);
     }
 
     @Transactional

@@ -38,7 +38,6 @@ public class SalesController {
         List<Sale> sales = saleService.getAllSales();       // o findAll(), como lo tengas
         model.addAttribute("title", "Listado de Ventas");
         model.addAttribute("sales", sales);
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         double totalSalesSum = sales.stream().mapToDouble(Sale::getTotal).sum();
         long onlineSalesCount = sales.stream()
                                      .filter(sale -> "ONLINE".equalsIgnoreCase(sale.getChannel().toString()))

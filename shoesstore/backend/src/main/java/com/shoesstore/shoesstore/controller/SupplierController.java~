@@ -5,6 +5,7 @@ import com.shoesstore.shoesstore.model.SupplierProduct;
 import com.shoesstore.shoesstore.repository.ProductRepository;
 import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.SupplierService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,16 +18,12 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/suppliers")
+@AllArgsConstructor
 public class SupplierController {
     private final SupplierService supplierService;
     private final ProductRepository productRepository;
     private final CustomUserDetailsService customUserDetailsService;
-
-    public SupplierController(SupplierService supplierService, ProductRepository productRepository, CustomUserDetailsService customUserDetailsService) {
-        this.supplierService = supplierService;
-        this.productRepository = productRepository;
-        this.customUserDetailsService = customUserDetailsService;
-    }
+    
 
     @GetMapping
     public String list(Model model) {
