@@ -56,6 +56,12 @@ public class ProductController {
         if (result.hasErrors()) {
             return "layout";
         }
+        if (product.getPrice() <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0");
+        }
+        if(product.getStock() <= 0){
+            throw new IllegalArgumentException("El stock debe ser mayor a 0");
+        }
 
         try {
             productService.saveProduct(product);

@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -111,8 +110,6 @@ public class SaleService {
     }
 
     public List<Sale> getSalesWithoutClaims() {
-        return saleRepository.findAll().stream()
-                .filter(sale -> sale.getTotal() > 0 && sale.getClaim() == null)
-                .collect(Collectors.toList());
+        return saleRepository.findAll();
     }
 }

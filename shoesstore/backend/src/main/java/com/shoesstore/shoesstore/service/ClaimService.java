@@ -5,6 +5,7 @@ import com.shoesstore.shoesstore.repository.ClaimRepository;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,21 +18,13 @@ import java.util.Map;
 
 
 @Service
+@AllArgsConstructor
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
     private final SaleRepository saleRepository;
     private final SaleDetailsRepository saleDetailsRepository;
 
-    @Autowired
-    public ClaimService(ClaimRepository claimRepository,
-                        SaleRepository saleRepository,
-                        SaleDetailsRepository saleDetailsRepository
-                        ) {
-        this.claimRepository = claimRepository;
-        this.saleRepository = saleRepository;
-        this.saleDetailsRepository = saleDetailsRepository;
-    }
 
     // Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
     // Todas las claims tienen asociadas una venta y un conjunto de productos que se quieren actualizar en la venta
@@ -172,4 +165,32 @@ public class ClaimService {
         }
         return total;
     }
+
+    @Transactional
+    public Claim invalidateProof(Long claimId) {
+        Claim claim = getClaimById(claimId);
+        if (claim.getState() != Claim.State.PROOF_UPLOADED) {
+            throw new IllegalStateException("Solo se puede invalidar comprobantes en estado PROOF_UPLOADED");
+        }
+        claim.setState(Claim.State.INITIATED);
+        claim.setProofUploadedDate(null);
+        claim.setShippingProofUrl(null);
+        return claimRepository.save(claim);
+    }
+
+    @Transactional
+    public void deleteClaim(Long claimId) {
+        Claim claim = getClaimById(claimId);
+        if(claim.getState() != Claim.State.PACKAGE_RECEIVED){
+            throw new IllegalStateException("Solo se puede eliminar reclamos en estado finalizado.");
+        }
+
+        Sale sale = claim.getSale();
+        if (sale != null) {
+            sale.setClaim(null); // Si tenés `sale.claim`
+        }
+
+        claimRepository.delete(claim);
+    }
+
 }

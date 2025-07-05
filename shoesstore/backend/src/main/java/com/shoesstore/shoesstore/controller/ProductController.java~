@@ -18,19 +18,16 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final CustomUserDetailsService customUserDetailsService;
 
     // Inyección de dependencias
-    public ProductController(ProductService productService, CustomUserDetailsService customUserDetailsService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
-        this.customUserDetailsService = customUserDetailsService;
     }
 
     @GetMapping
     public String listarProductos(Model model) {
         List<ProductWithSuppliersDTO> products = productService.getAllProductsWithSuppliers();
         model.addAttribute("products", products);
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         model.addAttribute("title", "Productos");
         model.addAttribute("view", "products/list");
         return "layout";
@@ -58,6 +55,9 @@ public class ProductController {
         // errores de validación estándar
         if (result.hasErrors()) {
             return "layout";
+        }
+        if (product.getPrice() <= 0 || product.getStock() <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0 y el stock no puede ser negativo");
         }
 
         try {

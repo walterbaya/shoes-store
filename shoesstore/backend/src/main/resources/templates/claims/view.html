@@ -75,9 +75,15 @@
                         Ver comprobante
                     </a>
                 </p>
-                <form th:action="@{/claims/{id}/approve(id=${claim.id})}" method="post">
-                    <button type="submit" class="btn btn-success">Aprobar Devolución y Realizar Reembolso</button>
-                </form>
+
+                <div class="d-flex justify-content-start">
+                    <form th:action="@{/claims/{id}/approve(id=${claim.id})}" method="post">
+                        <button type="submit" class="btn btn-success">Aprobar Devolución y Realizar Reembolso</button>
+                    </form>
+                    <form th:action="@{/claims/{id}/invalidProof(id=${claim.id})}" method="post">
+                        <button type="submit" class="btn btn-danger ms-2">Marcar Comprobante Inválido</button>
+                    </form>
+                </div>
             </div>
         </div>
 

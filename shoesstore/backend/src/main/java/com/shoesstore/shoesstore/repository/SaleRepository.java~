@@ -28,5 +28,5 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
 	@Query("SELECT s.user.username, SUM(s.total) as total FROM Sale s WHERE s.saleDate BETWEEN :start AND :end GROUP BY s.user.username ORDER BY total DESC")
 	List<Object[]> findTopSellers(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-
+	
 }
