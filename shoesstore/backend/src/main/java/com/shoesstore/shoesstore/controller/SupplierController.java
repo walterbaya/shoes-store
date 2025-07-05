@@ -20,18 +20,15 @@ import java.util.stream.Collectors;
 public class SupplierController {
     private final SupplierService supplierService;
     private final ProductRepository productRepository;
-    private final CustomUserDetailsService customUserDetailsService;
 
     public SupplierController(SupplierService supplierService, ProductRepository productRepository, CustomUserDetailsService customUserDetailsService) {
         this.supplierService = supplierService;
         this.productRepository = productRepository;
-        this.customUserDetailsService = customUserDetailsService;
     }
 
     @GetMapping
     public String list(Model model) {
         model.addAttribute("title", "Proveedores");
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         model.addAttribute("suppliers", supplierService.findAll());
         model.addAttribute("view", "suppliers/view");
         return "layout";

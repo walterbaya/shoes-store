@@ -21,17 +21,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/reports/sales")
 public class ReportController {
 
-    private final CustomUserDetailsService customUserDetailsService;
 
     public ReportController(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
+
     }
 
     @GetMapping
     public String salesReport(Model model) {
         model.addAttribute("title", "Reporte de Ventas");
         model.addAttribute("view", "reports/salesReport");
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         return "layout";
     }
 
