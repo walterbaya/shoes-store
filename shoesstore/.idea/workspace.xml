@@ -6,15 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/layout.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/layout.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/orders/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/products/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/reports/salesReport.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/sales/list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/suppliers/view.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/new.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/new.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/view.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/claims/view.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

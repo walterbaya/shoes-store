@@ -1,11 +1,8 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.dto.ProductDto;
-import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
-import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
-import com.shoesstore.shoesstore.repository.SaleRepository;
 import com.shoesstore.shoesstore.service.SaleService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -43,7 +39,7 @@ public class SaleApiController {
         // Mapeo Product → ProductDto
         var p = detail.getProduct();
         ProductDto dto = new ProductDto();
-        dto.setCode(p.getCode());
+        dto.setId(p.getId());;
         dto.setDescription(p.getDescription());
         dto.setSize(p.getSize().name());
         dto.setPrice(p.getPrice());
