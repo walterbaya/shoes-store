@@ -1,4 +1,4 @@
-<div th:fragment="content card shadow" class="container mt-4">
+<divclass="content card shadow">
 
     <div class="alert alert-danger" th:if="${error}" role="alert">
         <i class="fas fa-exclamation-circle me-2"></i>
@@ -8,21 +8,20 @@
     <div class="card shadow border-0">
         <div class="card-header bg-gradient-primary text-white py-3">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0"
-                    th:text="'Nuevo Producto'">
-                </h1>
+                <h1 class="h3 mb-0" th:text="${product.id} != null ? 'Editar Producto' : 'Nuevo Producto'"></h1>
                 <i class="fas fa-shoe-prints fa-lg"></i>
             </div>
         </div>
 
         <div class="card-body">
 
-            <form th:action="@{/products/save}"
+            <form th:action="@{${product.id} != null ? '/products/update/' + ${product.id} : '/products/save'}"
                   th:object="${product}"
                   method="post"
                   class="needs-validation"
                   novalidate>
-                <!-- 1) Eliminamos el hidden y dejamos solo este input -->
+
+                <input type="hidden" th:if="${product.id}" th:field="*{id}"/>
 
                 <div class="row">
                     <div class="col-md-6 mb-4">
@@ -32,6 +31,7 @@
                                class="form-control"
                                th:field="*{id}"
                                placeholder="EJ: 1001"
+                               th:disabled="${product.id} != null"
                                required>
                         <div class="invalid-feedback">
                             Por favor ingrese un ID para el producto
@@ -52,7 +52,6 @@
                     </div>
                 </div>
 
-                <!-- resto de campos igual -->
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="typeInput" class="form-label">Categoría</label>
@@ -81,9 +80,9 @@
                     </div>
                 </div>
 
-                <!-- campos originales reorganizados -->
+                <!-- Nueva fila para Talla, Género y Marca -->
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-4 mb-4">
                         <label for="sizeSelect" class="form-label">Talla</label>
                         <select class="form-select"
                                 id="sizeSelect"
@@ -100,7 +99,25 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 mb-4">
+                    <!-- Nuevo campo: Género -->
+                    <div class="col-md-4 mb-4">
+                        <label for="genderSelect" class="form-label">Género</label>
+                        <select class="form-select"
+                                id="genderSelect"
+                                th:field="*{gender}"
+                                required>
+                            <option value="">Seleccionar género</option>
+                            <option th:each="gender : ${allGenders}"
+                                    th:value="${gender}"
+                                    th:text="${gender.displayValue}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor seleccione un género
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
                         <label for="brandInput" class="form-label">Marca</label>
                         <input type="text"
                                id="brandInput"
@@ -120,8 +137,7 @@
                               id="descriptionTextarea"
                               th:field="*{description}"
                               rows="4"
-                              placeholder="Detalles del producto, características...">
-          </textarea>
+                              placeholder="Detalles del producto, características..."></textarea>
                 </div>
 
                 <div class="row">
@@ -163,7 +179,8 @@
                         <i class="fas fa-arrow-left me-2"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i> Guardar Producto
+                        <i class="fas fa-save me-2"></i>
+                        <span th:text="${product.id} != null ? 'Actualizar Producto' : 'Guardar Producto'"></span>
                     </button>
                 </div>
 

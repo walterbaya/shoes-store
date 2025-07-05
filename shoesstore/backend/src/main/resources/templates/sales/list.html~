@@ -1,4 +1,5 @@
-<div class="content card shadow order-card">
+<div th:fragment="content card shadow">
+    <div class="card order-card">
                 <div class="card-header bg-primary text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="h4 mb-0">
@@ -144,7 +145,7 @@
                     </div>
                 </div>
             </div>
-
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
