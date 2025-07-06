@@ -88,7 +88,7 @@
                   <input type="hidden" name="_method" value="DELETE">
                   <button type="submit"
                           class="btn btn-sm btn-danger"
-                          onclick="return confirm('¿Está seguro de que desea eliminar este producto permanentemente? Esto también lo eliminará de todos los proveedores relacionados.')">
+                          onclick="return confirm('¿Desea eliminar este producto permanentemente, en ese caso se quitarán los mismos de todos los proveedores relacionados?')">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>

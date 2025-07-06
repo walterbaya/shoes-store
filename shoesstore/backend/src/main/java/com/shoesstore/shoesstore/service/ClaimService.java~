@@ -191,7 +191,7 @@ public class ClaimService {
         Sale sale = claim.getSale();
         claim.getClaimDetails().forEach(detail -> {
             detail.getSaleDetails().setClaim(null);
-        });
+        })
         if (sale != null) {
             sale.setClaim(null); // Si tenés `sale.claim`
         }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -56,8 +57,11 @@ public class ProductController {
         if (result.hasErrors()) {
             return "layout";
         }
-        if (product.getPrice() <= 0 || product.getStock() <= 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor a 0 y el stock no puede ser negativo");
+        if (product.getPrice() <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0");
+        }
+        if(product.getStock() <= 0){
+            throw new IllegalArgumentException("El stock debe ser mayor a 0");
         }
 
         try {
@@ -107,8 +111,13 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+    public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.deleteProduct(id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar venta: " + e.getMessage());
+        }
+
         return "redirect:/products";
     }
 

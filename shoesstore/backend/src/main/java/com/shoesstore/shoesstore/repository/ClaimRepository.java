@@ -14,4 +14,5 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     // Obtener todos los reclamos
     List<Claim> findAll();
+
 }

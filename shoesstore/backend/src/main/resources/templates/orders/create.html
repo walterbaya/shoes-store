@@ -217,12 +217,17 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>Producto</th><th>Stock Actual</th><th>Precio Unitario</th>
-                            <th>Cantidad a Comprar</th><th class="th-subtotal">Subtotal</th>
+                            <th>Id</th>
+                            <th>Producto</th>
+                            <th>Stock Actual</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad a Comprar</th>
+                            <th class="th-subtotal">Subtotal</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr class="product-row" th:each="prod : ${entry.value}">
+                            <td th:text="${prod.product.id}"></td>
                             <td><strong th:text="${prod.product.brand}">Marca</strong></td>
                             <td class="text-center" th:text="${prod.product.stock}">0</td>
                             <td class="text-center fw-bold"
@@ -232,8 +237,7 @@
                             <td>
                                 <div class="input-group" style="max-width:120px;">
                                     <button class="btn btn-outline-secondary" type="button">−</button>
-                                    <input type="number" class="form-control text-center"
-                                           th:name="${'product_' + prod.product.id}" min="0" value="0">
+                                    <input type="number" class="form-control text-center" th:name="${'product_' + prod.product.id}" min="0" value="0">
                                     <button class="btn btn-outline-secondary" type="button">+</button>
                                 </div>
                             </td>
@@ -362,9 +366,10 @@
 
         card.querySelectorAll('tbody tr').forEach(row => {
             const inp = row.querySelector('input[type=number]');
+            const priceCell = row.cells[3];
+            const subtotalCell = row.cells[5];
+
             inp.addEventListener('change', () => {
-                const priceCell = row.cells[2];
-                const subtotalCell = row.cells[4];
                 const price = parseARPeso(priceCell.textContent);
                 const qty = parseInt(inp.value, 10) || 0;
                 const tot = price * qty;
@@ -396,6 +401,7 @@
             inp.dispatchEvent(new Event('change'));
         });
     }
+
 
     function updateOrderSummary(){
         let sub = 0;
