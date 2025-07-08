@@ -29,10 +29,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendRecoverEmail(User user) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Este es tu nombre de usuario: ").append(user.getUsername())
-                .append("esta es tu contraseña: ").append(user.getPassword()).append(" Recomendamos una vez obtenido este mail cambiar la contraseña.");
-        logger.info(sb.toString());
+
     }
 
 

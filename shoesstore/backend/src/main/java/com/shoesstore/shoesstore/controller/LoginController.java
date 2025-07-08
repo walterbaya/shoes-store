@@ -16,7 +16,4 @@ public class LoginController {
     public String recover(){
         return "auth/recover";
     }
-
-    @GetMapping("/signup")
-    public String signup(){return "auth/signup";}
 }
