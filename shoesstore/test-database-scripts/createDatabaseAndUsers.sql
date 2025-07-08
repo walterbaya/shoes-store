@@ -4,10 +4,9 @@ CREATE DATABASE shoes_store;
 USE shoes_store;
 
 -- Inserción de usuarios (bcrypt sin tocar)
-INSERT INTO users (username, password, full_name, role) VALUES
-                                                            ('admin',  '$2a$12$A95WpI9tt5Zy4Y4Ih.IOLe1a1QJyxalyrrMsoYj8bP2eg7jBCULgy', 'Administrador Principal', 'ROLE_ADMIN'),
-                                                            ('seller1','$2a$12$A95WpI9tt5Zy4Y4Ih.IOLe1a1QJyxalyrrMsoYj8bP2eg7jBCULgy', 'Vendedor Uno',         'ROLE_SELLER'),
-                                                            ('seller2','$2a$12$A95WpI9tt5Zy4Y4Ih.IOLe1a1QJyxalyrrMsoYj8bP2eg7jBCULgy', 'Vendedor Dos',         'ROLE_SELLER'),
-                                                            ('seller3','$2a$12$A95WpI9tt5Zy4Y4Ih.IOLe1a1QJyxalyrrMsoYj8bP2eg7jBCULgy', 'Vendedor Tres',        'ROLE_SELLER'),
-                                                            ('stockmanager','$2a$12$A95WpI9tt5Zy4Y4Ih.IOLe1a1QJyxalyrrMsoYj8bP2eg7jBCULgy', 'Gestors de Stock',        'ROLE_SELLER');
-
+INSERT INTO users (username, created_at, password, full_name, role, email) VALUES
+    ('admin',        NOW(), '$2a$12$Dvlnp.XiHtxgjrmhlINPfOElXDej4TmCfq4ioXuo3NwvHtJduKHn.', 'Administrador Principal', 'ROLE_ADMIN',        'admin@example.com'),
+    ('seller1',      NOW(), '$2a$12$Dvlnp.XiHtxgjrmhlINPfOElXDej4TmCfq4ioXuo3NwvHtJduKHn.', 'Vendedor Uno',         'ROLE_SELLER',       'seller1@example.com'),
+    ('seller2',      NOW(), '$2a$12$Dvlnp.XiHtxgjrmhlINPfOElXDej4TmCfq4ioXuo3NwvHtJduKHn.', 'Vendedor Dos',         'ROLE_SELLER',       'seller2@example.com'),
+    ('seller3',      NOW(), '$2a$12$Dvlnp.XiHtxgjrmhlINPfOElXDej4TmCfq4ioXuo3NwvHtJduKHn.', 'Vendedor Tres',        'ROLE_SELLER',       'seller3@example.com'),
+    ('stockmanager', NOW(), '$2a$12$Dvlnp.XiHtxgjrmhlINPfOElXDej4TmCfq4ioXuo3NwvHtJduKHn.', 'Gestors de Stock',     'ROLE_SELLER',       'stockmanager@example.com');

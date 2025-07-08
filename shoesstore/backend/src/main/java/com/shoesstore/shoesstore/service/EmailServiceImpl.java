@@ -2,6 +2,7 @@ package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.model.PurchaseOrder;
 import com.shoesstore.shoesstore.model.PurchaseOrderItem;
+import com.shoesstore.shoesstore.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -25,4 +26,14 @@ public class EmailServiceImpl implements EmailService {
         }
         logger.info(sb.toString());
     }
+
+    @Override
+    public void sendRecoverEmail(User user) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Este es tu nombre de usuario: ").append(user.getUsername())
+                .append("esta es tu contraseña: ").append(user.getPassword()).append(" Recomendamos una vez obtenido este mail cambiar la contraseña.");
+        logger.info(sb.toString());
+    }
+
+
 }
