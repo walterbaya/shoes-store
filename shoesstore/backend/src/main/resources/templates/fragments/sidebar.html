@@ -69,6 +69,15 @@
                     <span class="fw-medium">Reclamos y Devoluciones</span>
                 </a>
             </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                   th:href="@{/users}">
+                    <i class="bi bi-person-gear fs-5"></i>
+                    <span class="fw-medium">Manejo de Usuarios</span>
+                </a>
+            </li>
+
         </ul>
     </div>
 </div>

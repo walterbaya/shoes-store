@@ -28,91 +28,61 @@ public class UserController {
     @GetMapping
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAll());
-        model.addAttribute("claims", claimService.getAllClaims());
-        model.addAttribute("view", "claims/list");
+        model.addAttribute("view", "users/list");
         return "layout";
     }
 
-    @GetMapping("/new")
-    public String newClaimForm(Model model) {
-        List<Sale> salesWithoutClaims = saleService.getSalesWithoutClaims();
-        model.addAttribute("sales", salesWithoutClaims);
-        model.addAttribute("view", "claims/new");
-        return "layout";
-    }
+//    @GetMapping("/new")
+//    public String newClaimForm(Model model) {
+//        List<Sale> salesWithoutClaims = saleService.getSalesWithoutClaims();
+//        model.addAttribute("sales", salesWithoutClaims);
+//        model.addAttribute("view", "claims/new");
+//        return "layout";
+//    }
 
-    @PostMapping
-    public String createClaim(
-            @RequestParam("saleId") Long saleId,
-            @RequestParam("description") String description,
-            @RequestParam Map<String, String> allParams) {
-
-        Map<Long, Integer> claimItems = new HashMap<>();
-
-        allParams.keySet().stream()
-                .filter(key -> key.matches("claimItems\\[\\d+\\]\\.include"))
-                .forEach(includeKey -> {
-                    String idStr = includeKey.replaceAll("claimItems\\[(\\d+)]\\.include", "$1");
-                    Long saleDetailId = Long.parseLong(idStr);
-                    String quantityKey = "claimItems[" + saleDetailId + "].quantity";
-                    int quantity = Integer.parseInt(allParams.getOrDefault(quantityKey, "1"));
-                    claimItems.put(saleDetailId, quantity);
-                });
-
-        if (claimItems.isEmpty()) {
-            throw new IllegalArgumentException("Debe seleccionar al menos un producto para reclamar");
-        }
-
-        claimService.createClaim(saleId, description, claimItems);
-        return "redirect:/claims";
-    }
-
-    @PostMapping("/{id}/proof")
-    public String uploadProof(@PathVariable Long id,
-                              @RequestParam("proofFile") MultipartFile proofFile) {
-        if (proofFile.isEmpty()) {
-            throw new IllegalArgumentException("El archivo está vacío");
-        }
-
-        String fileName = fileStorageService.storeFile(proofFile);
-        claimService.uploadProof(id, fileName);
-
-        return "redirect:/claims/" + id;
-    }
-
-    @PostMapping("/{id}/approve")
-    public String approveRefund(@PathVariable Long id) {
-        claimService.approveRefund(id);
-        return "redirect:/claims/" + id;
-    }
-
-    @PostMapping("/{id}/receive")
-    public String receivePackage(@PathVariable Long id) {
-        claimService.receivePackage(id);
-        return "redirect:/claims/" + id;
-    }
-
-    @GetMapping("/{id}")
-    public String viewClaim(@PathVariable Long id, Model model) {
-        Claim claim = claimService.getClaimById(id);
-        model.addAttribute("claim", claim);
-        model.addAttribute("claims", claimService.getAllClaims());
-        model.addAttribute("view", "claims/view");
-        return "layout";
-    }
-
-
-    @PostMapping("/{id}/invalidProof")
-    public String invalidProof(@PathVariable Long id) {
-        claimService.invalidateProof(id);
-        return "redirect:/claims/" + id;
-    }
-
-
-    @DeleteMapping("/delete/{id}")
-    public String deleteClaim(@PathVariable Long id) {
-        claimService.deleteClaim(id);
-        return "redirect:/claims";
-    }
+//    @PostMapping
+//    public String createClaim(
+//            @RequestParam("saleId") Long saleId,
+//            @RequestParam("description") String description,
+//            @RequestParam Map<String, String> allParams) {
+//
+//        Map<Long, Integer> claimItems = new HashMap<>();
+//
+//        allParams.keySet().stream()
+//                .filter(key -> key.matches("claimItems\\[\\d+\\]\\.include"))
+//                .forEach(includeKey -> {
+//                    String idStr = includeKey.replaceAll("claimItems\\[(\\d+)]\\.include", "$1");
+//                    Long saleDetailId = Long.parseLong(idStr);
+//                    String quantityKey = "claimItems[" + saleDetailId + "].quantity";
+//                    int quantity = Integer.parseInt(allParams.getOrDefault(quantityKey, "1"));
+//                    claimItems.put(saleDetailId, quantity);
+//                });
+//
+//        if (claimItems.isEmpty()) {
+//            throw new IllegalArgumentException("Debe seleccionar al menos un producto para reclamar");
+//        }
+//
+//        claimService.createClaim(saleId, description, claimItems);
+//        return "redirect:/claims";
+//    }
+//
+//    @PostMapping("/{id}/proof")
+//    public String uploadProof(@PathVariable Long id,
+//                              @RequestParam("proofFile") MultipartFile proofFile) {
+//        if (proofFile.isEmpty()) {
+//            throw new IllegalArgumentException("El archivo está vacío");
+//        }
+//
+//        String fileName = fileStorageService.storeFile(proofFile);
+//        claimService.uploadProof(id, fileName);
+//
+//        return "redirect:/claims/" + id;
+//    }
+//
+//    @DeleteMapping("/delete/{id}")
+//    public String deleteClaim(@PathVariable Long id) {
+//        claimService.deleteClaim(id);
+//        return "redirect:/claims";
+//    }
 
 }

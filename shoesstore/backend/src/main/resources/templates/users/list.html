@@ -1,5 +1,4 @@
-<div class="content card shadow order-card">
-
+<div class="content card shadow">
     <!-- Mensaje de error -->
     <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
         <span th:text="${error}"></span>
@@ -31,7 +30,7 @@
                         <th class="py-3">ID</th>
                         <th class="py-3">Nombre de Usuario</th>
                         <th class="py-3">Fecha de Creación</th>
-                        <th class="py-3 text-end">Rol</th>
+                        <th class="py-3">Rol</th>
                         <th class="py-3">Dirección de Email</th>
                         <th class="py-3">Acciones</th>
                     </tr>
@@ -96,6 +95,8 @@
             </div>
         </div>
     </div>
+
+</div>
 
 
     <script>
