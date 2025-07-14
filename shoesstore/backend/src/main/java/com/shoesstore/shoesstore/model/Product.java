@@ -13,24 +13,42 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "suppliers")
+@ToString(exclude = {"suppliers", "supplierProducts"})
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    @Column(name = "id")
+    @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @NotBlank(message = "El código del producto es obligatorio")
-    @Column(nullable = false, unique = true) // Código único
-    private String code;
+    public enum Gender {
+        HOMBRE("Hombre"),
+        MUJER("Mujer"),
+        UNISEX("Unisex"),
+        NIÑO("Niño"),
+        NIÑA("Niña");
+
+        private final String displayValue;
+
+        Gender(String displayValue) {
+            this.displayValue = displayValue;
+        }
+
+        public String getDisplayValue() {
+            return displayValue;
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull(message = "El género es obligatorio")
+    private Gender gender = Gender.UNISEX;
 
     private String description;
 
@@ -45,6 +63,10 @@ public class Product {
     @NotBlank(message = "El material es obligatorio")
     @Column(nullable = false)
     private String material;
+
+    @NotBlank(message = "La marca es obligatoria")
+    @Column(nullable = false)
+    private String brand;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "La talla es obligatoria")
@@ -77,7 +99,12 @@ public class Product {
         }
     }
 
-    @ManyToMany(mappedBy = "products", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany
+    @JoinTable(
+            name = "supplier_product",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "supplier_id")
+    )
     private Set<Supplier> suppliers = new HashSet<>();
 
     @OneToMany(mappedBy = "product")

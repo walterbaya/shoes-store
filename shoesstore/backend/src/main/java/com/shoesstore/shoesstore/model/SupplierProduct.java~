@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "supplier_product")
+@Table(name = "productos_proveedores")
 public class SupplierProduct {
     @EmbeddedId
     private SupplierProductId id;
@@ -21,9 +21,9 @@ public class SupplierProduct {
     @JoinColumn(name="supplier_id")
     private Supplier supplier;
 
-    @MapsId("productCode")
+    @MapsId("productId")
     @ManyToOne
-    @JoinColumn(name="product_code")
+    @JoinColumn(name="product_id")
     private Product product;
 
     @Column(nullable = false)
@@ -33,7 +33,7 @@ public class SupplierProduct {
     public SupplierProduct() {}
 
     public SupplierProduct(Supplier supplier, Product product, BigDecimal price) {
-        this.id = new SupplierProductId(supplier.getId(), product.getCode());
+        this.id = new SupplierProductId(supplier.getId(), product.getId());
         this.supplier = supplier;
         this.product = product;
         this.price = price;

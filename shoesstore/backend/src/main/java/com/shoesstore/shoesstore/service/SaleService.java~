@@ -4,10 +4,12 @@ import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.model.User;
+import com.shoesstore.shoesstore.repository.ClaimRepository;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import com.shoesstore.shoesstore.repository.UserRepository;
 import com.shoesstore.shoesstore.utils.SaleItemForm;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class SaleService {
 
@@ -25,13 +28,6 @@ public class SaleService {
     private final CustomUserDetailsService customUserDetailsService;
     private final UserService userService;
 
-    public SaleService(SaleRepository saleRepository, ProductService productService, CustomUserDetailsService customUserDetailsService, UserService userService, SaleDetailsRepository saleDetailsRepository) {
-        this.saleRepository = saleRepository;
-        this.productService = productService;
-        this.customUserDetailsService = customUserDetailsService;
-        this.userService = userService;
-        this.saleDetailsRepository = saleDetailsRepository;
-    }
 
     @Transactional
     public Sale processSale(Sale sale, List<SaleItemForm> itemsToProcess) {
@@ -66,8 +62,6 @@ public class SaleService {
             }
         );
 
-
-
         return res;
     }
 
@@ -86,8 +80,21 @@ public class SaleService {
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
     }
 
+    @Transactional
     public void deleteSale(Long id) {
-        saleRepository.deleteById(id);
+        Sale sale = getSaleById(id);
+
+        if (sale.getClaim() != null) {
+            throw new RuntimeException("No se puede eliminar una venta con un reclamo asociado, elimine primero el reclamo y posteriormente la venta.");
+        }
+        else {
+
+            sale.getDetails().forEach(saleDetails -> {
+                productService.updateStock(saleDetails.getProduct().getId(), saleDetails.getQuantity());
+                saleDetailsRepository.delete(saleDetails);
+            });
+            saleRepository.delete(sale);
+        }
     }
     
     public List<Object[]> getDailySalesData(LocalDateTime start, LocalDateTime end) {
@@ -98,7 +105,11 @@ public class SaleService {
         return saleRepository.findTopSellers(start, end);
     }
 
+    public List<Sale> getAllSales() {
+        return saleRepository.findAll();
+    }
+
     public List<Sale> getSalesWithoutClaims() {
-        return saleRepository.findSalesWithoutClaims();
+        return saleRepository.findAll();
     }
 }

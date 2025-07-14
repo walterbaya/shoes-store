@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "sales")
 public class Sale {
 
     @Id
@@ -24,6 +25,13 @@ public class Sale {
 
     @Enumerated(EnumType.STRING)
     private SaleChannel channel;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+
+    private double shippingCost;
+    private double discountPercentage;
 
     private double total;
 

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long> {
     List<PurchaseOrder> findByGeneratedDate(LocalDate date);
+
 }

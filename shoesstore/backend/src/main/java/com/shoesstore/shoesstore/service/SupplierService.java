@@ -36,19 +36,18 @@ public class SupplierService {
         persisted.getSupplierProducts().clear();
         // Si usás price map, también clear ahí
 
-        // Creamos y asociamos cada SupplierProduct con su precio
-        for (int i = 0; i < productIds.size(); i++) {
-            Long pid = productIds.get(i);
-            BigDecimal pr = prices.get(i);
+        List<Product> products = productRepository.findAllById(productIds);
 
-            productRepository.findById(pid).ifPresent(prod -> {
-                SupplierProduct sp = new SupplierProduct();
-                sp.setId(new SupplierProductId(persisted.getId(), pid));
-                sp.setSupplier(persisted);
-                sp.setProduct(prod);
-                sp.setPrice(pr != null ? pr : BigDecimal.ZERO); // asegura no null
-                persisted.getSupplierProducts().add(sp);
-            });
+        // Creamos y asociamos cada SupplierProduct con su precio
+        for (Product prod : products) {
+            BigDecimal pr = prices.get(products.indexOf(prod));
+
+            SupplierProduct sp = new SupplierProduct();
+            sp.setId(new SupplierProductId(persisted.getId(), prod.getId()));
+            sp.setSupplier(persisted);
+            sp.setProduct(prod);
+            sp.setPrice(pr != null ? pr : BigDecimal.ZERO); // asegura no null
+            persisted.getSupplierProducts().add(sp);
         }
 
         // Guardamos las relaciones
@@ -61,6 +60,12 @@ public class SupplierService {
                 .orElseThrow(() -> new EntityNotFoundException("Supplier not found"));
         existing.setName(datos.getName());
         existing.setEmail(datos.getEmail());
+        existing.setCuit(datos.getCuit());
+        existing.setAddress(datos.getAddress());
+        existing.setPhone(datos.getPhone());
+        existing.setPaymentConditions(datos.getPaymentConditions());
+        existing.setContactName(datos.getContactName());
+
 
         // Mapa temporal para buscar asociaciones existentes por ID de producto
         Map<Long, SupplierProduct> existingProductsMap = existing.getSupplierProducts().stream()
@@ -87,6 +92,14 @@ public class SupplierService {
 
     public List<Supplier> findAll() { return supplierRepository.findAll(); }
     public Supplier findById(Long id) { return supplierRepository.findById(id).orElse(null); }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!supplierRepository.existsById(id)) {
+            throw new EntityNotFoundException("Supplier not found with ID: " + id);
+        }
+        supplierRepository.deleteById(id);
+    }
 }
 
 

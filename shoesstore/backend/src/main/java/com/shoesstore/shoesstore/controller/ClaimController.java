@@ -107,4 +107,19 @@ public class ClaimController {
         model.addAttribute("view", "claims/view");
         return "layout";
     }
+
+
+    @PostMapping("/{id}/invalidProof")
+    public String invalidProof(@PathVariable Long id) {
+        claimService.invalidateProof(id);
+        return "redirect:/claims/" + id;
+    }
+
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteClaim(@PathVariable Long id) {
+        claimService.deleteClaim(id);
+        return "redirect:/claims";
+    }
+
 }

@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DashboardController {
 
-    private final CustomUserDetailsService customUserDetailsService;
     private final SaleService saleService;
 
     @GetMapping("/dashboard")
@@ -33,7 +32,6 @@ public class DashboardController {
         double dailyEarnings = todaySales.stream().mapToDouble(Sale::getTotal).sum();
         model.addAttribute("title", "Dashboard");
         model.addAttribute("view", "dashboard"); // Fragmento
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
         model.addAttribute("dailySales", todaySales.size());
         model.addAttribute("dailyEarnings", dailyEarnings);
         model.addAttribute("ultimasCompras", pastFiveDaysFromNowSales);

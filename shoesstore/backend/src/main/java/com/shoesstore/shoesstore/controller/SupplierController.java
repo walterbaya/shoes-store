@@ -3,6 +3,7 @@ package com.shoesstore.shoesstore.controller;
 import com.shoesstore.shoesstore.model.Supplier;
 import com.shoesstore.shoesstore.model.SupplierProduct;
 import com.shoesstore.shoesstore.repository.ProductRepository;
+import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.SupplierService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,7 @@ public class SupplierController {
     private final SupplierService supplierService;
     private final ProductRepository productRepository;
 
-    public SupplierController(SupplierService supplierService, ProductRepository productRepository) {
+    public SupplierController(SupplierService supplierService, ProductRepository productRepository, CustomUserDetailsService customUserDetailsService) {
         this.supplierService = supplierService;
         this.productRepository = productRepository;
     }
@@ -75,6 +76,12 @@ public class SupplierController {
                          @RequestParam("productIds") List<Long> productIds,
                          @RequestParam("prices") List<BigDecimal> prices) {
         supplierService.update(id, supplier, productIds, prices);
+        return "redirect:/suppliers";
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public String deleteSupplier(@PathVariable Long id) {
+        supplierService.delete(id);
         return "redirect:/suppliers";
     }
 }

@@ -24,7 +24,7 @@ public class Claim {
     @JoinColumn(name = "sale_id", nullable = false, unique = true)
     private Sale sale;
 
-    @OneToMany(mappedBy = "claim", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "claim", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClaimDetails> claimDetails;
 
     private String description;

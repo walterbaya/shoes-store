@@ -1,6 +1,7 @@
 package com.shoesstore.shoesstore.controller;
 
 
+import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ReportService;
 
 import java.time.LocalDate;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/reports/sales")
 public class ReportController {
+
+
+    public ReportController(CustomUserDetailsService customUserDetailsService) {
+
+    }
 
     @GetMapping
     public String salesReport(Model model) {

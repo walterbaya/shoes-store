@@ -1,91 +1,160 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <div th:fragment="sidebar" class="sidebar">
-    <div class="sidebar-sticky pt-4">
-        <ul class="nav flex-column gap-2 px-3">
-            <li class="nav-item">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+    <!-- Cabecera con logo y nombre -->
+    <div class="sidebar-header px-4 py-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <div class="brand-icon bg-primary p-2 rounded">
+                <i class="bi bi-shop text-white fs-4"></i>
+            </div>
+            <h5 class="mb-0 text-primary fw-bold">Shoes Store</h5>
+        </div>
+    </div>
+
+    <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column gap-1 px-3">
+            <!-- Elementos de menú -->
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/dashboard}">
-                    <i class="bi bi-speedometer2 fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Dashboard</span>
+                    <i class="bi bi-speedometer2 fs-5"></i>
+                    <span class="fw-medium">Dashboard</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/products}">
-                    <i class="bi bi-box-seam fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Productos</span>
+                    <i class="bi bi-box-seam fs-5"></i>
+                    <span class="fw-medium">Productos</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/suppliers}">
-                    <!-- Icono de proveedores -->
-                    <i class="bi bi-people fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Proveedores</span>
+                    <i class="bi bi-people fs-5"></i>
+                    <span class="fw-medium">Proveedores</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/orders}">
-                    <i class="bi bi-bag-check fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Compras</span>
+                    <i class="bi bi-bag-check fs-5"></i>
+                    <span class="fw-medium">Compras</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','SELLER')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/sales}">
-                    <i class="bi bi-currency-dollar fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Ventas</span>
+                    <i class="bi bi-currency-dollar fs-5"></i>
+                    <span class="fw-medium">Ventas</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/reports/sales}">
-                    <i class="bi bi-graph-up fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Reportes</span>
+                    <i class="bi bi-graph-up fs-5"></i>
+                    <span class="fw-medium">Reportes</span>
                 </a>
             </li>
+
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link d-flex align-items-center gap-3 py-2 rounded-3 hover-custom"
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
                    th:href="@{/claims}">
-                    <i class="bi bi-arrow-counterclockwise fs-5 text-primary"></i>
-                    <span class="fw-medium text-secondary">Reclamos y Devoluciones</span>
+                    <i class="bi bi-arrow-counterclockwise fs-5"></i>
+                    <span class="fw-medium">Reclamos y Devoluciones</span>
                 </a>
             </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                   th:href="@{/users}">
+                    <i class="bi bi-person-gear fs-5"></i>
+                    <span class="fw-medium">Manejo de Usuarios</span>
+                </a>
+            </li>
+
         </ul>
     </div>
 </div>
 
 <style>
+    :root {
+        --sidebar-width: 260px;
+        --primary-color: #4361ee;
+        --hover-bg: rgba(67, 97, 238, 0.05);
+        --active-bg: rgba(67, 97, 238, 0.1);
+    }
+
     .sidebar {
-        width: 240px;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
-    }
-    .sidebar-sticky {
-        padding: 1rem 0.5rem;
-    }
-    .hover-custom {
+        width: var(--sidebar-width);
+        background: #ffffff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        height: 100vh;
+        position: sticky;
+        top: 0;
         transition: all 0.3s ease;
-        color: #2c3e50 !important;
+        z-index: 100;
     }
-    .hover-custom:hover {
-        background: #e9f2ff !important;
-        transform: translateX(5px);
+
+    .sidebar-header {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(5px);
     }
-    .nav-link.active {
-        background: #e9f2ff !important;
-        border-left: 3px solid #0d6efd;
-        color: #0d6efd !important;
+
+    .brand-icon {
+        transition: transform 0.3s ease;
     }
-    .bi {
+
+    .sidebar-sticky {
+        padding: 1rem 0;
+    }
+
+    .menu-item {
+        transition: all 0.2s ease;
+        color: #5a6a85;
+        position: relative;
+    }
+
+    .menu-item i {
         min-width: 24px;
+        transition: color 0.3s ease;
     }
-    .text-secondary {
-        color: #2c3e50 !important;
+
+    .menu-item:hover {
+        background: var(--hover-bg);
+        color: var(--primary-color);
     }
-    /* Ajuste para el icono gráfico dentro del enlace */
-    .nav-link i.bi-bar-chart-line-fill {
-        opacity: 0.7;
+
+    .menu-item:hover i {
+        color: var(--primary-color);
+    }
+
+    .menu-item.active {
+        background: var(--active-bg);
+        color: var(--primary-color);
+        border-left: 3px solid var(--primary-color);
+    }
+
+    .menu-item.active i {
+        color: var(--primary-color);
+    }
+
+    .menu-item::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 20px;
+        right: 20px;
+        height: 1px;
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-item:last-child .menu-item::after {
+        display: none;
     }
 </style>

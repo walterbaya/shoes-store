@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "purchase_order_items")
+@Table(name = "purchase_order_item")
 public class PurchaseOrderItem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +28,7 @@ public class PurchaseOrderItem {
 
     private int quantity;
     private BigDecimal purchasePrice;
+    private BigDecimal subtotal;
 
     public BigDecimal getTotal() {
         return purchasePrice.multiply(BigDecimal.valueOf(quantity));

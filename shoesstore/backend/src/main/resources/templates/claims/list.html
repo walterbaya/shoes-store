@@ -1,4 +1,4 @@
-<div th:fragment="content card shadow">
+<div class="content card shadow">
     <div class="card-header bg-primary text-white">
         <h1 class="h4 mb-0">Reclamos Registrados (<span th:text="${#lists.size(claims)}">0</span>) </h1>
     </div>
@@ -43,7 +43,23 @@
                           th:text="${claim.state.displayValue}">Estado</span>
                     </td>
                     <td>
-                        <a th:href="@{/claims/{id}(id=${claim.id})}" class="btn btn-sm btn-info">Ver Detalle</a>
+                        <a href="#" class="action-btn btn btn-sm btn-info"
+                           title="Ver detalle"
+                           data-bs-toggle="tooltip"
+                           th:href="@{/claims/{id}(id=${claim.id})}">
+                            <i class="bi bi-eye"></i>
+                        </a>
+
+                        <th:block th:if="${claim.state.name() == 'PACKAGE_RECEIVED'}">
+                            <form th:action="@{/claims/delete/{id}(id=${claim.id})}" method="post" class="d-inline">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('¿Desea eliminar este reclamo permanentemente?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </th:block>
                     </td>
                 </tr>
                 </tbody>

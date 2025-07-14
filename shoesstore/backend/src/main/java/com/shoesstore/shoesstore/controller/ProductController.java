@@ -1,13 +1,18 @@
 package com.shoesstore.shoesstore.controller;
 
 
+import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.model.Product;
+import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/products")
@@ -22,7 +27,8 @@ public class ProductController {
 
     @GetMapping
     public String listarProductos(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
+        List<ProductWithSuppliersDTO> products = productService.getAllProductsWithSuppliers();
+        model.addAttribute("products", products);
         model.addAttribute("title", "Productos");
         model.addAttribute("view", "products/list");
         return "layout";
@@ -30,6 +36,7 @@ public class ProductController {
 
     @GetMapping("/new")
     public String showProductForm(Model model) {
+        model.addAttribute("allGenders", Product.Gender.values());
         model.addAttribute("product", new Product());
         model.addAttribute("shoeSizes", Product.ShoeSize.values()); // Pasa los valores del enum
         model.addAttribute("view", "products/form");
@@ -37,41 +44,80 @@ public class ProductController {
     }
 
     @PostMapping("/save")
-    public String saveProduct(@Valid @ModelAttribute Product product,
-                              BindingResult result,
-                              Model model) {
-        if(result.hasErrors()) {
-            model.addAttribute("allSizes", Product.ShoeSize.values());
-            return "products/form";
+    public String saveProduct(
+            @Valid @ModelAttribute("product") Product product,
+            BindingResult result,
+            Model model) {
+
+        // repoblamos tallas y la vista
+        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("view", "products/form");
+
+        // errores de validación estándar
+        if (result.hasErrors()) {
+            return "layout";
         }
-        productService.saveProduct(product);
+        if (product.getPrice() <= 0) {
+            throw new IllegalArgumentException("El precio debe ser mayor a 0");
+        }
+        if(product.getStock() <= 0){
+            throw new IllegalArgumentException("El stock debe ser mayor a 0");
+        }
+
+        try {
+            productService.saveProduct(product);
+        } catch (IllegalArgumentException ex) {
+            // pasamos el mensaje de excepción al modelo
+            model.addAttribute("error", ex.getMessage());
+            return "layout";
+        }
+
         return "redirect:/products";
     }
 
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Product product = productService.getProductById(id);
+        model.addAttribute("allGenders", Product.Gender.values());
         model.addAttribute("product", product);
         model.addAttribute("allSizes", Product.ShoeSize.values()); // Si usas el enum de tallas
-        model.addAttribute("view", "products/form");
-        return "layout"; // Reutiliza el mismo formulario para crear/editar
+        model.addAttribute("view", "products/edit");
+        return "layout";
     }
 
-    @PostMapping("/update/{id}")
-    public String updateProduct(@PathVariable Long id,
-                                @Valid @ModelAttribute Product product,
-                                BindingResult result) {
-        if(result.hasErrors()) {
-            return "products/form";
+    @PutMapping("/update/{id}")
+    public String updateProduct(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("product") Product product,
+            BindingResult result,
+            Model model) {
+
+        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("view", "products/edit");
+
+        if (result.hasErrors()) {
+            return "layout";
         }
-        product.setId(id);
-        productService.saveProduct(product);
+
+        try {
+            product.setId(id);  // aseguramos que venga el mismo ID de la URL
+            productService.updateProduct(product);
+        } catch (IllegalArgumentException ex) {
+            model.addAttribute("error", ex.getMessage());
+            return "layout";
+        }
+
         return "redirect:/products";
     }
 
     @DeleteMapping("/{id}")
-    public String deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
+    public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            productService.deleteProduct(id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al eliminar el producto: " + e.getMessage());
+        }
+
         return "redirect:/products";
     }
 

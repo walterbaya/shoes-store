@@ -1,27 +1,365 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: html}">
-<head>
-    <title>Listado de Ventas</title>
-</head>
-<body>
-<div th:fragment="content">
-    <h2>Listado de Ventas</h2>
-    <table>
-        <thead>
-        <tr>
-            <th>Canal</th>
-            <th>Fecha</th>
-            <th>Total</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="sale : ${sales}">
-            <td th:text="${sale.channel}"></td>
-            <td th:text="${#dates.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
-            <td th:text="${sale.total}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-</body>
-</html>
+<div class="content card shadow order-card">
+
+                <!-- Mensaje de error -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h4 mb-0">
+                            <i class="bi bi-cash-coin me-2"></i>
+                            Listado de Ventas
+                        </h1>
+                        <a href="/sales/create" class="btn btn-light">
+                            <i class="bi bi-plus-circle me-1"></i> Nueva Venta
+                        </a>
+
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Resumen Estadístico -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card summary-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted text-uppercase small">Total Ventas</h6>
+                                            <div class="stat-number text-primary" th:text="${totalSalesCount}">0</div>
+                                        </div>
+                                        <div class="icon-circle bg-primary-light">
+                                            <i class="bi bi-cart text-primary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card summary-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted text-uppercase small">Ventas Online</h6>
+                                            <div class="stat-number text-success" th:text="${onlineSalesCount}">0</div>
+                                        </div>
+                                        <div class="icon-circle bg-success-light">
+                                            <i class="bi bi-globe text-success"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card summary-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted text-uppercase small">Ventas en Tienda</h6>
+                                            <div class="stat-number text-warning" th:text="${storeSalesCount}">0</div>
+                                        </div>
+                                        <div class="icon-circle bg-warning-light">
+                                            <i class="bi bi-shop text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card summary-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="text-muted text-uppercase small">Ingresos Totales</h6>
+                                            <div class="stat-number text-info" th:text="'$' + ${totalRevenue}">$0</div>
+                                        </div>
+                                        <div class="icon-circle bg-info-light">
+                                            <i class="bi bi-currency-dollar text-info"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            <div class="indicator-square bg-warning">
+                                <i class="text-white"></i>
+                            </div>
+
+                            <span class="text-muted  small ms-2">ventas devueltas</span>
+
+                        </div>
+                    </div>
+
+                    <!-- Tabla de ventas -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="py-3">ID</th>
+                                <th class="py-3">Canal</th>
+                                <th class="py-3">Fecha</th>
+                                <th class="py-3">Usuario</th>
+                                <th class="py-3 text-end">Total</th>
+                                <th class="py-3">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="sale : ${sales}" th:classappend="${sale.total == 0} ? 'table-warning' : ''">
+                                <td data-label="ID" th:text="${sale.id}"></td>
+                                <td data-label="Canal">
+                                    <span class="channel-badge" th:classappend="${sale.channel.name() == 'ONLINE'} ? 'badge-online' : 'badge-store'">
+                                        <i class="bi" th:class="${sale.channel.name() == 'ONLINE'} ? 'bi-globe' : 'bi-shop'"></i>
+                                        <span th:text="${sale.channel}"></span>
+                                    </span>
+                                </td>
+                                <td data-label="Fecha" th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td data-label="Usuario" th:text="${sale.user.username}"></td>
+                                <td data-label="Total" class="text-end fw-bold total-cell" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></td>
+                                <td data-label="Acciones" class="action-cell">
+                                    <a th:href="@{'/sales/' + ${sale.id} + '/details'}"
+                                       class="action-btn view-btn"
+                                       title="Ver detalle"
+                                       data-bs-toggle="tooltip">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <form method="post"
+                                          th:action="@{'/sales/delete/' + ${sale.id}}"
+                                          style="display:inline-block"
+                                          >
+                                        <input type="hidden" name="_method" value="delete">
+                                        <button type="submit"
+                                                class="action-btn btn btn-sm btn-danger"
+                                                title="Eliminar"
+                                                data-bs-toggle="tooltip"
+                                                onclick="return confirm('¿Estas seguro de eliminar esta venta?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+
+                            <!-- Estado cuando no hay ventas -->
+                            <tr th:if="${sales == null || sales.isEmpty()}">
+                                <td colspan="6">
+                                    <div class="no-sales">
+                                        <i class="bi bi-receipt"></i>
+                                        <h4>No se encontraron ventas</h4>
+                                        <p>No hay registros de ventas en el sistema</p>
+                                        <a href="/sales/create" class="btn btn-primary mt-2">
+                                            <i class="bi bi-plus-circle me-1"></i> Crear primera venta
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+
+<style>
+
+    .indicator-square {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+    }
+    .text-label {
+        font-family: 'Segoe UI', system-ui;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    .card-header {
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+        padding: 1rem 1.5rem;
+    }
+
+    .table thead th {
+        background-color: var(--primary-color);
+        color: white;
+        font-weight: 500;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .channel-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .badge-online {
+        background-color: rgba(76, 201, 240, 0.15);
+        color: #4cc9f0;
+    }
+
+    .badge-store {
+        background-color: rgba(255, 159, 67, 0.15);
+        color: #ff9f43;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 3px;
+        transition: all 0.2s;
+    }
+
+    .view-btn {
+        background-color: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+    }
+
+    .view-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .delete-btn {
+        background-color: rgba(239, 71, 111, 0.1);
+        color: var(--danger-color);
+    }
+
+    .delete-btn:hover {
+        background-color: #ef476f;
+        color: white;
+    }
+
+    .total-cell {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .no-sales {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    .no-sales i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ced4da;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .summary-card {
+        border-radius: 0.75rem;
+        border: none;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .summary-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .icon-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bg-primary-light {
+        background-color: rgba(67, 97, 238, 0.15);
+    }
+
+    .bg-success-light {
+        background-color: rgba(76, 201, 240, 0.15);
+    }
+
+    .bg-warning-light {
+        background-color: rgba(255, 159, 67, 0.15);
+    }
+
+    .bg-info-light {
+        background-color: rgba(111, 114, 185, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: 0;
+        }
+
+        .table thead {
+            display: none;
+        }
+
+        .table, .table tbody, .table tr, .table td {
+            display: block;
+            width: 100%;
+        }
+
+        .table tr {
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.5rem;
+        }
+
+        .table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            width: 45%;
+            padding-left: 1rem;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .table td:last-child {
+            border-bottom: 0;
+        }
+
+        .action-cell {
+            display: flex;
+            justify-content: flex-end;
+        }
+    }
+</style>

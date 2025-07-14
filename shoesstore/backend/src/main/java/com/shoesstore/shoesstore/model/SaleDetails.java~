@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "sale_details")
+@Table(name = "detalles_venta")
 public class SaleDetails {
 
     @Id
@@ -22,7 +22,7 @@ public class SaleDetails {
     private Sale sale;
 
     @ManyToOne
-    @JoinColumn(name = "product_code", referencedColumnName = "code", nullable = false)
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
     @ManyToOne

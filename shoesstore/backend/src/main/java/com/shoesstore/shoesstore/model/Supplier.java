@@ -19,7 +19,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = "products")
+@ToString(exclude = {"products", "supplierProducts"})
 public class Supplier {
     @Id @GeneratedValue(strategy = IDENTITY) @EqualsAndHashCode.Include
     private Long id;
@@ -29,11 +29,36 @@ public class Supplier {
 
     @Email @Column(nullable = false)
     private String email;
-    @ManyToMany(cascade = { PERSIST, MERGE })
-    @JoinTable(name = "supplier_product",
+
+    @Column(nullable = false)
+    private String contactName;
+
+    @Column(name = "cuit_cuil", nullable = false, unique = true, length = 13)
+    private String cuit;  // Formato: XX-XXXXXXXX-X
+
+    @Column(length = 200)
+    private String address;
+
+    @Column(length = 20)
+    private String phone;
+
+    @ElementCollection
+    @CollectionTable(name = "supplier_payment_conditions",
+            joinColumns = @JoinColumn(name = "supplier_id"))
+    @Column(name = "payment_condition")
+    @Enumerated(EnumType.STRING)
+    private Set<PaymentCondition> paymentConditions = new HashSet<>();
+
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
+
+    @ManyToMany
+    @JoinTable(
+            name = "supplier_product",
             joinColumns = @JoinColumn(name = "supplier_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
-    private List<Product> products = new ArrayList<>();
+            inverseJoinColumns = @JoinColumn(name = "product_id")
+    )
+    private Set<Product> products = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "supplier_product_price", joinColumns = @JoinColumn(name = "supplier_id"))
@@ -41,6 +66,15 @@ public class Supplier {
     @Column(name = "price", nullable = false)
     private Map<Long, BigDecimal> productPrices = new HashMap<>();
 
+
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SupplierProduct> supplierProducts = new HashSet<>();
+
+    @OneToMany(
+            mappedBy = "supplier",
+            cascade = CascadeType.ALL,       // Propaga persist, merge y remove
+            orphanRemoval = true             // Elimina huérfanos al quitar de la colección
+    )
+    private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
+
 }

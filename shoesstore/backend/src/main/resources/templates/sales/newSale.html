@@ -1,245 +1,618 @@
-<form th:action="@{/sales}" method="post" th:object="${saleForm}">
-    <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h1 class="mb-0 h4">Registrar Nueva Venta</h1>
-        </div>
-
-        <div class="card-body">
-
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-
-            <div class="row">
-                <!-- Canal de Venta -->
-                <div class="mb-4 col-4">
-                    <label class="form-label fw-bold">Canal de Venta</label>
-                    <select th:field="*{channel}" class="form-select form-select-lg">
-                        <option th:each="channel : ${channels}"
-                                th:value="${channel}"
-                                th:text="${channel}"
-                                class="text-capitalize"></option>
-                    </select>
-                </div>
-
-                <!-- Buscador de Productos -->
-                <div class="mb-4 col-8">
-                    <label class="form-label fw-bold">Buscar Producto</label>
-                    <input type="text"
-                           id="searchProducts"
-                           placeholder="Buscar producto..."
-                           onkeyup="filterProducts()"
-                           class="form-control form-control-lg">
-                </div>
+<div th:fragment="content card shadow">
+    <form th:action="@{/sales/create}" method="post" th:object="${saleForm}">
+        <!-- Alertas flotantes -->
+        <div class="alert-container">
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
-            <!-- Productos -->
-            <div class="border-top pt-3">
-                <h5 class="mb-3 fw-bold">Selección de Productos</h5>
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+        <div class="sale-card card">
 
-                <div th:each="product, iterStat : ${products}" class="card mb-3 product-card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <input type="hidden" th:field="*{saleItems[__${iterStat.index}__].productId}" th:value="${product.id}" />
-                                <h6 class="card-title mb-1" th:text="${product.code}"></h6>
-                                <div class="d-flex gap-3 text-muted small">
-                                    <span th:text="|$${#numbers.formatDecimal(product.price, 1, 2)}|"></span>
-                                    <span th:text="|Stock: ${product.stock}|"></span>
-                                </div>
+            <div class="card-header">
+                <h1 class="h4 mb-0"><i class="bi bi-cart-plus me-2"></i>Registrar Nueva Venta</h1>
+            </div>
+
+            <div class="card-body">
+                <!-- Información de la venta -->
+                <div class="form-section">
+                    <h3 class="form-title"><i class="bi bi-info-circle"></i> Información de la Venta</h3>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-bold mb-3">Canal de Venta</label>
+                            <select id="channelSelect" th:field="*{channel}" class="form-select form-select-lg" onchange="toggleFields()">
+                                <option th:each="channel : ${channels}"
+                                        th:value="${channel}"
+                                        th:text="${channel}"
+                                        class="text-capitalize"></option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-bold mb-3">Método de Pago</label>
+                            <select id="paymentMethod" th:field="*{paymentMethod}" class="form-select form-select-lg" onchange="toggleFields()">
+                                <option value="EFECTIVO">Efectivo</option>
+                                <option value="TARJETA">Tarjeta</option>
+                                <option value="TRANSFERENCIA">Transferencia</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold mb-3">Buscar Producto</label>
+                            <div class="search-container">
+                                <i class="bi bi-search"></i>
+                                <input type="text"
+                                       id="searchProducts"
+                                       placeholder="Buscar por nombre o código..."
+                                       onkeyup="filterProducts()"
+                                       class="form-control form-control-lg">
                             </div>
-                            <div class="col-md-4">
-                                <div class="input-group">
+                        </div>
+                    </div>
+
+                    <!-- Campos condicionales -->
+                    <div class="row mt-3">
+                        <!-- Campo de envío (solo para ventas online) -->
+                        <div id="shippingField" class="col-md-6 mb-4 conditional-field">
+                            <label class="form-label fw-bold mb-3">Costo de Envío</label>
+                            <input type="number"
+                                   id="shippingCost"
+                                   th:field="*{shippingCost}"
+                                   class="form-control form-control-lg"
+                                   min="0"
+                                   step="0.01"
+                                   onchange="calculateTotal()"
+                                   placeholder="0.00">
+                        </div>
+
+                        <!-- Campo de descuento (solo para pagos en efectivo) -->
+                        <div id="discountField" class="col-md-6 mb-4 conditional-field">
+                            <label class="form-label fw-bold mb-3">Descuento (%)</label>
+                            <input type="number"
+                                   id="discountPercentage"
+                                   th:field="*{discountPercentage}"
+                                   class="form-control form-control-lg"
+                                   min="0"
+                                   max="100"
+                                   step="1"
+                                   onchange="calculateTotal()"
+                                   placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selección de productos -->
+                <div class="form-section">
+                    <h3 class="form-title"><i class="bi bi-box-seam"></i> Productos Seleccionados</h3>
+
+                    <div class="product-grid">
+                        <div th:each="product, iterStat : ${products}" class="product-card"
+                             th:data-name="${product.brand}" th:data-id="${product.id}">
+                            <div class="product-image">
+                                <i class="bi bi-box"></i>
+                            </div>
+
+                            <div class="product-info">
+                                <input type="hidden" th:field="*{saleItems[__${iterStat.index}__].productId}" th:value="${product.id}" />
+
+                                <div class="product-name" th:text="${product.brand} ? ${product.brand} : 'Producto ' + ${product.id}"></div>
+
+                                <div class="product-meta">
+                                    <div class="product-price" th:text="'$' + ${#numbers.formatDecimal(product.price, 1, 2)}"></div>
+                                    <span class="stock-indicator"
+                                          th:classappend="${product.stock > 10} ? 'stock-high' :
+                                                         (${product.stock > 5} ? 'stock-medium' :
+                                                         (${product.stock > 0} ? 'stock-low' : 'stock-out'))"
+                                          th:text="${product.stock} + ' en stock'"></span>
+                                </div>
+
+                                <div class="quantity-controls">
+                                    <button type="button" class="quantity-btn" onclick="adjustQuantity(this, -1)">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+
                                     <input type="number"
                                            th:field="*{saleItems[__${iterStat.index}__].quantity}"
-                                           class="form-control form-control-lg"
+                                           class="quantity-input"
                                            min="0"
                                            th:max="${product.stock}"
-                                           placeholder="Cantidad">
-                                    <span class="input-group-text">unidades</span>
+                                           th:data-price="${product.price}"
+                                           onchange="calculateSubtotal(this)"
+                                           placeholder="0">
+
+                                    <button type="button" class="quantity-btn" onclick="adjustQuantity(this, 1)">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
                                 </div>
+
+                                <div class="subtotal" th:id="'subtotal-' + ${product.id}">$0.00</div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Resumen de la venta -->
+                <div class="summary-card">
+                    <h3 class="form-title"><i class="bi bi-receipt"></i> Resumen de la Venta</h3>
+
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Subtotal</span>
+                            <span class="summary-value" id="summary-subtotal">$0.00</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">Descuento</span>
+                            <span class="summary-value" id="summary-discount">$0.00</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">IVA (21%)</span>
+                            <span class="summary-value" id="summary-tax">$0.00</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">Envío</span>
+                            <span class="summary-value" id="summary-shipping">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="total-section">
+                        <div class="total-label">TOTAL DE LA VENTA</div>
+                        <div class="total-value" id="summary-total">$0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-light">
+                <button type="submit" class="btn-submit w-100 py-3">
+                    <i class="bi bi-cart-check"></i> Confirmar Venta
+                </button>
             </div>
         </div>
+    </form>
+</div>
 
-        <div class="card-footer bg-light">
-            <button type="submit" class="btn btn-primary btn-lg w-100">
-                <i class="bi bi-cart-check me-2"></i>Confirmar Venta
-            </button>
-        </div>
-    </div>
-</form>
+<script>
+    // Función para filtrar productos
+    function filterProducts() {
+        const input = document.getElementById('searchProducts');
+        const filter = input.value.toLowerCase();
+        const productCards = document.querySelectorAll('.product-card');
+
+        productCards.forEach(card => {
+            const name = card.getAttribute('data-name').toLowerCase();
+            const id = card.getAttribute('data-id').toString().toLowerCase();
+
+            if (name.includes(filter) || id.includes(filter)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Función para ajustar la cantidad
+    function adjustQuantity(button, change) {
+        const input = button.parentNode.querySelector('input[type=number]');
+        let value = parseInt(input.value) || 0;
+        const max = parseInt(input.getAttribute('max')) || Infinity;
+
+        value += change;
+
+        if (value < 0) value = 0;
+        if (value > max) value = max;
+
+        input.value = value;
+
+        // Disparar evento change para calcular subtotal
+        const event = new Event('change');
+        input.dispatchEvent(event);
+    }
+
+    // Función para calcular el subtotal de un producto
+    function calculateSubtotal(input) {
+        const price = parseFloat(input.getAttribute('data-price'));
+        const quantity = parseInt(input.value) || 0;
+        const productId = input.closest('.product-card').getAttribute('data-id');
+        const subtotalElement = document.getElementById('subtotal-' + productId);
+
+        const subtotal = quantity * price;
+        subtotalElement.textContent = '$' + subtotal.toFixed(2);
+
+        // Calcular total general
+        calculateTotal();
+    }
+
+    // Función para calcular el total de la venta
+    function calculateTotal() {
+        let subtotal = 0;
+        const subtotalElements = document.querySelectorAll('.subtotal');
+
+        subtotalElements.forEach(element => {
+            const text = element.textContent.replace('$', '');
+            const value = parseFloat(text) || 0;
+            subtotal += value;
+        });
+
+        // Obtener descuento si es en efectivo
+        let discountAmount = 0;
+        const discountPercentage = parseFloat(document.getElementById('discountPercentage').value) || 0;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+
+        if (paymentMethod === 'EFECTIVO' && discountPercentage > 0) {
+            discountAmount = subtotal * (discountPercentage / 100);
+        }
+
+        // Obtener envío si es venta online
+        let shippingCost = 0;
+        const channel = document.getElementById('channelSelect').value;
+
+        if (channel === 'ONLINE') {
+            shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+        }
+
+        // Calcular impuestos sobre el subtotal con descuento
+        const tax = (subtotal - discountAmount) * 0.21;
+        const total = (subtotal - discountAmount) + tax + shippingCost;
+
+        // Actualizar resumen
+        document.getElementById('summary-subtotal').textContent = '$' + subtotal.toFixed(2);
+        document.getElementById('summary-discount').textContent = discountAmount > 0 ?
+            '-$' + discountAmount.toFixed(2) : '$0.00';
+        document.getElementById('summary-tax').textContent = '$' + tax.toFixed(2);
+        document.getElementById('summary-shipping').textContent = shippingCost > 0 ?
+            '$' + shippingCost.toFixed(2) : '$0.00';
+        document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
+    }
+
+    // Función para mostrar/ocultar campos condicionales
+    function toggleFields() {
+        const channel = document.getElementById('channelSelect').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+
+        // Mostrar campo de envío solo para ventas online
+        const shippingField = document.getElementById('shippingField');
+        if (channel === 'ONLINE') {
+            shippingField.classList.add('visible');
+        } else {
+            shippingField.classList.remove('visible');
+            document.getElementById('shippingCost').value = '';
+        }
+
+        // Mostrar campo de descuento solo para pagos en efectivo
+        const discountField = document.getElementById('discountField');
+        if (paymentMethod === 'EFECTIVO') {
+            discountField.classList.add('visible');
+        } else {
+            discountField.classList.remove('visible');
+            document.getElementById('discountPercentage').value = '';
+        }
+
+        // Recalcular total con los nuevos valores
+        calculateTotal();
+    }
+
+    // Inicializar cálculos al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mostrar campos condicionales según estado inicial
+        toggleFields();
+
+        // Inicializar subtotales para productos con cantidad ya ingresada
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            if (input.value && input.value > 0) {
+                calculateSubtotal(input);
+            }
+        });
+
+        // Configurar tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 
 <style>
-    /* Estilos para el Formulario de Registro de Ventas */
-.container.mt-4 {
-    max-width: 900px; /* Limitar el ancho del formulario */
-    margin-left: auto;
-    margin-right: auto;
-}
 
-.card.shadow {
-    border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-}
+    .sale-form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
 
-.card-header.bg-primary {
-    background-color: var(--primary-color) !important;
-    border-radius: 0.75rem 0.75rem 0 0;
-    padding: 1.25rem 1.5rem;
-}
+    .sale-card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+    }
 
-.card-header h4.mb-0 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
+    .sale-card .card-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
 
-.card-body {
-    padding: 1.5rem;
-}
+    .form-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.form-label.fw-bold {
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-    display: block; /* Asegura que la etiqueta ocupe todo el ancho */
-}
+    .form-section:last-child {
+        border-bottom: none;
+    }
 
-.form-select.form-select-lg,
-.form-control.form-control-lg {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
-}
+    .form-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
 
-.form-select:focus,
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
-}
+    .form-title i {
+        color: var(--primary-color);
+    }
 
-.mb-4 {
-    margin-bottom: 2rem !important; /* Aumentar el espaciado entre los elementos del formulario */
-}
+    .search-container {
+        position: relative;
+    }
 
-/* Estilos para la sección de Productos Seleccionados */
-.border-top.pt-3 {
-    border-top: 2px solid var(--border-color);
-    padding-top: 1.5rem;
-    margin-top: 1.5rem;
-}
+    .search-container i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
 
-.card.mb-3.product-card {
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: none;
-    transition: transform 0.2s ease-in-out;
-}
+    .search-container input {
+        padding-left: 40px;
+        border-radius: 50px;
+        height: 50px;
+    }
 
-.card.mb-3.product-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-}
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
 
-.card-body .row.align-items-center {
-    padding: 1rem 0;
-}
+    .product-card {
+        border: 1px solid #e9ecef;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background-color: white;
+        position: relative;
+    }
 
-.card-title.mb-1 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: var(--text-color);
-}
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        border-color: var(--primary-color);
+    }
 
-.text-muted.small {
-    font-size: 0.9rem;
-}
+    .product-image {
+        height: 150px;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
 
-.input-group {
-    border-radius: 0.5rem;
-    overflow: hidden; /* Para que el borde redondeado se aplique correctamente */
-}
+    .product-image i {
+        font-size: 3rem;
+        color: #adb5bd;
+    }
 
-.input-group-text {
-    background-color: var(--light-bg);
-    border: 1px solid var(--border-color);
-    color: var(--secondary-color);
-    border-left: none; /* Evita doble borde con el input */
-}
+    .product-info {
+        padding: 1.25rem;
+    }
 
-.form-control {
-    border-right: none; /* Evita doble borde con el input-group-text */
-}
+    .product-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
 
-.form-control::placeholder {
-    color: #aaa;
-}
+    .product-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
 
-/* Estilos para el pie del formulario */
-.card-footer.bg-light {
-    background-color: var(--light-bg) !important;
-    border-radius: 0 0 0.75rem 0.75rem;
-    padding: 1.25rem 1.5rem;
-    display: flex;
-    justify-content: flex-end; /* Alinea el botón a la derecha (opcional) */
-}
+    .product-price {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 1.1rem;
+    }
 
-.btn.btn-primary.btn-lg.w-100 {
-    font-size: 1.1rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    box-shadow: 0 0.25rem 0.5rem rgba(var(--primary-color-rgb), 0.25);
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
+    .stock-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
 
-.btn.btn-primary.btn-lg.w-100:hover {
-    background-color: darken(var(--primary-color), 10%);
-    box-shadow: 0 0.3rem 0.7rem rgba(var(--primary-color-rgb), 0.3);
-}
+    .stock-high {
+        background-color: rgba(6, 214, 160, 0.15);
+        color: #06d6a0;
+    }
 
-.btn.btn-primary.btn-lg.w-100 i {
-    font-size: 1.2rem;
-    vertical-align: middle;
-}
+    .stock-medium {
+        background-color: rgba(255, 209, 102, 0.15);
+        color: #ffd166;
+    }
 
-/* Estilos para el buscador de productos */
-#searchProducts {
-    border-radius: 0.5rem;
-    border: 1px solid var(--border-color);
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-}
+    .stock-low {
+        background-color: rgba(239, 71, 111, 0.15);
+        color: #ef476f;
+    }
 
-#searchProducts:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25);
-}
+    .stock-out {
+        background-color: rgba(108, 117, 125, 0.15);
+        color: #6c757d;
+    }
 
-</style>
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
 
-<!-- Script para filtrar los productos -->
-<script>
-    function filterProducts() {
-        var input = document.getElementById('searchProducts');
-        var filter = input.value.toUpperCase();
-        var productCards = document.getElementsByClassName('product-card');
+    .quantity-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid #dee2e6;
+        background-color: white;
+        transition: all 0.2s;
+    }
 
-        // Recorre todas las cards de producto
-        for (var i = 0; i < productCards.length; i++) {
-            var card = productCards[i];
-            // Se asume que el nombre del producto está dentro de un elemento <h6> con clase "card-title"
-            var nameElement = card.querySelector('h6.card-title');
-            if (nameElement) {
-                var txtValue = nameElement.textContent || nameElement.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    card.style.display = "";
-                } else {
-                    card.style.display = "none";
-                }
-            }
+    .quantity-btn:hover {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem;
+        font-weight: 500;
+    }
+
+    .subtotal {
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-top: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .summary-card {
+        background-color: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        margin-top: 2rem;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .summary-label {
+        color: #6c757d;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .summary-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .total-section {
+        background-color: rgba(67, 97, 238, 0.05);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total-label {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .total-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .btn-submit {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #3a56e0;
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(67, 97, 238, 0.3);
+    }
+
+    .alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        max-width: 400px;
+    }
+
+    .conditional-field {
+        display: none;
+    }
+
+    .conditional-field.visible {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .product-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .total-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
         }
     }
-</script>
+</style>
