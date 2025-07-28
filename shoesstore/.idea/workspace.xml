@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/users/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/users/list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/utils/SaleItemForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/utils/SaleItemForm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/shoesstore/shoesstore/ClaimServiceTest.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +22,8 @@
       <list>
         <option value="HTML File" />
         <option value="Enum" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -53,11 +57,27 @@
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Application.ShoesstoreApplication.executor": "Run",
     "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.ClaimServiceTest.executor": "Run",
+    "JUnit.ClaimServiceTest.testApproveRefund.executor": "Run",
+    "JUnit.ClaimServiceTest.testCreateClaim.executor": "Run",
+    "JUnit.ClaimServiceTest.testDeleteClaim.executor": "Run",
+    "JUnit.ClaimServiceTest.testInvalidateProof.executor": "Run",
+    "JUnit.ClaimServiceTest.testReceivePackage.executor": "Run",
+    "JUnit.ClaimServiceTest.testUploadProof.executor": "Run",
+    "JUnit.ProductServiceTest.executor": "Run",
+    "JUnit.ProductServiceTest.testDeleteProduct_afterClaimIsDeleted_productDeletedSuccessfully.executor": "Run",
+    "JUnit.PurchaseOrderServiceTest.executor": "Run",
+    "JUnit.ReportServiceTest.executor": "Run",
+    "JUnit.ReportServiceTest.generateSalesReport_byProduct_shouldReturnDetailedRows.executor": "Run",
+    "JUnit.SaleServiceTest.executor": "Run",
+    "JUnit.SaleServiceTest.getDailySalesData_shouldCallRepository.executor": "Run",
+    "JUnit.SaleServiceTest.getTopSellers_shouldCallRepository.executor": "Run",
     "JUnit.SupplierControllerTest.executor": "Run",
     "JUnit.SupplierServiceTest.executor": "Run",
     "JUnit.SupplierServiceTest.registerSupplier_shouldSaveWithAssociatedProducts.executor": "Run",
     "JUnit.SupplierServiceTest.updateSupplier_shouldReplaceAssociatedProducts.executor": "Run",
     "JUnit.SupplierServiceTest.updateSupplier_shouldThrowIfNotFound.executor": "Run",
+    "JUnit.UserServiceTest.executor": "Run",
     "Maven.shoesstore [clean].executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -68,9 +88,9 @@
     "Spring Boot.ShoesstoreApplication.executor": "Run",
     "com.codeium.enabled": "true",
     "data.sources.detected.do.not.suggest.again": "true",
-    "git-widget-placeholder": "productos",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/Documentos/GitHub/shoes-store/shoesstore",
+    "last_opened_file_path": "D:/Documentos/GitHub/shoes-store/shoesstore/backend/src/test/java/com/shoesstore/shoesstore/service",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -88,6 +108,7 @@
       <recent name="com.shoesstore.shoesstore.dto" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Documentos\GitHub\shoes-store\shoesstore\backend\src\test\java\com\shoesstore\shoesstore\service" />
       <recent name="D:\Documentos\GitHub\shoes-store\shoesstore\backend\src\main\resources\templates\orders" />
       <recent name="D:\Documentos\GitHub\shoes-store\shoesstore\backend\src\main\resources\templates\products" />
       <recent name="C:\Users\walte\Documents\GitHub\shoes-store\shoesstore\backend\src\main\resources\templates\sales" />
@@ -103,80 +124,79 @@
       <recent name="com.shoesstore.shoesstore.repository" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.ShoesstoreApplication">
-    <configuration name="SupplierControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.ReportServiceTest">
+    <configuration name="ClaimServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="shoesstore" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.shoesstore.shoesstore.*" />
+          <option name="PATTERN" value="com.shoesstore.shoesstore.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore" />
-      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.SupplierControllerTest" />
+      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore.service" />
+      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.service.ClaimServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SupplierServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ClaimServiceTest.testDeleteClaim" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="shoesstore" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.shoesstore.shoesstore.*" />
+          <option name="PATTERN" value="com.shoesstore.shoesstore.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore" />
-      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.SupplierServiceTest" />
+      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore.service" />
+      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.service.ClaimServiceTest" />
+      <option name="METHOD_NAME" value="testDeleteClaim" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PurchaseOrderServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="shoesstore" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.shoesstore.shoesstore.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore.service" />
+      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.service.PurchaseOrderServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SupplierServiceTest.registerSupplier_shouldSaveWithAssociatedProducts" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ReportServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="shoesstore" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.shoesstore.shoesstore.*" />
+          <option name="PATTERN" value="com.shoesstore.shoesstore.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore" />
-      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.SupplierServiceTest" />
-      <option name="METHOD_NAME" value="registerSupplier_shouldSaveWithAssociatedProducts" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore.service" />
+      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.service.ReportServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SupplierServiceTest.updateSupplier_shouldReplaceAssociatedProducts" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ReportServiceTest.generateSalesReport_byProduct_shouldReturnDetailedRows" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="shoesstore" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.shoesstore.shoesstore.*" />
+          <option name="PATTERN" value="com.shoesstore.shoesstore.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore" />
-      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.SupplierServiceTest" />
-      <option name="METHOD_NAME" value="updateSupplier_shouldReplaceAssociatedProducts" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SupplierServiceTest.updateSupplier_shouldThrowIfNotFound" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="shoesstore" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.shoesstore.shoesstore.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore" />
-      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.SupplierServiceTest" />
-      <option name="METHOD_NAME" value="updateSupplier_shouldThrowIfNotFound" />
+      <option name="PACKAGE_NAME" value="com.shoesstore.shoesstore.service" />
+      <option name="MAIN_CLASS_NAME" value="com.shoesstore.shoesstore.service.ReportServiceTest" />
+      <option name="METHOD_NAME" value="generateSalesReport_byProduct_shouldReturnDetailedRows" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -192,11 +212,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.SupplierServiceTest" />
-        <item itemvalue="JUnit.SupplierServiceTest.updateSupplier_shouldReplaceAssociatedProducts" />
-        <item itemvalue="JUnit.SupplierServiceTest.updateSupplier_shouldThrowIfNotFound" />
-        <item itemvalue="JUnit.SupplierControllerTest" />
-        <item itemvalue="JUnit.SupplierServiceTest.registerSupplier_shouldSaveWithAssociatedProducts" />
+        <item itemvalue="JUnit.ReportServiceTest" />
+        <item itemvalue="JUnit.ReportServiceTest.generateSalesReport_byProduct_shouldReturnDetailedRows" />
+        <item itemvalue="JUnit.PurchaseOrderServiceTest" />
+        <item itemvalue="JUnit.ClaimServiceTest" />
+        <item itemvalue="JUnit.ClaimServiceTest.testDeleteClaim" />
       </list>
     </recent_temporary>
   </component>
@@ -247,6 +267,8 @@
       <workItem from="1752016156699" duration="1863000" />
       <workItem from="1752598056276" duration="140000" />
       <workItem from="1753658780644" duration="1805000" />
+      <workItem from="1753673663660" duration="827000" />
+      <workItem from="1753733843854" duration="12429000" />
     </task>
     <servers />
   </component>
