@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="806a2700-3d58-4cc1-b3f8-4cc29a736386" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/shoesstore/shoesstore/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/templates/users/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/templates/users/list.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,41 +48,41 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Application.ShoesstoreApplication.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;JUnit.SupplierControllerTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SupplierServiceTest.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SupplierServiceTest.registerSupplier_shouldSaveWithAssociatedProducts.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SupplierServiceTest.updateSupplier_shouldReplaceAssociatedProducts.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.SupplierServiceTest.updateSupplier_shouldThrowIfNotFound.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.shoesstore [clean].executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.ShoesstoreApplication.executor&quot;: &quot;Run&quot;,
-    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
-    &quot;data.sources.detected.do.not.suggest.again&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;productos&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Documentos/GitHub/shoes-store/shoesstore/backend/src/main/resources/templates/orders&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.ShoesstoreApplication.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "JUnit.SupplierControllerTest.executor": "Run",
+    "JUnit.SupplierServiceTest.executor": "Run",
+    "JUnit.SupplierServiceTest.registerSupplier_shouldSaveWithAssociatedProducts.executor": "Run",
+    "JUnit.SupplierServiceTest.updateSupplier_shouldReplaceAssociatedProducts.executor": "Run",
+    "JUnit.SupplierServiceTest.updateSupplier_shouldThrowIfNotFound.executor": "Run",
+    "Maven.shoesstore [clean].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.ShoesstoreApplication.executor": "Run",
+    "com.codeium.enabled": "true",
+    "data.sources.detected.do.not.suggest.again": "true",
+    "git-widget-placeholder": "productos",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/Documentos/GitHub/shoes-store/shoesstore",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.shoesstore.shoesstore.dto" />
@@ -245,6 +245,8 @@
       <workItem from="1751936381949" duration="19000" />
       <workItem from="1752012958476" duration="599000" />
       <workItem from="1752016156699" duration="1863000" />
+      <workItem from="1752598056276" duration="140000" />
+      <workItem from="1753658780644" duration="1805000" />
     </task>
     <servers />
   </component>

@@ -51,8 +51,8 @@
                                         <span th:if="${user.role.name == 'ROLE_SELLER'}" th:text="Vendedor">Vendedor</span>
 
                                         <!-- STOCK_MANAGER -->
-                                        <i th:if="${user.role.name == 'ROLE_STOCK_MANAGER'}" class="fas fa-boxes"></i>
-                                        <span th:if="${user.role.name == 'ROLE_STOCK_MANAGER'}">Gestor de Inventario</span>
+                                        <i th:if="${user.role == 'ROLE_STOCK_MANAGER'}" class="fas fa-boxes"></i>
+                                        <span th:if="${user.role == 'ROLE_STOCK_MANAGER'}">Gestor de Inventario</span>
                                     </span>
                         </td>
                         <td class="email-verified" data-label="Email">
