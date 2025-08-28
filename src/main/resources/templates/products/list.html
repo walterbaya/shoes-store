@@ -45,7 +45,7 @@
           </thead>
           <tbody>
           <tr th:each="product : ${products}" class="product-row">
-            <td th:text="${product.id}" class="fw-semibold"></td>
+            <td th:text="${product.name}" class="fw-semibold"></td>
             <td>
               <div class="fw-medium" th:text="${product.description}"></div>
               <div class="text-muted small">

@@ -22,9 +22,9 @@
                         <input type="number"
                                id="idInput"
                                class="form-control"
-                               th:field="*{id}"
+                               th:field="*{name}"
                                placeholder="EJ: 1001"
-                               th:disabled="${product.id} != null"
+                               th:disabled="${product.name} != null"
                                required>
                         <div class="invalid-feedback">
                             Por favor ingrese un ID para el producto
@@ -143,7 +143,7 @@
                                    class="form-control"
                                    th:field="*{price}"
                                    step="1"
-                                   min="0.01"
+                                   min="1"
                                    placeholder="0.00"
                                    required>
                         </div>
@@ -158,7 +158,8 @@
                                id="stockInput"
                                class="form-control"
                                th:field="*{stock}"
-                               min="0.01"
+                               step="1"
+                               min="1"
                                placeholder="Cantidad disponible"
                                required>
                         <div class="invalid-feedback">

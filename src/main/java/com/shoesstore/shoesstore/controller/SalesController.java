@@ -49,6 +49,12 @@ public class SalesController {
         model.addAttribute("storeSalesCount", storeSalesCount);
         model.addAttribute("totalRevenue", String.format("%.2f", totalSalesSum));
 
+        sales.forEach(sale -> {
+            if(sale.getTotal() > 0) {
+                sale.setTotal(sale.getTotal() + sale.getShippingCost());
+            }
+        });
+
         // Indica a layout.html qué fragmento renderizar
         model.addAttribute("view", "sales/list");
         return "layout";
@@ -58,6 +64,8 @@ public class SalesController {
     @GetMapping("/{id}/details")
     public String getSaleDetail(@PathVariable Long id, Model model) {
         Sale sale = saleService.getSaleById(id);
+        sale.setTotal(sale.getTotal() + sale.getShippingCost());
+
         if (sale == null) {
             return "redirect:/sales";
         }

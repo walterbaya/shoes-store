@@ -48,10 +48,6 @@
                                     <span>Envío:</span>
                                     <span th:text="${'$' + #numbers.formatDecimal(sale.shippingCost, 1, 2)}"></span>
                                 </div>
-                                <div class="summary-item">
-                                    <span>IVA (21%):</span>
-                                    <span th:text="${'$' + #numbers.formatDecimal(sale.total * 0.21, 1, 2)}"></span>
-                                </div>
                                 <div class="summary-item mb-3">
                                     <span class="summary-total">Total:</span>
                                     <span class="summary-total" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></span>

@@ -17,6 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class ProductWithSuppliersDTO {
     private Long id;
+    private Long name;
     private String description;
     private String color;
     private String type;
@@ -32,6 +33,7 @@ public class ProductWithSuppliersDTO {
     // Constructor que acepta un Product
     public ProductWithSuppliersDTO(Product product) {
         this.id = product.getId();
+        this.name = product.getName();
         this.description = product.getDescription();
         this.color = product.getColor();
         this.type = product.getType();

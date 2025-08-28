@@ -23,9 +23,13 @@ import java.util.Set;
 public class Product {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
+
+    @Column(nullable = false)
+    private Long name;
 
     public enum Gender {
         HOMBRE("Hombre"),
@@ -86,7 +90,7 @@ public class Product {
     public enum ShoeSize {
         S35("35"), S36("36"), S37("37"), S38("38"),
         S39("39"), S40("40"), S41("41"), S42("42"),
-        S43("43"), S44("44");
+        S43("43"), S44("44"), S45("45"), S46("46");
 
         private final String displayValue;
 

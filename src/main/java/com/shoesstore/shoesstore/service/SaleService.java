@@ -52,7 +52,7 @@ public class SaleService {
         }
 
         sale.setUser(user.get());
-        sale.setTotal(totalSale);
+        sale.setTotal(totalSale - totalSale * (sale.getDiscountPercentage()/100.0));
 
         Sale res = saleRepository.save(sale);
 

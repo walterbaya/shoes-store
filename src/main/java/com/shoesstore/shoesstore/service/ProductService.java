@@ -74,17 +74,10 @@ public class ProductService {
 
     public Product saveProduct(Product product) {
         // Validar que siempre venga ID desde el formulario
-        if (product.getId() == null) {
+        if (product.getName() == null) {
             throw new IllegalArgumentException("El ID del producto es obligatorio");
         }
-        // Si es creación y ya existe, lanzar excepción opcionalmente:
-        if (!productRepository.existsById(product.getId())) {
-            return productRepository.save(product);
-        }
-        // Si ya existe, hacemos actualización
-        else{
-            throw new IllegalArgumentException("El código de producto ingresado ya existe, si desea modificarlo utilice la opción editar.");
-        }
+        return productRepository.save(product);
     }
 
     @Transactional
