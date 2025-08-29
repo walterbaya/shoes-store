@@ -1,0 +1,4 @@
+-mvn compile jib:dockerBuild
+-docker run -d --name shoesstore -p 9090:9090 walterbaya/shoesstore:v1
+
+
