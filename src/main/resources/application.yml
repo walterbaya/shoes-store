@@ -1,15 +1,20 @@
+server:
+  port: 9090
 spring:
   application:
     name="shoes_store"
   #Standard Database
   datasource:
-    url: "jdbc:mysql://localhost:3306/shoes_store"
+    url: jdbc:mysql://host.docker.internal:3306/shoes_store
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   # JPA
   jpa:
     show-sql: false
+  #sql:
+   # init:
+    #  mode: always
   properties:
     hibernate:
       format_sql: true
@@ -32,5 +37,3 @@ spring:
 # File upload settings
 file:
   upload-dir: ./uploads
-
-server.port: 9090
