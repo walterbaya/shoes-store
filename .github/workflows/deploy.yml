@@ -1,0 +1,39 @@
+name: CI/CD with Jib and Docker Compose
+
+on:
+  push:
+    branches:
+      - main   # cada vez que pushes a main se dispara
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build Docker image with Jib
+        run: |
+          mvn compile jib:dockerBuild \
+            -Dimage=shoestore:latest
+          docker images | grep shoestore
+
+      - name: Run docker-compose
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+          docker ps -a
