@@ -7,7 +7,8 @@ app = Flask(__name__)
 def deploy():
     data = request.json
     print("🚀 Recibido deploy:", data)
-    os.system("docker-compose pull && docker-compose up -d")
+    # Traer última imagen y levantar contenedores
+    os.system("docker-compose pull && docker-compose up -d --build")
     return {"status": "ok"}
 
 if __name__ == "__main__":

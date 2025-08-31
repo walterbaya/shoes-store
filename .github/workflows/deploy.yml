@@ -11,18 +11,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Clonar el repositorio
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ Configurar JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3️⃣ Cachear dependencias de Maven
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,30 +27,21 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      # 4️⃣ Construir la imagen con Jib
-      - name: Build Docker image with Jib
+      # 4️⃣ Build Docker image with Jib directly to Docker Hub
+      - name: Build and push image with Jib
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          mvn compile jib:dockerBuild -Dimage=shoestore:latest
-          echo "✅ Imagen construida con Jib"
-          docker images | grep shoestore
+          mvn compile jib:build \
+            -Dimage=${DOCKER_USERNAME}/shoestore:latest \
+            -Djib.to.auth.username=${DOCKER_USERNAME} \
+            -Djib.to.auth.password=${DOCKER_PASSWORD}
 
-      # 5️⃣ Instalar docker-compose en el runner
+      # 5️⃣ (Opcional) levantar contenedores en el runner
       - name: Install docker-compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-
-      # 6️⃣ Levantar los contenedores usando docker-compose
-      - name: Run containers with docker-compose
-        run: |
-          docker-compose up -d --build
-          echo "✅ Contenedores levantados"
-          docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
-      
-      - name: Notify Hookdeck (trigger deploy on desktop)
-        run: |
-          curl -X POST https://hkdk.events/dx04bea4pkpd6h \
-            -H "Content-Type: application/json" \
-            -d '{"event":"deploy","image":"shoestore:latest"}'
 
 
