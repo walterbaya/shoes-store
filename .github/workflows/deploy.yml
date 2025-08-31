@@ -27,7 +27,6 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      # 4️⃣ Build Docker image with Jib directly to Docker Hub
       - name: Build and push image with Jib
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
@@ -43,6 +42,7 @@ jobs:
           curl -X POST https://hkdk.events/dx04bea4pkpd6h \
           -H "Content-Type: application/json" \
           -d '{"event":"deploy","image":"shoestore:latest"}'
+
   
 
 
