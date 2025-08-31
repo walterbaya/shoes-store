@@ -33,7 +33,13 @@ jobs:
             -Dimage=shoestore:latest
           docker images | grep shoestore
 
-      - name: Run docker-compose
+      - name: Install docker-compose
         run: |
-          docker-compose -f docker-compose.yml up -d --build
-          docker ps -a
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Run containers with docker-compose
+        run: |
+          docker-compose up -d --build
+          docker ps
+
