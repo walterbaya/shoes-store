@@ -49,5 +49,11 @@ jobs:
           docker-compose up -d --build
           echo "✅ Contenedores levantados"
           docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
+      
+      - name: Notify Hookdeck (trigger deploy on desktop)
+        run: |
+          curl -X POST https://YOUR_HOOKDECK_ENDPOINT \
+            -H "Content-Type: application/json" \
+            -d '{"event":"deploy","image":"shoestore:latest"}'
 
 
