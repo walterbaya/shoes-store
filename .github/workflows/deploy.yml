@@ -29,8 +29,8 @@ jobs:
 
       - name: Build Docker image with Jib
         run: |
-          mvn compile jib:dockerBuild \
-            -Dimage=shoestore:latest
+          mvn compile jib:dockerBuild -Dimage=shoestore:latest
+          echo "✅ Imagen construida con Jib"
           docker images | grep shoestore
 
       - name: Install docker-compose
@@ -41,5 +41,6 @@ jobs:
       - name: Run containers with docker-compose
         run: |
           docker-compose up -d --build
-          docker ps
+          echo "✅ Contenedores levantados"
+          docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Status}}\t{{.Ports}}"
 
