@@ -38,12 +38,6 @@ jobs:
             -Djib.to.auth.username=${DOCKER_USERNAME} \
             -Djib.to.auth.password=${DOCKER_PASSWORD}
 
-      # 5️⃣ (Opcional) levantar contenedores en el runner
-      - name: Install docker-compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Notify Hookdeck (trigger deploy on PC)
         run: |
           curl -X POST https://hkdk.events/dx04bea4pkpd6h \
