@@ -1,0 +1,14 @@
+from flask import Flask, request
+import os
+
+app = Flask(__name__)
+
+@app.route("/deploy", methods=["POST"])
+def deploy():
+    data = request.json
+    print("🚀 Recibido deploy:", data)
+    os.system("docker-compose pull && docker-compose up -d")
+    return {"status": "ok"}
+
+if __name__ == "__main__":
+    app.run(port=4000)
