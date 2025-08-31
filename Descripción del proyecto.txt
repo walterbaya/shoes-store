@@ -16,3 +16,6 @@ ShoesStore-App
 │   ├── css (Estilos personalizados)
 │   └── js (Funcionalidades específicas)
 └── database (MySQL 5)
+
+
+      
