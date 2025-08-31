@@ -19,7 +19,7 @@ services:
       start_period: 10s
 
   shoesstore:
-    image: shoestore:latest
+    image: walterbaya/shoestore:latest
     container_name: shoesstore-app
     ports:
       - "8080:8080"
