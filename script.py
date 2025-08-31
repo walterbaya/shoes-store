@@ -3,7 +3,7 @@ import subprocess
 
 app = Flask(__name__)
 
-@app.route("/deploy", methods=["POST"])
+@app.route("/", methods=["POST"])
 def deploy():
     data = request.json
     print("🚀 Recibido deploy:", data)
