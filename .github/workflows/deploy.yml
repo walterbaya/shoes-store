@@ -52,7 +52,7 @@ jobs:
       
       - name: Notify Hookdeck (trigger deploy on desktop)
         run: |
-          curl -X POST https://YOUR_HOOKDECK_ENDPOINT \
+          curl -X POST https://hkdk.events/dx04bea4pkpd6h \
             -H "Content-Type: application/json" \
             -d '{"event":"deploy","image":"shoestore:latest"}'
 
