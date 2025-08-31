@@ -44,4 +44,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Notify Hookdeck (trigger deploy on PC)
+        run: |
+          curl -X POST https://hkdk.events/dx04bea4pkpd6h \
+          -H "Content-Type: application/json" \
+          -d '{"event":"deploy","image":"shoestore:latest"}'
+  
+
 
