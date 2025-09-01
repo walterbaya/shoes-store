@@ -2,14 +2,14 @@ import subprocess
 import time
 import requests
 import webbrowser
+import threading
 
 DOCKER_COMPOSE_FILE = "/home/negocio/Escritorio/shoes-store/docker-compose.yml"
-MYSQL_SERVICE_NAME = "mysql"  # nombre exacto del servicio en tu docker-compose
+MYSQL_SERVICE_NAME = "mysql"
 APP_URL = "http://localhost:8080/login"
-
+CHECK_INTERVAL = 2  # segundos entre cada chequeo de disponibilidad
 
 def is_mysql_running():
-    """Verifica si el contenedor mysql ya está corriendo"""
     try:
         result = subprocess.run(
             ["docker", "ps", "--filter", f"name={MYSQL_SERVICE_NAME}", "--format", "{{.Names}}"],
@@ -21,8 +21,22 @@ def is_mysql_running():
         print(f"⚠️ Error al verificar MySQL: {e}")
         return False
 
+def wait_for_app(url):
+    """Espera hasta que la aplicación responda y abre el navegador."""
+    print(f"⏳ Esperando a que la aplicación esté disponible en {url}...")
+    while True:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                print(f"\n✅ Aplicación lista en {url}")
+                webbrowser.open(url)
+                break
+        except requests.exceptions.ConnectionError:
+            pass
+        time.sleep(CHECK_INTERVAL)
 
 def start_docker():
+    """Levanta los servicios docker mostrando logs en tiempo real."""
     try:
         # Obtener lista de servicios definidos en docker-compose
         result = subprocess.run(
@@ -40,10 +54,19 @@ def start_docker():
 
         if services_to_start:
             print(f"🚀 Levantando servicios: {', '.join(services_to_start)}")
-            subprocess.run(
-                ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"] + services_to_start,
-                check=True
+            process = subprocess.Popen(
+                ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "--build"] + services_to_start,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
             )
+
+            # Mostrar logs en tiempo real
+            for line in process.stdout:
+                print(line, end="")
+
+            process.wait()
+            print(f"✅ Servicios levantados con código de salida {process.returncode}")
         else:
             print("⚠️ No hay servicios para levantar (todo está protegido o ya corriendo).")
 
@@ -52,34 +75,28 @@ def start_docker():
     except Exception as e:
         print(f"⚠️ Error inesperado: {e}")
 
-
-def wait_for_app(url, timeout=120):
-    """Espera hasta que la app esté disponible"""
-    print(f"⏳ Esperando a que la aplicación esté lista en {url} ...")
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        try:
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                print("✅ La aplicación ya está disponible.")
-                return True
-        except requests.exceptions.RequestException:
-            pass
-        time.sleep(3)
-
-    print("❌ La aplicación no respondió en el tiempo esperado.")
-    return False
-
-
 if __name__ == "__main__":
     print("🔼 Ejecutando script de arranque...")
-    start_docker()
 
-    if wait_for_app(APP_URL):
-        print("🌐 Abriendo navegador en:", APP_URL)
-        webbrowser.open(APP_URL)
-    else:
-        print("⚠️ No se pudo abrir el navegador porque la app no está lista.")
+    # Hilo para levantar docker y mostrar logs
+    docker_thread = threading.Thread(target=start_docker)
+    docker_thread.start()
+
+    # Hilo para esperar que la app esté lista y abrir navegador
+    app_thread = threading.Thread(target=wait_for_app, args=(APP_URL,))
+    app_thread.start()
+
+    # Esperamos que ambos hilos terminen
+    docker_thread.join()
+    app_thread.join()
+
+    print("✅ Arranque completo y navegador abierto.")
+
+
+
+
+
+
 
 
 
