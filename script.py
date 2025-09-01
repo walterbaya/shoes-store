@@ -7,7 +7,7 @@ import yaml
 
 app = Flask(__name__)
 
-def get_ports_from_compose(file_path="docker-compose.yml"):
+def get_ports_from_compose(file_path="/home/negocio/Escritorio/shoes-store/docker-compose.yml"):
     """Extrae todos los puertos mapeados en docker-compose.yml"""
     ports = []
     with open(file_path, "r") as f:
@@ -51,7 +51,7 @@ def run_deploy():
         docker_pass = "Alfiosos17$"
 
         # Liberar puertos usados por docker-compose
-        ports = get_ports_from_compose("docker-compose.yml")
+        ports = get_ports_from_compose("/home/negocio/Escritorio/shoes-store/docker-compose.yml")
         free_ports(ports)
 
         # Login a Docker
