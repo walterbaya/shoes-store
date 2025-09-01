@@ -16,18 +16,23 @@ FLASK_PORT = 4000
 app = Flask(__name__)
 
 def run_deploy():
-    """Ejecuta el deploy automáticamente usando docker-compose."""
+    """Ejecuta el deploy automáticamente usando docker-compose y recarga la app."""
     try:
         print("🚀 Ejecutando deploy...")
+        # Traer nuevas imágenes
         subprocess.run(
             ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "pull"],
             check=True
         )
+        # Levantar o actualizar contenedores
         subprocess.run(
             ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"],
             check=True
         )
-        print("✅ Deploy completado.")
+        print("✅ Deploy completado. Recargando navegador...")
+
+        # Abrir o recargar la app en el navegador
+        webbrowser.open(APP_URL)
     except subprocess.CalledProcessError as e:
         print(f"❌ Error en deploy: {e}")
 
@@ -35,6 +40,7 @@ def run_deploy():
 def deploy():
     data = request.json
     print("🚀 Recibido deploy:", data)
+    # Lanzar deploy en otro hilo para no bloquear Flask
     threading.Thread(target=run_deploy).start()
     return jsonify({"status": "accepted"}), 202
 
@@ -126,13 +132,6 @@ if __name__ == "__main__":
     docker_thread.join()
     app_thread.join()
     flask_thread.join()
-
-
-
-
-
-
-
 
 
 
