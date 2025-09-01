@@ -10,7 +10,7 @@ DOCKER_COMPOSE_FILE = "/home/negocio/Escritorio/shoes-store/docker-compose.yml"
 MYSQL_SERVICE_NAME = "mysql"
 APP_URL = "http://localhost:8080/login"
 CHECK_INTERVAL = 2  # segundos entre cada chequeo de disponibilidad
-FLASK_PORT = 5000
+FLASK_PORT = 4000
 
 # --- FLASK ---
 app = Flask(__name__)
