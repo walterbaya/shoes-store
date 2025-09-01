@@ -7,7 +7,9 @@ import yaml
 
 app = Flask(__name__)
 
-def get_ports_from_compose(file_path="/home/negocio/Escritorio/shoes-store/docker-compose.yml"):
+DOCKER_COMPOSE_FILE = "/home/negocio/Escritorio/shoes-store/docker-compose.yml"
+
+def get_ports_from_compose(file_path=DOCKER_COMPOSE_FILE):
     """Extrae todos los puertos mapeados en docker-compose.yml"""
     ports = []
     with open(file_path, "r") as f:
@@ -51,7 +53,7 @@ def run_deploy():
         docker_pass = "Alfiosos17$"
 
         # Liberar puertos usados por docker-compose
-        ports = get_ports_from_compose("/home/negocio/Escritorio/shoes-store/docker-compose.yml")
+        ports = get_ports_from_compose(DOCKER_COMPOSE_FILE)
         free_ports(ports)
 
         # Login a Docker
@@ -63,21 +65,21 @@ def run_deploy():
 
         # Pull de las últimas imágenes
         pull = subprocess.run(
-            ["docker-compose", "pull"],
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "pull"],
             check=True, capture_output=True, text=True
         )
         print(pull.stdout)
 
         # Levantar contenedores en background
         up = subprocess.run(
-            ["docker-compose", "up", "-d", "--build"],
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"],
             check=True, capture_output=True, text=True
         )
         print(up.stdout)
 
         # Logs en tiempo real
         logs = subprocess.Popen(
-            ["docker-compose", "logs", "-f"],
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "logs", "-f"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True
@@ -100,4 +102,5 @@ def deploy():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=4000)
+
 
