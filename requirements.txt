@@ -1,3 +1,9 @@
 flask
 pyyaml
+docker-compose
+npm
+hookdeck
+pip3
+python3
+
 
