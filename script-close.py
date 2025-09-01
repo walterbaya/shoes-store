@@ -2,10 +2,15 @@ import subprocess
 import os
 import signal
 
+DOCKER_COMPOSE_FILE = "/home/negocio/Escritorio/shoes-store/docker-compose.yml"
+
 def stop_docker():
     try:
         print("🛑 Apagando contenedores Docker...")
-        subprocess.run(["docker-compose", "down"], check=True)
+        subprocess.run(
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "down"], 
+            check=True
+        )
     except Exception as e:
         print(f"⚠️ Error al apagar Docker: {e}")
 
@@ -26,11 +31,12 @@ def free_ports(ports):
 if __name__ == "__main__":
     print("🔻 Ejecutando script de apagado...")
     
-    # Apagar docker
+    # Apagar docker usando ruta absoluta del docker-compose.yml
     stop_docker()
     
     # Opcional: liberar puertos que uses (ej. Flask 4000 y app 8080)
     free_ports([4000, 8080])
     
     print("✅ Apagado completo.")
+
 
