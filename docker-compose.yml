@@ -3,9 +3,9 @@ version: '3.9'
 services:
   mysql:
     image: mysql:8.0
-    container_name: shoesstore-mysql
+    container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE: shoes_store
     ports:
       - "3306:3306"
@@ -26,7 +26,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shoes_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_PASSWORD: 
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
       SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000

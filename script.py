@@ -1,106 +1,85 @@
-from flask import Flask, request, jsonify
 import subprocess
-import threading
-import os
-import signal
-import yaml
-
-app = Flask(__name__)
+import time
+import requests
+import webbrowser
 
 DOCKER_COMPOSE_FILE = "/home/negocio/Escritorio/shoes-store/docker-compose.yml"
+MYSQL_SERVICE_NAME = "mysql"  # nombre exacto del servicio en tu docker-compose
+APP_URL = "http://localhost:8080/login"
 
-def get_ports_from_compose(file_path=DOCKER_COMPOSE_FILE):
-    """Extrae todos los puertos mapeados en docker-compose.yml"""
-    ports = []
-    with open(file_path, "r") as f:
-        compose = yaml.safe_load(f)
-        for service in compose.get("services", {}).values():
-            for port in service.get("ports", []):
-                local_port = port.split(":")[0]  # toma la parte antes de ":"
-                try:
-                    ports.append(int(local_port))
-                except ValueError:
-                    pass
-    return ports
 
-def free_ports(ports):
-    """Mata procesos que estén usando los puertos especificados"""
-    for port in ports:
-        try:
-            if os.name == "nt":  # Windows
-                result = subprocess.run(
-                    f'netstat -ano | findstr :{port}', shell=True, capture_output=True, text=True
-                )
-                lines = result.stdout.strip().splitlines()
-                for line in lines:
-                    pid = line.split()[-1]
-                    print(f"🛑 Matando proceso PID {pid} que usa el puerto {port}")
-                    subprocess.run(f"taskkill /PID {pid} /F", shell=True)
-            else:  # Linux / macOS
-                result = subprocess.run(
-                    f"lsof -ti:{port}", shell=True, capture_output=True, text=True
-                )
-                pids = result.stdout.strip().splitlines()
-                for pid in pids:
-                    print(f"🛑 Matando proceso PID {pid} que usa el puerto {port}")
-                    os.kill(int(pid), signal.SIGKILL)
-        except Exception as e:
-            print(f"⚠️ No se pudo liberar el puerto {port}: {e}")
-
-def run_deploy():
+def is_mysql_running():
+    """Verifica si el contenedor mysql ya está corriendo"""
     try:
-        docker_user = "walterbaya"
-        docker_pass = "Alfiosos17$"
-
-        # Liberar puertos usados por docker-compose
-        ports = get_ports_from_compose(DOCKER_COMPOSE_FILE)
-        free_ports(ports)
-
-        # Login a Docker
-        login = subprocess.run(
-            ["docker", "login", "-u", docker_user, "--password-stdin"],
-            input=docker_pass, text=True, check=True, capture_output=True
+        result = subprocess.run(
+            ["docker", "ps", "--filter", f"name={MYSQL_SERVICE_NAME}", "--format", "{{.Names}}"],
+            capture_output=True, text=True, check=True
         )
-        print(login.stdout)
+        running = result.stdout.strip().splitlines()
+        return any(MYSQL_SERVICE_NAME in name for name in running)
+    except Exception as e:
+        print(f"⚠️ Error al verificar MySQL: {e}")
+        return False
 
-        # Pull de las últimas imágenes
-        pull = subprocess.run(
-            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "pull"],
-            check=True, capture_output=True, text=True
-        )
-        print(pull.stdout)
 
-        # Levantar contenedores en background
-        up = subprocess.run(
-            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"],
-            check=True, capture_output=True, text=True
+def start_docker():
+    try:
+        # Obtener lista de servicios definidos en docker-compose
+        result = subprocess.run(
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "config", "--services"],
+            capture_output=True, text=True, check=True
         )
-        print(up.stdout)
+        services = result.stdout.strip().splitlines()
 
-        # Logs en tiempo real
-        logs = subprocess.Popen(
-            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "logs", "-f"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True
-        )
-        for line in logs.stdout:
-            print(line, end="")
+        # Si MySQL ya corre, lo sacamos de la lista de arranque
+        if is_mysql_running():
+            print("✅ MySQL ya está corriendo, no se volverá a levantar.")
+            services_to_start = [s for s in services if s != MYSQL_SERVICE_NAME]
+        else:
+            services_to_start = services
+
+        if services_to_start:
+            print(f"🚀 Levantando servicios: {', '.join(services_to_start)}")
+            subprocess.run(
+                ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"] + services_to_start,
+                check=True
+            )
+        else:
+            print("⚠️ No hay servicios para levantar (todo está protegido o ya corriendo).")
 
     except subprocess.CalledProcessError as e:
-        print("❌ Error:", e.stderr)
+        print("❌ Error en docker-compose:", e.stderr)
+    except Exception as e:
+        print(f"⚠️ Error inesperado: {e}")
 
-@app.route("/", methods=["POST"])
-def deploy():
-    data = request.json
-    print("🚀 Recibido deploy:", data)
 
-    # Ejecutar deploy en un thread para no bloquear Flask
-    threading.Thread(target=run_deploy).start()
+def wait_for_app(url, timeout=120):
+    """Espera hasta que la app esté disponible"""
+    print(f"⏳ Esperando a que la aplicación esté lista en {url} ...")
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            response = requests.get(url, timeout=3)
+            if response.status_code == 200:
+                print("✅ La aplicación ya está disponible.")
+                return True
+        except requests.exceptions.RequestException:
+            pass
+        time.sleep(3)
 
-    return jsonify({"status": "accepted"}), 202
+    print("❌ La aplicación no respondió en el tiempo esperado.")
+    return False
+
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=4000)
+    print("🔼 Ejecutando script de arranque...")
+    start_docker()
+
+    if wait_for_app(APP_URL):
+        print("🌐 Abriendo navegador en:", APP_URL)
+        webbrowser.open(APP_URL)
+    else:
+        print("⚠️ No se pudo abrir el navegador porque la app no está lista.")
+
 
 
