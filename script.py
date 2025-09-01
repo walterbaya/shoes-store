@@ -40,7 +40,6 @@ def run_deploy():
 def deploy():
     data = request.json
     print("🚀 Recibido deploy:", data)
-    # Lanzar deploy en otro hilo para no bloquear Flask
     threading.Thread(target=run_deploy).start()
     return jsonify({"status": "accepted"}), 202
 
@@ -76,23 +75,18 @@ def wait_for_app(url, timeout=120):
     return False
 
 def start_docker():
-    """Levanta los servicios docker mostrando logs en tiempo real."""
+    """Levanta los servicios docker en background."""
     try:
-        # Obtener lista de servicios
         result = subprocess.run(
             ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "config", "--services"],
             capture_output=True, text=True, check=True
         )
         services = result.stdout.strip().splitlines()
 
-        # Si MySQL ya corre, no lo levantamos
-        services_to_start = services
-        if is_mysql_running():
-            print("✅ MySQL ya está corriendo, no se volverá a levantar.")
-            services_to_start = [s for s in services if s != MYSQL_SERVICE_NAME]
+        # No levantar MySQL si ya corre
+        services_to_start = [s for s in services if s != MYSQL_SERVICE_NAME] if is_mysql_running() else services
 
         if services_to_start:
-            # Levantar contenedores en background
             print(f"🚀 Levantando servicios: {', '.join(services_to_start)}")
             subprocess.run(
                 ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"] + services_to_start,
@@ -100,37 +94,31 @@ def start_docker():
             )
             print("✅ Contenedores levantados en background")
 
-            # Mostrar logs en tiempo real
-            subprocess.run(
-                ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "logs", "-f"] + services_to_start
-            )
+            # Lanzar hilo para logs en tiempo real (opcional)
+            def follow_logs():
+                subprocess.run(
+                    ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "logs", "-f"] + services_to_start
+                )
+            threading.Thread(target=follow_logs, daemon=True).start()
+
         else:
             print("⚠️ No hay servicios para levantar (todo ya está corriendo).")
-
-    except subprocess.CalledProcessError as e:
-        print("❌ Error en docker-compose:", e.stderr)
     except Exception as e:
-        print(f"⚠️ Error inesperado: {e}")
+        print(f"⚠️ Error al levantar Docker: {e}")
 
 # --- EJECUCIÓN PRINCIPAL ---
 if __name__ == "__main__":
     print("🔼 Iniciando sistema unificado...")
 
-    # Hilo para levantar Docker
-    docker_thread = threading.Thread(target=start_docker)
-    docker_thread.start()
+    # 1️⃣ Levantar Docker (bloquea hasta que termine)
+    start_docker()
 
-    # Hilo para esperar que la app esté lista y abrir navegador
-    app_thread = threading.Thread(target=wait_for_app, args=(APP_URL,))
-    app_thread.start()
+    # 2️⃣ Esperar que la app responda y abrir navegador
+    wait_for_app(APP_URL)
 
-    # Hilo para Flask (webhook deploy)
+    # 3️⃣ Iniciar Flask en un hilo separado para recibir webhooks
     flask_thread = threading.Thread(target=lambda: app.run(host="0.0.0.0", port=FLASK_PORT))
     flask_thread.start()
-
-    # Esperamos a los hilos principales
-    docker_thread.join()
-    app_thread.join()
     flask_thread.join()
 
 
