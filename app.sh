@@ -3,6 +3,7 @@
 APP_PORT=4000
 LOGIN_URL="http://localhost:8080/login"
 PYTHON_SCRIPT="/home/negocio/Escritorio/shoes-store/script.py"
+PYTHON_SCRIPT_CLOSE="/home/negocio/Escritorio/shoes-store/script-close.py"
 
 # --- FUNCION DE LIMPIEZA ---
 cleanup() {
@@ -27,7 +28,7 @@ cleanup() {
 
     # Ejecutar script de cierre
     echo "  - Ejecutando script-close.py..."
-    python3 script-close.py
+    python3 $PYTHON_SCRIPT_CLOSE
 
     echo "✅ Todo apagado."
     exit 0
