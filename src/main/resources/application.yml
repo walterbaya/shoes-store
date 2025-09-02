@@ -1,5 +1,6 @@
 server:
-  port: 8080
+  #port: 8080
+  port: 8090
 
 spring:
 
@@ -12,11 +13,12 @@ spring:
       continue-on-error: true
 
   datasource:
-    url: jdbc:mysql://mysql:3306/shoes_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    #url: jdbc:mysql://mysql:3306/shoes_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/shoes_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
-    password: root
+    #password: root
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
-
 
 
   jpa:
