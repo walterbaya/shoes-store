@@ -7,6 +7,12 @@ import lombok.RequiredArgsConstructor;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.global.opencv_imgproc;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.MatVector;
+import org.bytedeco.opencv.opencv_core.Rect;
+import org.bytedeco.opencv.opencv_core.Size;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,90 +55,49 @@ public class OcrStockService {
             Pattern.compile("(PALMA)", Pattern.CASE_INSENSITIVE);
 
 
-    private List<File> preprocessImage(File input) throws IOException {
-        // Cargar imagen con OpenCV
-        Mat src = Imgcodecs.imread(input.getAbsolutePath());
-
+    public File preprocessImage(File input) throws IOException {
+        Mat src = opencv_imgcodecs.imread(input.getAbsolutePath());
         if (src.empty()) {
             throw new IOException("No se pudo cargar la imagen: " + input.getAbsolutePath());
         }
 
-        // 1. Escala de grises
+        // Escala de grises
         Mat gray = new Mat();
-        Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
+        opencv_imgproc.cvtColor(src, gray, opencv_imgproc.COLOR_BGR2GRAY);
 
-        // 2. Suavizado
-        Imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
+        // Suavizado
+        opencv_imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
 
-        // 3. Bordes
-        Mat edges = new Mat();
-        Imgproc.Canny(gray, edges, 50, 150);
+        // Binarización adaptativa
+        Mat thresh = new Mat();
+        opencv_imgproc.adaptiveThreshold(gray, thresh, 255,
+                opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+                opencv_imgproc.THRESH_BINARY, 15, 10);
 
-        // 4. Contornos
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-        Imgproc.findContours(edges, contours, hierarchy,
-                Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        // Guardar a archivo temporal
+        File tmp = Files.createTempFile("clean_", ".png").toFile();
+        opencv_imgcodecs.imwrite(tmp.getAbsolutePath(), thresh);
 
-        List<File> results = new ArrayList<>();
-        int index = 0;
-
-        for (MatOfPoint contour : contours) {
-            Rect rect = Imgproc.boundingRect(contour);
-
-            // 5. Filtrar (rectángulos tipo etiqueta)
-            if (rect.width > 100 && rect.height > 20 && rect.width > rect.height * 2) {
-                // Recortar ROI
-                Mat roi = new Mat(src, rect);
-
-                // 6. Binarización adaptativa
-                Mat roiGray = new Mat();
-                Imgproc.cvtColor(roi, roiGray, Imgproc.COLOR_BGR2GRAY);
-                Mat roiThresh = new Mat();
-                Imgproc.adaptiveThreshold(roiGray, roiThresh, 255,
-                        Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-                        Imgproc.THRESH_BINARY, 15, 10);
-
-                // 7. Guardar a archivo temporal
-                File tmp = Files.createTempFile("label_" + index, ".png").toFile();
-                Imgcodecs.imwrite(tmp.getAbsolutePath(), roiThresh);
-                results.add(tmp);
-
-                index++;
-            }
-        }
-
-        return results;
+        return tmp;
     }
 
-
-
-
+    // ------------------- Procesamiento OCR -------------------
     public List<OcrResultDTO> processImage(MultipartFile file, boolean dryRun) throws Exception {
-        // Archivo temporal original
         File tmp = Files.createTempFile("ocr-", Objects.requireNonNull(file.getOriginalFilename())).toFile();
         file.transferTo(tmp);
 
-        // 🔹 Preprocesar (escala de grises + binarización)
         File clean = preprocessImage(tmp);
 
         try {
-            // Ejecutar OCR sobre la imagen preprocesada
             String fullText = runTesseract(clean);
             System.out.println("=== OCR RESULT ===\n" + fullText);
 
             List<String> blocks = splitIntoBlocks(fullText);
-
-            // Agrupación por clave única (nombre-color-talle)
             Map<String, Product> grouped = new HashMap<>();
 
             for (String block : blocks) {
-                System.out.println("BLOCK >>> " + block); // Debug
                 Map<String, String> f = extractFields(block);
-
-                if (!f.containsKey("name") || !f.containsKey("size")) {
-                    continue; // si falta nombre o talle, descartamos
-                }
+                if (!f.containsKey("name") || !f.containsKey("size")) continue;
 
                 String key = f.get("name") + "-" + f.get("color") + "-" + f.get("size");
                 if (!grouped.containsKey(key)) {
@@ -142,7 +107,6 @@ public class OcrStockService {
                 }
             }
 
-            // Convertir a DTOs
             List<OcrResultDTO> results = new ArrayList<>();
             for (Product p : grouped.values()) {
                 Product saved = null;
@@ -164,13 +128,12 @@ public class OcrStockService {
             }
 
             return results;
+
         } finally {
             tmp.delete();
             clean.delete();
         }
     }
-
-
     private String runTesseract(File img) throws TesseractException {
         ITesseract t = new Tesseract();
 
