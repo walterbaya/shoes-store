@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.global.opencv_imgproc;
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -34,7 +35,7 @@ public class OcrStockService {
 
     private final ProductRepository productRepository;
 
-    // Regex
+    // ------------------- Regex -------------------
     private static final Pattern ART_P =
             Pattern.compile("Ar[t7]\\.?\\s*(\\d{3,6})", Pattern.CASE_INSENSITIVE);
 
@@ -46,67 +47,52 @@ public class OcrStockService {
                     Pattern.CASE_INSENSITIVE);
 
     private static final Pattern DESC_P =
-            Pattern.compile("(Bota.*|Zapato.*|Zapatilla.*)", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("(Bota.*|Zapato.*|Zapatilla.*|Mocasin.*|Sandalia.*)",
+                    Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern TIPO =
-            Pattern.compile("\\b(Bota|Zapato|Zapatilla)\\b", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern BRAND =
-            Pattern.compile("(PALMA)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern TYPE_P =
+            Pattern.compile("\\b(Bota.*|Zapato.*|Zapatilla.*|Mocasin.*|Sandalia.*)", Pattern.CASE_INSENSITIVE);
 
 
-    public File preprocessImage(File input) throws IOException {
-        Mat src = opencv_imgcodecs.imread(input.getAbsolutePath());
-        if (src.empty()) {
-            throw new IOException("No se pudo cargar la imagen: " + input.getAbsolutePath());
-        }
-
-        // Escala de grises
-        Mat gray = new Mat();
-        opencv_imgproc.cvtColor(src, gray, opencv_imgproc.COLOR_BGR2GRAY);
-
-        // Suavizado
-        opencv_imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
-
-        // Binarización adaptativa
-        Mat thresh = new Mat();
-        opencv_imgproc.adaptiveThreshold(gray, thresh, 255,
-                opencv_imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
-                opencv_imgproc.THRESH_BINARY, 15, 10);
-
-        // Guardar a archivo temporal
-        File tmp = Files.createTempFile("clean_", ".png").toFile();
-        opencv_imgcodecs.imwrite(tmp.getAbsolutePath(), thresh);
-
-        return tmp;
-    }
+    // Marca: primeras palabras largas en mayúsculas
+    private static final Pattern BRAND_P =
+            Pattern.compile("^([A-ZÁÉÍÓÚÑ ]+?)\\s+(?=Art\\.|N°|\\d)", Pattern.MULTILINE);
 
     // ------------------- Procesamiento OCR -------------------
     public List<OcrResultDTO> processImage(MultipartFile file, boolean dryRun) throws Exception {
         File tmp = Files.createTempFile("ocr-", Objects.requireNonNull(file.getOriginalFilename())).toFile();
         file.transferTo(tmp);
 
-        File clean = preprocessImage(tmp);
-
         try {
-            String fullText = runTesseract(clean);
-            System.out.println("=== OCR RESULT ===\n" + fullText);
+            // 1. Detectar etiquetas blancas y recortarlas
+            List<File> labels = detectAndCropLabels(tmp);
 
-            List<String> blocks = splitIntoBlocks(fullText);
             Map<String, Product> grouped = new HashMap<>();
 
-            for (String block : blocks) {
-                Map<String, String> f = extractFields(block);
-                if (!f.containsKey("name") || !f.containsKey("size")) continue;
+            // 2. Procesar cada etiqueta por separado
+            for (File label : labels) {
+                String fullText = runTesseract(label);
+                System.out.println("=== OCR LABEL ===\n" + fullText);
 
-                String key = f.get("name") + "-" + f.get("color") + "-" + f.get("size");
-                if (!grouped.containsKey(key)) {
-                    grouped.put(key, buildProductFromFields(f));
-                } else {
-                    grouped.get(key).setStock(grouped.get(key).getStock() + 1);
+                List<String> blocks = splitIntoBlocks(fullText);
+
+                for (String block : blocks) {
+                    Map<String, String> f = extractFields(block);
+                    if (!f.containsKey("name") || !f.containsKey("size")) continue;
+
+                    String key = f.get("name") + "-" + f.get("color") + "-" + f.get("size");
+                    if (!grouped.containsKey(key)) {
+                        grouped.put(key, buildProductFromFields(f));
+                    } else {
+                        grouped.get(key).setStock(grouped.get(key).getStock() + 1);
+                    }
                 }
+
+                // borrar temp de la etiqueta procesada
+                label.delete();
             }
 
+            // 3. Guardar y devolver resultados
             List<OcrResultDTO> results = new ArrayList<>();
             for (Product p : grouped.values()) {
                 Product saved = null;
@@ -131,9 +117,9 @@ public class OcrStockService {
 
         } finally {
             tmp.delete();
-            clean.delete();
         }
     }
+
     private String runTesseract(File img) throws TesseractException {
         ITesseract t = new Tesseract();
 
@@ -149,7 +135,6 @@ public class OcrStockService {
         return t.doOCR(img);
     }
 
-
     private List<String> splitIntoBlocks(String text) {
         String[] lines = text.split("\\R+");
         List<String> blocks = new ArrayList<>();
@@ -159,27 +144,31 @@ public class OcrStockService {
         return blocks;
     }
 
-    private Map<String,String> extractFields(String block) {
-        Map<String,String> map = new HashMap<>();
+    private Map<String, String> extractFields(String block) {
+        Map<String, String> map = new HashMap<>();
         Matcher m;
+
+        // Ignorar ruido si no tiene artículo
+        if (!block.toLowerCase().contains("art")) {
+            return map;
+        }
 
         m = ART_P.matcher(block);
         if (m.find()) map.put("name", m.group(1));
 
         m = SIZE_P.matcher(block);
-        if (m.find()) map.put("size", m.group(1));
+        if (m.find()) map.put("size", m.group(2));
 
         m = COLOR_P.matcher(block);
         if (m.find()) map.put("color", capitalize(m.group(1)));
 
-
-        m = BRAND.matcher(block);
-        if (m.find()) map.put("brand", m.group(1));
+        m = BRAND_P.matcher(block);
+        if (m.find()) map.put("brand", capitalize(m.group(1).trim()));
 
         m = DESC_P.matcher(block);
-        if (m.find()) map.put("description", capitalize(m.group(1)));
+        if (m.find()) map.put("description", capitalize(m.group(1).trim()));
 
-        m = TIPO.matcher(block);
+        m = TYPE_P.matcher(block);
         if (m.find()) map.put("type", capitalize(m.group(1)));
 
         return map;
@@ -189,11 +178,11 @@ public class OcrStockService {
         Product p = new Product();
 
         p.setName(Long.parseLong(f.get("name")));
-        p.setBrand(f.get("brand"));
-        p.setMaterial(f.getOrDefault("material", null));
+        p.setBrand(f.getOrDefault("brand", "GENÉRICO"));
+        p.setMaterial(f.getOrDefault("material", "Desconocido"));
         p.setColor(f.getOrDefault("color", null));
         p.setDescription(f.getOrDefault("description", null));
-        p.setType(null);
+        p.setType(f.getOrDefault("type", "Otro"));
         p.setGender(Product.Gender.UNISEX);
 
         String sz = f.getOrDefault("size", "37");
@@ -228,4 +217,46 @@ public class OcrStockService {
         if (s == null || s.isEmpty()) return s;
         return s.substring(0,1).toUpperCase() + s.substring(1).toLowerCase();
     }
+
+    public List<File> detectAndCropLabels(File input) throws IOException {
+        Mat src = opencv_imgcodecs.imread(input.getAbsolutePath());
+        if (src.empty()) {
+            throw new IOException("No se pudo cargar la imagen: " + input.getAbsolutePath());
+        }
+
+        Mat gray = new Mat();
+        opencv_imgproc.cvtColor(src, gray, opencv_imgproc.COLOR_BGR2GRAY);
+
+        // Binarización fuerte (valores altos para detectar lo blanco)
+        Mat thresh = new Mat();
+        opencv_imgproc.threshold(gray, thresh, 200, 255, opencv_imgproc.THRESH_BINARY);
+
+        // Invertir (texto blanco sobre fondo negro)
+        Mat inverted = new Mat();
+        opencv_core.bitwise_not(thresh, inverted);
+
+        // Buscar contornos
+        MatVector contours = new MatVector();
+        Mat hierarchy = new Mat();
+        opencv_imgproc.findContours(inverted, contours, hierarchy,
+                opencv_imgproc.RETR_EXTERNAL, opencv_imgproc.CHAIN_APPROX_SIMPLE);
+
+        List<File> labelImages = new ArrayList<>();
+
+        for (int i = 0; i < contours.size(); i++) {
+            Rect rect = opencv_imgproc.boundingRect(contours.get(i));
+
+            // Filtrar por tamaño mínimo (descarta ruidos y logos)
+            if (rect.width() > 200 && rect.height() > 50) {
+                Mat roi = new Mat(src, rect);
+
+                File tmp = Files.createTempFile("label_", ".png").toFile();
+                opencv_imgcodecs.imwrite(tmp.getAbsolutePath(), roi);
+                labelImages.add(tmp);
+            }
+        }
+
+        return labelImages;
+    }
+
 }
