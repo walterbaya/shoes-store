@@ -72,3 +72,54 @@ We gonna use this for documenting REST APIs automatically using Swagger.
 Documentar APIs REST de forma automática, generando documentación Swagger de los endpoints.
 
 
+## ETAPA DE PRUEBAS
+
+### Capa de Modelo / Entidades
+
+Qué es: Clases Product, Category, ScannerResult, etc.
+
+Qué testear:
+    * Métodos de utilidad que tengas (si hay lógica en getters/setters rara vez se testea).
+    * equals(), hashCode(), toString() si son importantes para la lógica.
+
+Tipo de test: Unit test.
+
+### Capa de Servicio / Lógica de Negocio
+
+Qué es: Clases con @Service que implementan la lógica de tu scanner, validaciones, reglas de negocio, etc.
+
+Qué testear:
+    * Todo cálculo, transformación o filtrado que haga tu servicio. 
+    * Manejo de errores, excepciones o validaciones.
+
+Tipo de test: Unit test puro con JUnit 5 + Mockito para mockear repositorios u otros servicios.
+
+### Capa de Controlador / API
+
+Qué es: Clases @RestController que exponen endpoints.
+
+Qué testear:
+    * Que los endpoints devuelvan los códigos HTTP correctos (200, 404, 400). 
+    * Que se llamen los servicios correctos.
+
+Tipo de test:
+    * Unit test con @WebMvcTest para testear solo controladores. 
+    * Integration test usando @SpringBootTest para levantar todo el contexto.
+
+### Capa de Integración / Microservicios externos
+
+Qué es: Llamadas a otros servicios (Eureka, OpenFeign, APIs externas).
+
+Qué testear:
+    * Que se hagan correctamente las llamadas. 
+    * Manejo de errores si el servicio externo falla.
+
+Tipo de test: 
+    * Unit test con Mockito para simular la respuesta de Feign. 
+    * Integration test con WireMock o MockWebServer si querés test realista.
+
+Todos los tests los realizaremos siguiendo la metodología de TDD.
+
+## Objetivos testing estructural
+
+El objetivo de testing estructural posterior al TDD es obtener un 100% de cobertura de sentencias.
