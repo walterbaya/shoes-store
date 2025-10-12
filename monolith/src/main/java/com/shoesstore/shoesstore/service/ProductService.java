@@ -72,6 +72,15 @@ public class ProductService {
         return productRepository.save(existing);
     }
 
+    @Transactional
+    public void addOneToStock(Long id) {
+        if (id == null || !productRepository.existsById(id)) {
+            throw new IllegalArgumentException("No existe un producto con ID: " + id);
+        }
+
+        productRepository.addOneToStock(id);
+    }
+
     public Product saveProduct(Product product) {
         // Validar que siempre venga ID desde el formulario
         if (product.getName() == null) {

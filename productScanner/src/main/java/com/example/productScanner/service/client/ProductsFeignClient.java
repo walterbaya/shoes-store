@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient("shoes-store")
 public interface ProductsFeignClient {
 
-    @PatchMapping(value = "/products/add-one-to-stock/{id}",consumes = "application/json")
+    @PatchMapping(value = "rest/products/add-one-to-stock/{id}",consumes = "application/json")
     public ResponseEntity<Void> addOneToStock(@RequestParam Long id);
 
 }
