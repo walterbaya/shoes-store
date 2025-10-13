@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crear Orden de Compra</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3bc9db;
+            --light-gray: #e9ecef;
+            --dark: #343a40;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh; padding-bottom: 2rem;
+        }
+        .header-container {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            color: white; padding: 1.5rem 0; margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 0 0 10px 10px;
+        }
+        .card {
+            border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border: none; margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white; border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.5rem; font-weight: 600;
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(67,97,238,0.25);
+            border-color: var(--primary);
+        }
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none; padding: .75rem 2rem; font-weight: 600;
+            transition: all .3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67,97,238,0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #5a6268);
+            border: none; padding: .75rem 1.5rem; font-weight: 600;
+            transition: all .3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(to right, #5a6268, #6c757d);
+            transform: translateY(-2px);
+        }
+        .table thead th {
+            background: linear-gradient(to bottom, #e3f2fd, #bbdefb);
+            color: var(--dark); font-weight: 600; vertical-align: middle;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(67,97,238,0.05);
+        }
+        .form-section { padding: 1.5rem; }
+        .supplier-info {
+            background-color: #e3f2fd; border-radius: 8px;
+            padding: 1rem; margin-bottom: 1.5rem;
+        }
+        .product-row {
+            transition: background-color .2s;
+        }
+        .product-row:hover {
+            background-color: rgba(76,201,240,0.1);
+        }
+        .status-badge {
+            padding: .5rem 1rem; border-radius: 20px; font-weight: 600;
+        }
+        .info-icon { font-size: 1.2rem; color: var(--primary); margin-right: .5rem; }
+        .input-group-text { background-color: var(--light-gray); }
+        .summary-card { background-color: #f8f9fa; border-left: 4px solid var(--primary); }
+        .summary-item {
+            display: flex; justify-content: space-between;
+            padding: .75rem 0; border-bottom: 1px solid var(--light-gray);
+        }
+        .summary-total { font-weight: 700; font-size: 1.2rem; color: var(--primary); }
+        .footer-actions {
+            background-color: white; padding: 1.5rem; border-radius: 10px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            position: sticky; bottom: 20px; margin-top: 2rem;
+        }
+        @media (max-width:768px) {
+            .card { margin-bottom: 1rem; }
+            .header-container h1 { font-size: 1.8rem; }
+        }
+        /* Ocultar flechitas nativas del number */
+        input[type=number]::-webkit-outer-spin-button,
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body>
+<div class="header-container">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1><i class="fas fa-file-invoice me-3"></i>Crear Orden de Compra</h1>
+            <p class="mb-0">Complete los detalles para crear una nueva orden</p>
+        </div>
+        <span class="status-badge bg-light text-primary">Pendiente</span>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Mensaje de error -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="d-flex justify-content-between mb-4">
+        <a href="/orders" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a Órdenes
+        </a>
+        <div class="d-flex align-items-center">
+            <span class="me-3 text-muted"><i class="fas fa-user-circle me-2"></i><span th:text="${#authentication.name}">Usuario</span></span>
+            <span class="badge bg-light text-dark"><i class="fas fa-calendar-alt me-2"></i><span th:text="${#calendars.format(#calendars.createNow(), 'dd MMM yyyy')}">01 Jul 2025</span></span>
+        </div>
+    </div>
+
+    <form th:action="@{/orders/create}" method="post" enctype="multipart/form-data" th:object="${order}">
+        <!-- Campos ocultos para descuento y envío -->
+        <input type="hidden" name="discountPct" id="discountPctInput" value="5">
+        <input type="hidden" name="shippingCost" id="shippingCostInput" value="45990">
+        <input type="hidden" name="iva" id="ivaInput" value="0">
+        <input type="hidden" name="total" id="totalInput" value="0">
+
+        <!-- Información Básica -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-info-circle me-2"></i>Información Básica</div>
+            <div class="form-section">
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Fecha de Creación</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                            <input type="text" class="form-control" value="01/07/2025" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fecha Estimada de Entrega <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-truck"></i></span>
+                            <input type="date" class="form-control" id="deliveryDate" th:field="*{dispatchDate}" required>
+                        </div>
+                        <small class="form-text text-muted">Seleccione la fecha esperada de entrega</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prioridad</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-exclamation-circle"></i></span>
+                            <select class="form-select" id="priority" th:field="*{priorityCondition}">
+                                <option value="NORMAL">Normal</option>
+                                <option value="ALTA">Alta</option>
+                                <option value="URGENTE">Urgente</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proveedor -->
+        <div class="card">
+            <div class="card-header"><i class="fas fa-truck-loading me-2"></i>Selección de Proveedor</div>
+            <div class="form-section">
+                <label class="form-label">Proveedor <span class="text-danger">*</span></label>
+                <div class="input-group mb-4">
+                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                    <select id="supplierSelect" name="supplierId" class="form-select" required>
+                        <option value="" disabled selected>Seleccione un proveedor</option>
+                        <option th:each="supplier : ${productsToBuyBySupplier.keySet()}"
+                                th:value="${supplier.id}" th:text="${supplier.name}"
+                                th:attr="data-contact=${supplier.contactName},
+                               data-email=${supplier.email},
+                               data-phone=${supplier.phone},
+                               data-address=${supplier.address}">
+                        </option>
+                    </select>
+                </div>
+                <div class="supplier-info border rounded p-3">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <p><i class="fas fa-user info-icon"></i><strong>Contacto:</strong> <span class="contact">–</span></p>
+                            <p><i class="fas fa-envelope info-icon"></i><strong>Email:</strong> <span class="email">–</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><i class="fas fa-phone info-icon"></i><strong>Teléfono:</strong> <span class="phone">–</span></p>
+                            <p><i class="fas fa-map-marker-alt info-icon"></i><strong>Dirección:</strong> <span class="address">–</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos -->
+        <div class="card" th:each="entry : ${productsToBuyBySupplier.entrySet()}"
+             th:attr="data-supplier-id=${entry.key.id}" style="display:none;">
+            <div class="card-header"><i class="fas fa-boxes me-2"></i><span th:text="${entry.key.name}">Proveedor X</span></div>
+            <div class="form-section">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Producto</th>
+                            <th>Stock Actual</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad a Comprar</th>
+                            <th class="th-subtotal">Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="product-row" th:each="prod : ${entry.value}">
+                            <td th:text="${prod.product.name}"></td>
+                            <td><strong th:text="${prod.product.brand}">Marca</strong></td>
+                            <td class="text-center" th:text="${prod.product.stock}">0</td>
+                            <td class="text-center fw-bold"
+                                th:text="'$'+${#numbers.formatDecimal(prod.price,1,2)}"
+
+                            >$0</td>
+                            <td>
+                                <div class="input-group" style="max-width:120px;">
+                                    <button class="btn btn-outline-secondary" type="button">−</button>
+                                    <input type="number" class="form-control text-center" th:name="${'product_' + prod.product.id}" min="0" value="0">
+                                    <button class="btn btn-outline-secondary" type="button">+</button>
+                                </div>
+                            </td>
+                            <td class="text-start fw-bold td-subtotal">$0,00</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de la Orden -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header"><i class="fas fa-file-alt me-2"></i>Detalles Adicionales</div>
+                    <div class="form-section">
+                        <div class="mb-3">
+                            <label class="form-label">Notas</label>
+                            <textarea class="form-control" rows="3" name="additionalInfo" th:field="*{additionalInformation}"    placeholder="Agregue notas adicionales..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                                <div class="form-group">
+                                    <label class="form-label" for="adjuntos">Adjuntos</label>
+                                    <input type="file"
+                                           id="adjuntos"
+                                           class="form-control"
+                                           name="attachmentFile"
+                                           accept=".pdf,.jpg,.jpeg,.png"
+                                           required>
+                                    <small class="form-text text-muted">
+                                        Formatos aceptados: PDF, JPG, PNG (Máx. 5MB)
+                                    </small>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card summary-card">
+                    <div class="card-header"><i class="fas fa-receipt me-2"></i>Resumen de la Orden</div>
+                    <div class="form-section">
+                        <div class="summary-item"><span>Subtotal:</span><span id="subtotalValue">$0,00</span></div>
+                        <div class="summary-item"><span>Descuento:</span>
+                            <span class="text-success" id="discountValue" th:field="*{discount}">-$0,00</span>
+                        </div>
+                        <div class="summary-item"><span>IVA (21%):</span><span id="ivaValue" th:field="*{iva}">$0,00</span></div>
+                        <div class="summary-item"><span>Envío:</span><span id="shippingValue" th:field="*{shippingCost}">$0,00</span></div>
+                        <div class="summary-item summary-total">
+                            <span>Total:</span><span id="totalValue" th:field="*{total}">$0,00</span>
+                        </div>
+                        <div class="mt-3">
+                            <div class="d-grid gap-2">
+                                <button id="btnDiscount" type="button" class="btn btn-outline-success">
+                                    <i class="fas fa-percentage me-2"></i>Aplicar Descuento
+                                </button>
+                                <button id="btnShipping" type="button" class="btn btn-outline-primary">
+                                    <i class="fas fa-shipping-fast me-2"></i>Calcular Envío
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Finales -->
+        <div class="footer-actions">
+            <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary me-2" onclick="window.location.href='/orders'">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-check-circle me-2"></i>Generar Orden
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Globals
+    let currentDiscountRate = 0;
+    let currentShippingCost = 0;
+
+    function parseARPeso(str) {
+        let s = (str||'').replace(/[^\d.,-]/g,'').trim();
+        if(!s) return 0;
+        if(s.includes('.')&&s.includes(',')) {
+            s=s.replace(/\./g,'').replace(/,/g,'.');
+        } else if(s.includes(',')) {
+            s=s.replace(/,/g,'.');
+        }
+        return parseFloat(s)||0;
+    }
+
+    function formatAR(v) {
+        return v.toLocaleString('es-AR',{ minimumFractionDigits:2, maximumFractionDigits:2 });
+    }
+
+    (function configureDates(){
+        const t = new Date();
+        const deliveryDate = document.getElementById('deliveryDate');
+        if(deliveryDate) {
+            deliveryDate.min = new Date().toISOString().split('T')[0];
+            deliveryDate.value = new Date(t.setDate(t.getDate() + 5)).toISOString().split('T')[0];
+        }
+    })();
+
+    function updateProductCards(){
+        const sel = document.getElementById('supplierSelect').value;
+        document.querySelectorAll('div.card[data-supplier-id]').forEach(c => {
+            if(c.getAttribute('data-supplier-id') === sel){
+                c.style.display = 'block';
+                initDynamicTable(c);
+            } else {
+                c.style.display = 'none';
+            }
+        });
+        updateOrderSummary();
+    }
+
+    function initDynamicTable(card){
+        if(card.dataset.inited === 'true') return;
+        card.dataset.inited = 'true';
+
+        card.querySelectorAll('tbody tr').forEach(row => {
+            const inp = row.querySelector('input[type=number]');
+            const priceCell = row.cells[3];
+            const subtotalCell = row.cells[5];
+
+            inp.addEventListener('change', () => {
+                const price = parseARPeso(priceCell.textContent);
+                const qty = parseInt(inp.value, 10) || 0;
+                const tot = price * qty;
+                subtotalCell.textContent = '$' + formatAR(tot);
+                updateOrderSummary();
+            });
+
+            inp.addEventListener('input', () => {
+                if(parseInt(inp.value,10) < 0) inp.value = 0;
+            });
+
+            const grp = inp.closest('.input-group');
+            if(grp){
+                grp.querySelector('.btn:first-of-type')
+                    .addEventListener('click', () => {
+                        let v = parseInt(inp.value,10) || 0;
+                        if(v > 0) {
+                            inp.value = v - 1;
+                            inp.dispatchEvent(new Event('change'));
+                        }
+                    });
+                grp.querySelector('.btn:last-of-type')
+                    .addEventListener('click', () => {
+                        let v = parseInt(inp.value,10) || 0;
+                        inp.value = v + 1;
+                        inp.dispatchEvent(new Event('change'));
+                    });
+            }
+            inp.dispatchEvent(new Event('change'));
+        });
+    }
+
+
+    function updateOrderSummary(){
+        let sub = 0;
+        const visibleCard = Array.from(document.querySelectorAll('div.card[data-supplier-id]'))
+            .find(c => c.style.display === 'block');
+
+        if(visibleCard) {
+            visibleCard.querySelectorAll('.td-subtotal').forEach(td => {
+                sub += parseARPeso(td.textContent) || 0;
+            });
+        }
+
+        const disc = sub * currentDiscountRate;
+        const iva = (sub - disc) * 0.21;
+        const ship = currentShippingCost;
+        const tot = sub - disc + iva + ship;
+
+        // Actualizar UI
+        document.getElementById('subtotalValue').textContent = '$' + formatAR(sub);
+        document.getElementById('discountValue').textContent = '-$' + formatAR(disc);
+        document.getElementById('ivaValue').textContent = '$' + formatAR(iva);
+        document.getElementById('shippingValue').textContent = '$' + formatAR(ship);
+        document.getElementById('totalValue').textContent = '$' + formatAR(tot);
+        document.getElementById('ivaInput').value = iva;
+        document.getElementById('totalInput').value = tot;
+
+        // Actualizar campos ocultos
+        document.getElementById('discountPctInput').value = currentDiscountRate * 100;
+        document.getElementById('shippingCostInput').value = currentShippingCost;
+    }
+
+    function updateSupplierInfo(){
+        const sel = document.getElementById('supplierSelect');
+        const opt = sel.selectedOptions[0] || {};
+
+        document.querySelector('.supplier-info .contact').textContent = opt.dataset.contact || '–';
+        document.querySelector('.supplier-info .email').textContent = opt.dataset.email || '–';
+        document.querySelector('.supplier-info .phone').textContent = opt.dataset.phone || '–';
+        document.querySelector('.supplier-info .address').textContent = opt.dataset.address || '–';
+    }
+
+    function validateForm() {
+        const supplier = document.getElementById('supplierSelect').value;
+        if (!supplier) {
+            alert('Seleccione un proveedor');
+            return false;
+        }
+
+        let hasProducts = false;
+        document.querySelectorAll('input[type=number]').forEach(input => {
+            if (parseInt(input.value) > 0) hasProducts = true;
+        });
+
+        if (!hasProducts) {
+            alert('Seleccione al menos un producto');
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('supplierSelect')
+            .addEventListener('change', () => {
+                updateSupplierInfo();
+                updateProductCards();
+            });
+
+        document.getElementById('btnDiscount')
+            .addEventListener('click', () => {
+                const p = prompt('Ingrese % de descuento (0-100)', currentDiscountRate * 100);
+                if(p !== null){
+                    const n = parseFloat(p);
+                    if(!isNaN(n) && n >= 0 && n <= 100){
+                        currentDiscountRate = n / 100;
+                        updateOrderSummary();
+                    } else {
+                        alert('Porcentaje inválido. Debe ser entre 0 y 100.');
+                    }
+                }
+            });
+
+        document.getElementById('btnShipping')
+            .addEventListener('click', () => {
+                const p = prompt('Ingrese monto de envío en $', currentShippingCost);
+                if(p !== null){
+                    const n = parseARPeso(p);
+                    if(!isNaN(n) && n >= 0){
+                        currentShippingCost = n;
+                        updateOrderSummary();
+                    } else {
+                        alert('Monto inválido. Debe ser un número positivo.');
+                    }
+                }
+            });
+
+        // Validar formulario al enviar
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+            }
+        });
+
+        updateSupplierInfo();
+        updateProductCards();
+    });
+</script>
+</body>
+</html>
+
