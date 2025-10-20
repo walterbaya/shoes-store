@@ -1,7 +1,6 @@
 package com.shoesstore.shoesstore.controller;
 
 
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ReportService;
 
 import java.time.LocalDate;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ReportController {
 
 
-    public ReportController(CustomUserDetailsService customUserDetailsService) {
+    public ReportController() {
 
     }
 

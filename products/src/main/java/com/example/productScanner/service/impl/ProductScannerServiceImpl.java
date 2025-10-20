@@ -1,5 +1,4 @@
 package com.example.productScanner.service.impl;
-import com.example.productScanner.dto.ScanRequest;
 import com.example.productScanner.service.IProductScannerService;
 import com.example.productScanner.service.client.ProductsFeignClient;
 import lombok.AllArgsConstructor;
@@ -12,8 +11,8 @@ public class ProductScannerServiceImpl implements IProductScannerService {
     private ProductsFeignClient productsFeignClient;
 
     @Override
-    public void increaseStockInOneUnit(ScanRequest scanRequest) {
-        productsFeignClient.addOneToStock(scanRequest);
+    public void increaseStockInOneUnit(Long id) {
+        productsFeignClient.addOneToStock(id);
     }
 }
 

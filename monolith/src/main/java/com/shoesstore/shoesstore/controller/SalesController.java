@@ -4,7 +4,6 @@ import com.shoesstore.shoesstore.model.PaymentMethod;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
 import com.shoesstore.shoesstore.utils.SaleForm;

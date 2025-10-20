@@ -1,7 +1,6 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.Sale;
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ReportService;
 import com.shoesstore.shoesstore.service.SaleService;
 import lombok.AllArgsConstructor;

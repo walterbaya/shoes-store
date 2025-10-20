@@ -3,7 +3,6 @@ package com.shoesstore.shoesstore.controller;
 import com.shoesstore.shoesstore.model.Supplier;
 import com.shoesstore.shoesstore.model.SupplierProduct;
 import com.shoesstore.shoesstore.repository.ProductRepository;
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.SupplierService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +20,7 @@ public class SupplierController {
     private final SupplierService supplierService;
     private final ProductRepository productRepository;
 
-    public SupplierController(SupplierService supplierService, ProductRepository productRepository, CustomUserDetailsService customUserDetailsService) {
+    public SupplierController(SupplierService supplierService, ProductRepository productRepository) {
         this.supplierService = supplierService;
         this.productRepository = productRepository;
     }

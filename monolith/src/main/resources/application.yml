@@ -2,9 +2,8 @@ server:
   port: 8080
 
 spring:
-
   application:
-    name: shoes_store
+    name: shoes-store
 
   sql:
     init:
@@ -12,18 +11,23 @@ spring:
       continue-on-error: true
 
   datasource:
-    url: jdbc:mysql://mysql:3306/shoes_store?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
   jpa:
-    show-sql: false
+    show-sql: true        
     hibernate:
       ddl-auto: update
-      dialect: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
 
   thymeleaf:
@@ -40,7 +44,16 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
 
 file:
   upload-dir: ./uploads
+
 

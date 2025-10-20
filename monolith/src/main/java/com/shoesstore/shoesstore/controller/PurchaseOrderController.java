@@ -25,18 +25,16 @@ public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
     private final SupplierService      supplierService;
     private final ProductService       productService;
-    private final CustomUserDetailsService customUserDetailsService;
     private final UserService userService;
     private final PurchaseOrderAttachmentRepository purchaseOrderAttachmentRepository;
     private final FileStorageService fileStorageService;
 
     public PurchaseOrderController(PurchaseOrderService purchaseOrderService,
                                    SupplierService supplierService,
-                                   ProductService productService, CustomUserDetailsService customUserDetailsService, UserService userService, PurchaseOrderAttachmentRepository purchaseOrderAttachmentRepository, FileStorageService fileStorageService) {
+                                   ProductService productService, UserService userService, PurchaseOrderAttachmentRepository purchaseOrderAttachmentRepository, FileStorageService fileStorageService) {
         this.purchaseOrderService = purchaseOrderService;
         this.supplierService      = supplierService;
         this.productService       = productService;
-        this.customUserDetailsService = customUserDetailsService;
         this.userService = userService;
         this.purchaseOrderAttachmentRepository = purchaseOrderAttachmentRepository;
         this.fileStorageService = fileStorageService;
@@ -45,7 +43,7 @@ public class PurchaseOrderController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("title", "Compras");
-        model.addAttribute("username", customUserDetailsService.getCurrentUserName());
+        model.addAttribute("username", "username");
         model.addAttribute("orders", purchaseOrderService.findAll());
         model.addAttribute("completedOrders", purchaseOrderService.findAll().stream().filter(PurchaseOrder::isCompleted).toList());
         model.addAttribute("sumOfTotals", purchaseOrderService.findAll().stream().map(PurchaseOrder::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
@@ -84,8 +82,9 @@ public class PurchaseOrderController {
             order.setShippingCost(shippingCost);
             order.setGeneratedDate(LocalDate.now());
 
+            
             // Usuario autenticado
-            User user = userService.getUserByUsername(customUserDetailsService.getCurrentUserName()).orElseThrow();
+            User user = new User();
             order.setUser(user);
 
             // Mapear productos

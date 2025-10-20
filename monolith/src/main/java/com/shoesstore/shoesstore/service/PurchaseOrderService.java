@@ -2,7 +2,6 @@ package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +90,7 @@ public class PurchaseOrderService {
         purchaseOrder.setShippingCost(shippingCost);
 
         // Usuario actual
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = "username";
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         purchaseOrder.setUser(user);

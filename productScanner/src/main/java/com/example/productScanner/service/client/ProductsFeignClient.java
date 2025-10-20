@@ -2,13 +2,16 @@ package com.example.productScanner.service.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.example.productScanner.dto.ScanRequest;
 
-@FeignClient("shoes-store")
+//ProductsFeignClient.java (SOLUCIÓN DEFINITIVA)
+
+@FeignClient(name = "shoes-store", path = "/rest/products") // AÑADE EL PATH BASE AQUÍ
 public interface ProductsFeignClient {
 
-    @PatchMapping(value = "rest/products/add-one-to-stock/{id}",consumes = "application/json")
-    public ResponseEntity<Void> addOneToStock(@RequestParam Long id);
+ @PostMapping("/add-one-to-stock") // Solo el path del método
+ public ResponseEntity<Void> addOneToStock(@RequestBody ScanRequest scanRequest);
 
 }

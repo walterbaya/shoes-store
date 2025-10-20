@@ -26,7 +26,6 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final ProductService productService;
     private final SaleDetailsRepository saleDetailsRepository;
-    private final CustomUserDetailsService customUserDetailsService;
     private final UserService userService;
 
 
@@ -34,7 +33,7 @@ public class SaleService {
     public Sale processSale(Sale sale, List<SaleItemForm> itemsToProcess) {
         double totalSale = 0;
         List<SaleDetails> saleDetailsList = new ArrayList<>();
-        Optional<User> user = userService.getUserByUsername(customUserDetailsService.getCurrentUserName());
+        Optional<User> user = userService.getUserByUsername("username");
 
         for (SaleItemForm item : itemsToProcess) {
             productService.updateStock(item.getProductId(), item.getQuantity());

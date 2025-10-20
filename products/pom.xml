@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.6</version>
+		<version>3.5.6</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>productScanner</artifactId>
+	<artifactId>products</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-	<name>productScanner</name>
+	<name>products</name>
 	<description>This Scanner is gonna be used for scanning labels from products and after the scan execute the corresponding actions in sales or stock microservices</description>
 	<url/>
 	<licenses>

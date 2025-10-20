@@ -3,7 +3,6 @@ package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 import com.shoesstore.shoesstore.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
