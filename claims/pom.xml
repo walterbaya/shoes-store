@@ -8,10 +8,10 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.products</groupId>
-	<artifactId>products</artifactId>
+	<groupId>com.claims</groupId>
+	<artifactId>claims</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>products</name>
+	<name>claims</name>
 	<description>products microservice</description>
 	<url/>
 	<licenses>

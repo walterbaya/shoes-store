@@ -8,11 +8,11 @@
 		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.products</groupId>
-	<artifactId>products</artifactId>
+	<groupId>com.suppliers</groupId>
+	<artifactId>suppliers</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>products</name>
-	<description>products microservice</description>
+	<name>suppliers</name>
+	<description>suppliers microservice</description>
 	<url/>
 	<licenses>
 		<license/>
