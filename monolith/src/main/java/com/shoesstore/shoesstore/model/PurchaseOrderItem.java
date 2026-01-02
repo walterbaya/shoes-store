@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -33,5 +32,72 @@ public class PurchaseOrderItem {
     public BigDecimal getTotal() {
         return purchasePrice.multiply(BigDecimal.valueOf(quantity));
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public PurchaseOrder getOrder() {
+		return order;
+	}
+
+	public void setOrder(PurchaseOrder order) {
+		this.order = order;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public BigDecimal getPurchasePrice() {
+		return purchasePrice;
+	}
+
+	public void setPurchasePrice(BigDecimal purchasePrice) {
+		this.purchasePrice = purchasePrice;
+	}
+
+	public BigDecimal getSubtotal() {
+		return subtotal;
+	}
+
+	public void setSubtotal(BigDecimal subtotal) {
+		this.subtotal = subtotal;
+	}
+
+	public PurchaseOrderItem() {
+		
+	}
+
+	public PurchaseOrderItem(Long id, PurchaseOrder order, Product product, int quantity, BigDecimal purchasePrice,
+			BigDecimal subtotal) {
+		super();
+		this.id = id;
+		this.order = order;
+		this.product = product;
+		this.quantity = quantity;
+		this.purchasePrice = purchasePrice;
+		this.subtotal = subtotal;
+	}
+	
+	
+    
+    
 
 }

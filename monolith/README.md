@@ -88,7 +88,7 @@ monolítica.
 * Spring Boot
 * Spring Data JPA
 * Spring Security (JWT)
-* PostgreSQL
+* PostgreSQL  (H2 para pruebas)
 * Docker \& Docker Compose
 * JUnit 5 / Mockito
 

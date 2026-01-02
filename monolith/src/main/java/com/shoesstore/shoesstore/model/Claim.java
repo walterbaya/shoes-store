@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "claim")
 public class Claim {
 
@@ -34,6 +32,7 @@ public class Claim {
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "El estado es obligatorio")
+    @Column(nullable = false)
     private State state = State.INITIATED;  // Valor por defecto
 
     @NotNull(message = "Es obligatorio tener una fecha de inicio para el reclamo")
