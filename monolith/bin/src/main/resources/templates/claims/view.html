@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalle de Reclamo</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div th:fragment="content">
+    <h2>Reclamo #<span th:text="${claim.id}">123</span></h2>
+
+    <div class="card mb-4">
+        <div class="card-header">Información Básica</div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Venta ID:</strong> <span th:text="${claim.sale.id}"></span></p>
+                    <p><strong>Fecha Creación:</strong>
+                        <span th:text="${#temporals.format(claim.createdAt, 'dd/MM/yyyy')}"></span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Estado:</strong>
+                        <span class="badge text-white"
+                              th:classappend="
+                                  ${claim.state.name() == 'INITIATED'} ? 'bg-warning' :
+                                  (${claim.state.name() == 'PROOF_UPLOADED'} ? 'bg-info' :
+                                  (${claim.state.name() == 'REFUND_PROCESSED'} ? 'bg-primary' :
+                                  (${claim.state.name() == 'PACKAGE_RECEIVED'} ? 'bg-success' : '')))">
+                            <span th:text="${claim.state.displayValue}">Estado</span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <p><strong>Descripción:</strong></p>
+            <p th:text="${claim.description}"></p>
+        </div>
+    </div>
+
+    <div th:switch="${claim.state.name()}">
+        <div th:case="'INITIATED'" class="card border-warning">
+            <div class="card-header bg-warning text-white">Acción Requerida</div>
+            <div class="card-body">
+                <h5>Subir Comprobante de Despacho</h5>
+                <!-- Formulario modificado para subir archivos -->
+                <form th:action="@{/claims/{id}/proof(id=${claim.id})}"
+                      method="post"
+                      enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="proofFile">Seleccionar archivo:</label>
+                        <input type="file"
+                               class="form-control-file"
+                               id="proofFile"
+                               name="proofFile"
+                               accept=".pdf,.jpg,.jpeg,.png"
+                               required>
+                        <small class="form-text text-muted">
+                            Formatos aceptados: PDF, JPG, PNG (Máx. 5MB)
+                        </small>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Subir Comprobante</button>
+                </form>
+            </div>
+        </div>
+
+        <div th:case="'PROOF_UPLOADED'" class="card border-info">
+            <div class="card-header bg-info text-white">Acción Requerida</div>
+            <div class="card-body">
+                <h5>Comprobante Subido</h5>
+                <!-- Mostrar archivo subido -->
+                <p>
+                    <a th:href="${claim.shippingProofUrl}"
+                       target="_blank"
+                       class="btn btn-outline-info btn-sm">
+                        Ver comprobante
+                    </a>
+                </p>
+
+                <div class="d-flex justify-content-start">
+                    <form th:action="@{/claims/{id}/approve(id=${claim.id})}" method="post">
+                        <button type="submit" class="btn btn-success">Aprobar Devolución y Realizar Reembolso</button>
+                    </form>
+                    <form th:action="@{/claims/{id}/invalidProof(id=${claim.id})}" method="post">
+                        <button type="submit" class="btn btn-danger ms-2">Marcar Comprobante Inválido</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resto del código se mantiene igual -->
+        <div th:case="'REFUND_PROCESSED'" class="card border-primary">
+            <div class="card-header bg-primary text-white">Acción Requerida</div>
+            <div class="card-body">
+                <h5>Reembolso Realizado</h5>
+                <p>Fecha: <span th:text="${#temporals.format(claim.refundProcessedDate, 'dd/MM/yyyy')}"></span></p>
+                <form th:action="@{/claims/{id}/receive(id=${claim.id})}" method="post">
+                    <button type="submit" class="btn btn-info">Marcar Paquete Recibido</button>
+                </form>
+            </div>
+        </div>
+
+        <div th:case="'PACKAGE_RECEIVED'" class="card border-success">
+            <div class="card-header bg-success text-white">Proceso Completado</div>
+            <div class="card-body">
+                <p>Paquete recibido el:
+                    <span th:text="${#temporals.format(claim.packageReceivedDate, 'dd/MM/yyyy')}"></span>
+                </p>
+                <p>Stock actualizado correctamente</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">Productos a Devolver</div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="detail : ${claim.claimDetails}">
+                    <td th:text="${detail.saleDetails.product.id}"></td>
+                    <td th:text="${detail.quantity}"></td>
+                    <td th:text="${#numbers.formatDecimal(detail.saleDetails.product.price,1,2)}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -86,4 +86,6 @@ public class Claim {
     public String getShippingProofUrl() {
         return "/uploads/" + shippingProofUrl;
     }
+
+
 }

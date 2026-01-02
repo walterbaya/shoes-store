@@ -1,0 +1,7 @@
+#creamos la imagen   
+-mvn compile jib:dockerBuild
+#Hacemos docker compose up
+-docker compose up   
+
+
+          

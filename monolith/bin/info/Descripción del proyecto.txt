@@ -1,0 +1,21 @@
+ShoesStore-App
+├── backend (Spring Boot)
+│   ├── src/main/java
+│   │   └── com/shoes/store
+│   │       ├── config (Security, WebMVC)
+│   │       ├── controller (MVC y API)
+│   │       ├── model (Entidades JPA)
+│   │       ├── repository (JPA Repositories)
+│   │       ├── service (Lógica de negocio)
+│   │       └── utils (Helpers, Reportes)
+│   └── src/main/resources
+│       ├── static (CSS/JS/IMG)
+│       ├── templates (Thymeleaf)
+│       └── application.properties
+├── frontend (Bootstrap 5)
+│   ├── css (Estilos personalizados)
+│   └── js (Funcionalidades específicas)
+└── database (MySQL 5)
+
+
+      

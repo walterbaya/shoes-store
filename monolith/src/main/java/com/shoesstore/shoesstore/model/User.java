@@ -14,13 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "users")
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank(message = "El nombre de usuario es obligatorio")
@@ -60,5 +58,22 @@ public class User {
 
     public enum Role {
         ROLE_ADMIN, ROLE_SELLER, ROLE_STOCK_MANAGER
+    }
+    
+    protected User() {
+    	
+    }
+    
+    private User(String username, String password, String fullName, String email, Role role) {
+    	this.username = username;
+    	this.password = password;
+    	this.fullName = fullName;
+    	this.email = email; 
+    	this.role = role;
+    	this.createdAt = LocalDateTime.now();
+    }
+    
+    public static User create(String username, String encodedPassword, String fullName, String email, Role role) {
+    	return new User(username, encodedPassword, fullName, email, role);
     }
 }

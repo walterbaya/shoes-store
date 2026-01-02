@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta - Shoes Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f8f9fa;
+            --text: #343a40;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --success: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border: none;
+        }
+
+        .card-header h3 {
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .brand-logo {
+            display: inline-block;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .brand-logo i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .form-control {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .form-control {
+            padding-left: 45px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0a0a0;
+            z-index: 10;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.05rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.25);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #a0a0a0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
+        .additional-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .additional-links a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .additional-links a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: #c62828;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-danger i {
+            margin-right: 10px;
+        }
+
+        .alert-success i {
+            margin-right: 10px;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #a0a0a0;
+            z-index: 10;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            background-color: #e9ecef;
+        }
+
+        .role-badge i {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 25px 20px;
+            }
+
+            .additional-links {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-card card shadow-lg">
+        <div class="card-header">
+            <div class="brand-logo">
+                <i class="fas fa-shoe-prints"></i>
+            </div>
+            <h3>Crear Nueva Cuenta</h3>
+        </div>
+        <div class="card-body">
+            <!-- Mensaje de éxito -->
+            <div id="success-message" class="alert alert-success" style="display: none;">
+                <i class="fas fa-check-circle"></i> Cuenta creada exitosamente
+            </div>
+
+            <!-- Mensaje de error -->
+            <div id="error-message" class="alert alert-danger" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i> <span id="error-text"></span>
+            </div>
+
+            <form id="signup-form">
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Nombre de usuario
+                    </label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" placeholder="Cree un nombre de usuario" required>
+                    </div>
+                    <small class="text-muted">Debe ser único y no contener espacios</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-id-card"></i> Nombre completo
+                    </label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-id-card"></i>
+                        <input type="text" id="fullname" class="form-control" placeholder="Ingrese su nombre completo" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" placeholder="Cree una contraseña segura" required>
+                        <i class="password-toggle fas fa-eye" onclick="togglePassword('password')"></i>
+                    </div>
+                    <div class="password-strength mt-2">
+                        <div class="progress" style="height: 8px;">
+                            <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small id="password-strength-text" class="text-muted">Seguridad de la contraseña</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-lock"></i> Confirmar contraseña
+                    </label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input type="password" id="confirm-password" class="form-control" placeholder="Repita su contraseña" required>
+                        <i class="password-toggle fas fa-eye" onclick="togglePassword('confirm-password')"></i>
+                    </div>
+                    <div id="password-match" class="mt-2" style="display: none;">
+                        <i class="fas fa-check-circle text-success me-1"></i>
+                        <small class="text-success">Las contraseñas coinciden</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-user-tag"></i> Rol de usuario
+                    </label>
+                    <select id="role" class="form-select" required>
+                        <option value="" disabled selected>Seleccione un rol</option>
+                        <option value="ROLE_SELLER">Vendedor</option>
+                        <option value="ROLE_STOCK_MANAGER">Gestor de Inventario</option>
+                        <option value="ROLE_ADMIN">Administrador</option>
+                    </select>
+                    <div class="mt-2">
+                        <span class="role-badge"><i class="fas fa-shopping-cart"></i> Vendedor</span>
+                        <span class="role-badge"><i class="fas fa-boxes"></i> Gestor de Inventario</span>
+                        <span class="role-badge"><i class="fas fa-cog"></i> Administrador</span>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-user-plus me-2"></i> Crear Cuenta
+                    </button>
+                </div>
+
+                <div class="additional-links">
+                    <a href="../auth/login.html">
+                        <i class="fas fa-arrow-left me-1"></i> Volver al inicio de sesión
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-text">
+        &copy; 2023 Shoes Store. Todos los derechos reservados.
+        <a href="#">Términos y condiciones</a> |
+        <a href="#">Política de privacidad</a>
+    </div>
+</div>
+
+<script>
+    // Función para mostrar/ocultar contraseña
+    function togglePassword(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        const toggleIcon = passwordField.nextElementSibling;
+
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = "password";
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Función para verificar fortaleza de contraseña
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length > 7) strength += 20;
+        if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) strength += 20;
+        if (password.match(/([0-9])/)) strength += 20;
+        if (password.match(/([!,@,#,$,%,^,&,*,?,_,~])/)) strength += 20;
+        if (password.match(/(.*[!,@,#,$,%,^,&,*,?,_,~].*[!,@,#,$,%,^,&,*,?,_,~])/)) strength += 20;
+
+        return strength;
+    }
+
+    // Evento para verificar fortaleza de contraseña
+    document.getElementById('password').addEventListener('input', function(e) {
+        const strength = checkPasswordStrength(e.target.value);
+        const bar = document.getElementById('password-strength-bar');
+        const text = document.getElementById('password-strength-text');
+
+        bar.style.width = strength + '%';
+
+        if (strength < 40) {
+            bar.className = 'progress-bar bg-danger';
+            text.className = 'text-danger';
+            text.textContent = 'Contraseña débil';
+        } else if (strength < 70) {
+            bar.className = 'progress-bar bg-warning';
+            text.className = 'text-warning';
+            text.textContent = 'Contraseña moderada';
+        } else {
+            bar.className = 'progress-bar bg-success';
+            text.className = 'text-success';
+            text.textContent = 'Contraseña fuerte';
+        }
+    });
+
+    // Evento para verificar coincidencia de contraseñas
+    document.getElementById('confirm-password').addEventListener('input', function(e) {
+        const password = document.getElementById('password').value;
+        const confirm = e.target.value;
+        const matchElement = document.getElementById('password-match');
+
+        if (password && confirm) {
+            if (password === confirm) {
+                matchElement.style.display = 'block';
+            } else {
+                matchElement.style.display = 'none';
+            }
+        }
+    });
+
+    // Evento para enviar formulario
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const fullname = document.getElementById('fullname').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+        const role = document.getElementById('role').value;
+
+        // Validaciones
+        if (password !== confirmPassword) {
+            showError('Las contraseñas no coinciden');
+            return;
+        }
+
+        if (!role) {
+            showError('Por favor seleccione un rol de usuario');
+            return;
+        }
+
+        // Simulación de éxito
+        document.getElementById('success-message').style.display = 'flex';
+        document.getElementById('error-message').style.display = 'none';
+
+        // Limpiar formulario después de 2 segundos
+        setTimeout(() => {
+            document.getElementById('signup-form').reset();
+            document.getElementById('password-strength-bar').style.width = '0%';
+            document.getElementById('password-strength-text').textContent = 'Seguridad de la contraseña';
+            document.getElementById('password-strength-text').className = 'text-muted';
+            document.getElementById('password-match').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }, 3000);
+    });
+
+    function showError(message) {
+        const errorElement = document.getElementById('error-message');
+        errorElement.style.display = 'flex';
+        document.getElementById('error-text').textContent = message;
+        document.getElementById('success-message').style.display = 'none';
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

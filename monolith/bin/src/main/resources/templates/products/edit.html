@@ -1,0 +1,352 @@
+<div th:fragment="content card shadow" class="container mt-4">
+
+    <div class="alert alert-danger" th:if="${error}" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <span th:text="${error}"></span>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Editar Producto</h1>
+                <i class="fas fa-shoe-prints fa-lg"></i>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/products/update/{id}(id=${product.id})}"
+                  th:object="${product}"
+                  method="post"
+                  class="needs-validation"
+                  novalidate>
+
+                <input type="hidden" name="_method" value="put">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="idInput" class="form-label">Código producto (ID)</label>
+                        <input type="number"
+                               id="idInput"
+                               class="form-control"
+                               th:field="*{name}"
+                               placeholder="EJ: 1001"
+                               disabled>
+                        <div class="invalid-feedback">
+                            Por favor ingrese un ID para el producto
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="colorInput" class="form-label">Color</label>
+                        <input type="text"
+                               id="colorInput"
+                               class="form-control"
+                               th:field="*{color}"
+                               placeholder="EJ: Rojo, Negro"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese un color para el producto
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="typeInput" class="form-label">Categoría</label>
+                        <input type="text"
+                               id="typeInput"
+                               class="form-control"
+                               th:field="*{type}"
+                               placeholder="EJ: Zapatilla, Bota"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una categoría de artículo
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="materialInput" class="form-label">Material</label>
+                        <input type="text"
+                               id="materialInput"
+                               class="form-control"
+                               th:field="*{material}"
+                               placeholder="EJ: Cuero, Tela"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese un material para el producto
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila para Talla, Género y Marca -->
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label for="sizeSelect" class="form-label">Talla</label>
+                        <select class="form-select"
+                                id="sizeSelect"
+                                th:field="*{size}"
+                                required>
+                            <option value="">Seleccionar talla</option>
+                            <option th:each="size : ${T(com.shoesstore.shoesstore.model.Product$ShoeSize).values()}"
+                                    th:value="${size}"
+                                    th:text="${size.displayValue}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor seleccione una talla
+                        </div>
+                    </div>
+
+                    <!-- Campo de Género -->
+                    <div class="col-md-4 mb-4">
+                        <label for="genderSelect" class="form-label">Género</label>
+                        <select class="form-select"
+                                id="genderSelect"
+                                th:field="*{gender}"
+                                required>
+                            <option value="">Seleccionar género</option>
+                            <option th:each="gender : ${allGenders}"
+                                    th:value="${gender}"
+                                    th:text="${gender.displayValue}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor seleccione un género
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label for="brandInput" class="form-label">Marca</label>
+                        <input type="text"
+                               id="brandInput"
+                               class="form-control"
+                               th:field="*{brand}"
+                               placeholder="EJ: Puma, Adidas"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una marca para el producto
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="descriptionTextarea" class="form-label">Descripción</label>
+                    <textarea class="form-control"
+                              id="descriptionTextarea"
+                              th:field="*{description}"
+                              rows="4"
+                              placeholder="Detalles del producto, características..."></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="priceInput" class="form-label">Precio</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number"
+                                   id="priceInput"
+                                   class="form-control"
+                                   th:field="*{price}"
+                                   step="0.01"
+                                   min="0"
+                                   placeholder="0.00"
+                                   required>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor ingrese un precio válido
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="stockInput" class="form-label">Stock</label>
+                        <input type="number"
+                               id="stockInput"
+                               class="form-control"
+                               th:field="*{stock}"
+                               min="0"
+                               placeholder="Cantidad disponible"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una cantidad válida
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                    <a th:href="@{/products}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i> Actualizar Producto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-dark: #3a0ca3;
+        --border-radius: 12px;
+        --shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    }
+
+    .card.shadow {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow) !important;
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card.shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border-radius: 0 !important;
+        padding: 1.5rem 2rem;
+    }
+
+    .card-body {
+        padding: 2.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 0.85rem 1.25rem;
+        height: auto;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        font-size: 1rem;
+        line-height: 1.5;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.2);
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: #adb5bd;
+        font-size: 0.95rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 0.75rem 1.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        min-width: 140px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        border: none;
+        box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #e2e8f0;
+        color: #495057;
+        background: #fff;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #495057;
+    }
+
+    .invalid-feedback {
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        color: #dc3545;
+    }
+
+    .needs-validation .form-control:invalid,
+    .needs-validation .form-select:invalid {
+        border-color: #dc3545;
+    }
+
+    .needs-validation .form-control:invalid:focus,
+    .needs-validation .form-select:invalid:focus {
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.2);
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #e2e8f0;
+        color: #495057;
+        padding: 0 15px;
+        border-radius: 8px 0 0 8px !important;
+    }
+
+    .border-top {
+        border-top: 1px solid #eee !important;
+        padding-top: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validación de formulario
+        const forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Formatear precio automáticamente
+        const priceInput = document.getElementById('priceInput');
+        if (priceInput) {
+            priceInput.addEventListener('blur', function() {
+                let value = parseFloat(this.value);
+                if (!isNaN(value)) {
+                    this.value = value.toFixed(2);
+                }
+            });
+        }
+
+        // Enfocar el primer campo al cargar la página
+        const firstField = document.querySelector('input:not([type="hidden"]), select');
+        if (firstField) firstField.focus();
+    });
+</script>

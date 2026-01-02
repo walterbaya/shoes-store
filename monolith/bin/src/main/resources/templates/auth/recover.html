@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Shoes Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #f8f9fa;
+            --text: #343a40;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --warning: #ff9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--warning) 0%, #e68a00 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border: none;
+        }
+
+        .card-header h3 {
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .brand-logo {
+            display: inline-block;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+
+        .brand-logo i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label i {
+            margin-right: 10px;
+            color: var(--warning);
+        }
+
+        .form-control {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--warning);
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.15);
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group .form-control {
+            padding-left: 45px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0a0a0;
+            z-index: 10;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--warning) 0%, #e68a00 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.05rem;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.25);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(255, 152, 0, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #a0a0a0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .divider::before {
+            margin-right: 15px;
+        }
+
+        .divider::after {
+            margin-left: 15px;
+        }
+
+        .additional-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .additional-links a {
+            color: var(--warning);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .additional-links a:hover {
+            color: #e68a00;
+            text-decoration: underline;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: #c62828;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-warning {
+            background-color: #fff8e1;
+            color: #f57f17;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .alert-danger i {
+            margin-right: 10px;
+        }
+
+        .alert-success i {
+            margin-right: 10px;
+        }
+
+        .alert-info i {
+            margin-right: 10px;
+        }
+
+        .alert-warning i {
+            margin-right: 10px;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .footer-text a {
+            color: var(--warning);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #a0a0a0;
+            z-index: 10;
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 25px 20px;
+            }
+
+            .additional-links {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-card card shadow-lg">
+        <div class="card-header">
+            <div class="brand-logo">
+                <i class="fas fa-key"></i>
+            </div>
+            <h3>Recuperar Contraseña</h3>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Ingrese su nombre de usuario para recuperar el acceso a su cuenta.
+            </div>
+
+            <!-- Mensaje de éxito -->
+            <div id="success-message" class="alert alert-success" style="display: none;">
+                <i class="fas fa-check-circle"></i> Se ha enviado un enlace de recuperación a su correo electrónico
+            </div>
+
+            <!-- Mensaje de error -->
+            <div id="error-message" class="alert alert-danger" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i> <span id="error-text"></span>
+            </div>
+
+            <form id="recover-form" th:action="@{/recover}" method="post" id="recoverForm">
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-user"></i> Nombre de usuario
+                    </label>
+                    <div class="input-group">
+                        <i class="input-icon fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" placeholder="Ingrese su usuario" required>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-login">
+                        <i class="fas fa-paper-plane me-2"></i> Enviar Enlace de Recuperación
+                    </button>
+                </div>
+            </form>
+
+            <div class="alert alert-warning mt-4">
+                <i class="fas fa-exclamation-triangle"></i> Si no recuerda su nombre de usuario, contacte al administrador del sistema.
+            </div>
+
+            <div class="additional-links">
+                <a href="login.html">
+                    <i class="fas fa-arrow-left me-1"></i> Volver al inicio de sesión
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-text">
+        &copy; 2023 Shoes Store. Todos los derechos reservados.
+        <a href="#">Términos y condiciones</a> |
+        <a href="#">Política de privacidad</a>
+    </div>
+</div>
+
+<script>
+    // Función para enviar formulario
+    document.getElementById('recover-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+
+        if (!username) {
+            showError('Por favor ingrese su nombre de usuario');
+            return;
+        }
+
+        // Simulación de éxito
+        document.getElementById('success-message').style.display = 'flex';
+        document.getElementById('error-message').style.display = 'none';
+
+        // Limpiar formulario después de 2 segundos
+        setTimeout(() => {
+            document.getElementById('recover-form').reset();
+            document.getElementById('success-message').style.display = 'none';
+        }, 5000);
+    });
+
+    function showError(message) {
+        const errorElement = document.getElementById('error-message');
+        errorElement.style.display = 'flex';
+        document.getElementById('error-text').textContent = message;
+        document.getElementById('success-message').style.display = 'none';
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

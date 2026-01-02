@@ -1,0 +1,432 @@
+<div class="content card shadow">
+    <!-- Mensaje de error -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">
+                <i class="bi bi-cash-coin me-2"></i>
+                Listado de Usuarios
+            </h1>
+            <a href="/users/create" class="btn btn-light">
+                <i class="bi bi-plus-circle me-1"></i> Crear Usuario
+            </a>
+
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Resumen Estadístico -->
+        <div class="row mb-4">
+
+            <!-- Tabla de ventas -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="py-3">ID</th>
+                        <th class="py-3">Nombre de Usuario</th>
+                        <th class="py-3">Fecha de Creación</th>
+                        <th class="py-3">Rol</th>
+                        <th class="py-3">Dirección de Email</th>
+                        <th class="py-3">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}">
+                        <td data-label="ID" th:text="${user.id}"></td>
+                        <td data-label="Usuario" th:text="${user.username}"></td>
+                        <td data-label="Fecha" th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td data-label="Rol">
+                                    <span th:classappend="'role-badge role-' + ${user.role}">
+                                        <!-- ADMIN -->
+                                        <i th:if="${user.role.name == 'ROLE_ADMIN'}" class="fas fa-crown"></i>
+                                        <span th:if="${user.role.name == 'ROLE_ADMIN'}">Administrador</span>
+
+                                        <!-- SELLER -->
+                                        <i th:if="${user.role.name == 'ROLE_SELLER'}" class="fas fa-shopping-cart"></i>
+                                        <span th:if="${user.role.name == 'ROLE_SELLER'}" th:text="Vendedor">Vendedor</span>
+
+                                        <!-- STOCK_MANAGER -->
+                                        <i th:if="${user.role == 'ROLE_STOCK_MANAGER'}" class="fas fa-boxes"></i>
+                                        <span th:if="${user.role == 'ROLE_STOCK_MANAGER'}">Gestor de Inventario</span>
+                                    </span>
+                        </td>
+                        <td class="email-verified" data-label="Email">
+                            <div class="email-badge">
+                                <i class="fas fa-envelope"></i>
+                                <span th:text="${user.email}"></span>
+
+                                <!-- Acciones para el email -->
+                                <span class="email-action">
+                                    <i class="fas fa-copy"></i>
+                                    <span class="tooltip-text">Copiar email</span>
+                                </span>
+
+                                <span class="email-action">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span class="tooltip-text">Enviar mensaje</span>
+                                </span>
+                            </div>
+                        </td>
+                        <td data-label="Acciones" class="action-cell">
+                            <form method="post"
+                                  th:action="@{'/users/delete/' + ${user.id}}"
+                                  style="display:inline-block"
+                            >
+                                <input type="hidden" name="_method" value="delete">
+                                <button type="submit"
+                                        class="action-btn btn btn-sm btn-danger"
+                                        title="Eliminar"
+                                        data-bs-toggle="tooltip"
+                                        onclick="return confirm('¿Estas seguro de eliminar este usuario? Se eliminaran todos los datos relacionados a el');">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+
+
+    <style>
+
+        .email-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 15px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .email-badge:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dbe7f0 100%);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .email-badge i {
+            margin-right: 8px;
+            color: #4361ee;
+            font-size: 1rem;
+        }
+
+        .email-action {
+            margin-left: 10px;
+            color: #4361ee;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .email-action:hover {
+            color: #3a56d4;
+            transform: scale(1.1);
+        }
+
+        /* Estilo para cuando el email está verificado */
+        .email-verified .email-badge {
+            background: linear-gradient(135deg, #e8f5e9 0%, #d1e7dd 100%);
+            border-color: #c3e6cb;
+        }
+
+        .email-verified .email-badge i {
+            color: #28a745;
+        }
+
+        /* Estilo para emails pendientes de verificación */
+        .email-pending .email-badge {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            border-color: #ffeeba;
+        }
+
+        .email-pending .email-badge i {
+            color: #ffc107;
+        }
+
+        /* Tooltip para acciones */
+        .tooltip-text {
+            visibility: hidden;
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .email-action:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-align: center;
+            min-width: 150px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* Rol ADMIN - Estilo destacado */
+        .role-ROLE_ADMIN {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            border: 1px solid #2a46c4;
+        }
+
+        /* Rol SELLER - Estilo profesional */
+        .role-ROLE_SELLER {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            border: 1px solid #2E7D32;
+        }
+
+        /* Rol STOCK_MANAGER - Estilo funcional */
+        .role-ROLE_STOCK_MANAGER {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            border: 1px solid #E65100;
+        }
+
+        /* Iconos para cada rol */
+        .role-badge i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        /* Efecto hover */
+        .role-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .indicator-square {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        .text-label {
+            font-family: 'Segoe UI', system-ui;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .card-header {
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+
+        .table thead th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            border: none;
+            padding: 1rem 1.25rem;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .channel-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-online {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: #4cc9f0;
+        }
+
+        .badge-store {
+            background-color: rgba(255, 159, 67, 0.15);
+            color: #ff9f43;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 3px;
+            transition: all 0.2s;
+        }
+
+        .view-btn {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+
+        .view-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: var(--danger-color);
+        }
+
+        .delete-btn:hover {
+            background-color: #ef476f;
+            color: white;
+        }
+
+        .total-cell {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .no-sales {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .no-sales i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ced4da;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .summary-card {
+            border-radius: 0.75rem;
+            border: none;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bg-primary-light {
+            background-color: rgba(67, 97, 238, 0.15);
+        }
+
+        .bg-success-light {
+            background-color: rgba(76, 201, 240, 0.15);
+        }
+
+        .bg-warning-light {
+            background-color: rgba(255, 159, 67, 0.15);
+        }
+
+        .bg-info-light {
+            background-color: rgba(111, 114, 185, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                border: 0;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table, .table tbody, .table tr, .table td {
+                display: block;
+                width: 100%;
+            }
+
+            .table tr {
+                margin-bottom: 1.5rem;
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                border-radius: 0.5rem;
+            }
+
+            .table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 45%;
+                padding-left: 1rem;
+                font-weight: 600;
+                text-align: left;
+            }
+
+            .table td:last-child {
+                border-bottom: 0;
+            }
+
+            .action-cell {
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    </style>
