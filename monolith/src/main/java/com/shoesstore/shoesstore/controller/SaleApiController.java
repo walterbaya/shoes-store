@@ -1,10 +1,10 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.dto.ProductDto;
+import com.shoesstore.shoesstore.dto.SaleDetailResponse;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.service.SaleService;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +20,10 @@ public class SaleApiController {
 
     @Autowired
     private SaleService saleService;
+    
+    public SaleApiController(SaleService saleService) {
+    	this.saleService = saleService;
+    }
 
     @GetMapping("/{saleId}/details")
     public List<SaleDetailResponse> getSaleDetails(@PathVariable Long saleId) {
@@ -47,13 +51,5 @@ public class SaleApiController {
 
         resp.setProduct(dto);
         return resp;
-    }
-
-    @Data
-    private static class SaleDetailResponse {
-        private Long id;
-        private ProductDto product;
-        private int quantity;
-        private double subtotal;
     }
 }
