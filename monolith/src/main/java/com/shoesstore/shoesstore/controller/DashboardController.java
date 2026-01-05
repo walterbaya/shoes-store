@@ -1,25 +1,25 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.Sale;
-import com.shoesstore.shoesstore.service.ReportService;
 import com.shoesstore.shoesstore.service.SaleService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 @Controller
-@AllArgsConstructor
 public class DashboardController {
 
     private final SaleService saleService;
 
+    public DashboardController(SaleService saleService) {
+    	this.saleService = saleService;
+    }
+    
+    
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
 

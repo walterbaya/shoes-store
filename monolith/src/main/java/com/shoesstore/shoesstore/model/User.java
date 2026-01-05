@@ -56,7 +56,9 @@ public class User {
         ROLE_ADMIN, ROLE_SELLER, ROLE_STOCK_MANAGER
     }
     
-    protected User() {
+    //Deberia ir protected pero para mantener el funcionamiento en el codigo actual
+    //es importante
+    public User() {
     	
     }
     

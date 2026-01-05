@@ -9,7 +9,6 @@ import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
 import com.shoesstore.shoesstore.repository.UserRepository;
 import com.shoesstore.shoesstore.utils.SaleItemForm;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Service
 public class SaleService {
 
@@ -30,7 +28,6 @@ public class SaleService {
     	
     public SaleService(SaleRepository saleRepository, ProductService productService,
 			SaleDetailsRepository saleDetailsRepository, UserService userService) {
-		super();
 		this.saleRepository = saleRepository;
 		this.productService = productService;
 		this.saleDetailsRepository = saleDetailsRepository;

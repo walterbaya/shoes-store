@@ -82,5 +82,80 @@ public class Claim {
         return "/uploads/" + shippingProofUrl;
     }
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Sale getSale() {
+		return sale;
+	}
+
+	public void setSale(Sale sale) {
+		this.sale = sale;
+	}
+
+	public List<ClaimDetails> getClaimDetails() {
+		return claimDetails;
+	}
+
+	public void setClaimDetails(List<ClaimDetails> claimDetails) {
+		this.claimDetails = claimDetails;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public State getState() {
+		return state;
+	}
+
+	public void setState(State state) {
+		this.state = state;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getProofUploadedDate() {
+		return proofUploadedDate;
+	}
+
+	public void setProofUploadedDate(LocalDateTime proofUploadedDate) {
+		this.proofUploadedDate = proofUploadedDate;
+	}
+
+	public LocalDateTime getRefundProcessedDate() {
+		return refundProcessedDate;
+	}
+
+	public void setRefundProcessedDate(LocalDateTime refundProcessedDate) {
+		this.refundProcessedDate = refundProcessedDate;
+	}
+
+	public LocalDateTime getPackageReceivedDate() {
+		return packageReceivedDate;
+	}
+
+	public void setPackageReceivedDate(LocalDateTime packageReceivedDate) {
+		this.packageReceivedDate = packageReceivedDate;
+	}
+
+	public void setShippingProofUrl(String shippingProofUrl) {
+		this.shippingProofUrl = shippingProofUrl;
+	}
 
 }
