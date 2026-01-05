@@ -23,12 +23,12 @@ public class ProductWithSuppliersDTO {
     private String type;
     private String material;
     private String brand;
-    private Product.ShoeSize size;
+    private com.shoesstore.shoesstore.model.ShoeSize size;
     private Double price;
     private Integer stock;
     private Set<String> supplierNames = new HashSet<>();
     private LocalDateTime createdAt;
-    private Product.Gender gender;
+    private com.shoesstore.shoesstore.model.Gender gender;
 
     // Constructor que acepta un Product
     public ProductWithSuppliersDTO(Product product) {
