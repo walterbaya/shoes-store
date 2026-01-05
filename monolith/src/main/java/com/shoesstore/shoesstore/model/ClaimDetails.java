@@ -1,14 +1,9 @@
 package com.shoesstore.shoesstore.model;
 
-
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
 
 @Entity
-@Getter
-@Setter
 @Table(name = "claim_details")
 public class ClaimDetails {
 
@@ -25,5 +20,39 @@ public class ClaimDetails {
         private SaleDetails saleDetails;
 
         private Integer quantity;
+
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
+		public Claim getClaim() {
+			return claim;
+		}
+
+		public void setClaim(Claim claim) {
+			this.claim = claim;
+		}
+
+		public SaleDetails getSaleDetails() {
+			return saleDetails;
+		}
+
+		public void setSaleDetails(SaleDetails saleDetails) {
+			this.saleDetails = saleDetails;
+		}
+
+		public Integer getQuantity() {
+			return quantity;
+		}
+
+		public void setQuantity(Integer quantity) {
+			this.quantity = quantity;
+		}
+        
+        
 }
 
