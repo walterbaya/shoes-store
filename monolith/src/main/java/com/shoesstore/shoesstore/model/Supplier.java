@@ -2,11 +2,8 @@ package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.*;
-
 import static jakarta.persistence.CascadeType.MERGE;
 import static jakarta.persistence.CascadeType.PERSIST;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -14,7 +11,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "proveedores")
-@ToString(exclude = {"products", "supplierProducts"})
+//@ToString(exclude = {"products", "supplierProducts"})
 public class Supplier {
     @Id @GeneratedValue(strategy = IDENTITY) 
     private Long id;
@@ -220,4 +217,13 @@ public class Supplier {
 		Supplier other = (Supplier) obj;
 		return Objects.equals(id, other.id);
 	}
+
+	@Override
+	public String toString() {
+		return "Supplier [id=" + id + ", name=" + name + ", email=" + email + ", contactName=" + contactName + ", cuit="
+				+ cuit + ", address=" + address + ", phone=" + phone + ", paymentConditions=" + paymentConditions
+				+ ", active=" + active + ", productPrices=" + productPrices + ", purchaseOrders=" + purchaseOrders
+				+ "]";
+	}
+	
 }

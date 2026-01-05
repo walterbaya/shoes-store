@@ -1,15 +1,9 @@
 package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "sale_details")
 public class SaleDetails {
 
@@ -34,6 +28,49 @@ public class SaleDetails {
 
     private int quantity;
     private double subtotal;
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Sale getSale() {
+		return sale;
+	}
+	public void setSale(Sale sale) {
+		this.sale = sale;
+	}
+	public Product getProduct() {
+		return product;
+	}
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+	public Claim getClaim() {
+		return claim;
+	}
+	public void setClaim(Claim claim) {
+		this.claim = claim;
+	}
+	public List<ClaimDetails> getDetails() {
+		return details;
+	}
+	public void setDetails(List<ClaimDetails> details) {
+		this.details = details;
+	}
+	public int getQuantity() {
+		return quantity;
+	}
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+	public double getSubtotal() {
+		return subtotal;
+	}
+	public void setSubtotal(double subtotal) {
+		this.subtotal = subtotal;
+	}
+    
 }
 
 
