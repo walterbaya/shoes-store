@@ -44,14 +44,6 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
-eureka:
-  instance:
-    preferIpAddress: true
-  client:
-    fetchRegistry: true
-    registerWithEureka: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
 
 file:
   upload-dir: ./uploads
