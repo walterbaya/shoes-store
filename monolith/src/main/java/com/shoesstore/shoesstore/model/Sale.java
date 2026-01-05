@@ -1,17 +1,10 @@
 package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "sales")
 public class Sale {
 
@@ -46,4 +39,85 @@ public class Sale {
     public enum SaleChannel {
         ONLINE, TIENDA;
     }
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public SaleChannel getChannel() {
+		return channel;
+	}
+
+	public void setChannel(SaleChannel channel) {
+		this.channel = channel;
+	}
+
+	public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	public double getShippingCost() {
+		return shippingCost;
+	}
+
+	public void setShippingCost(double shippingCost) {
+		this.shippingCost = shippingCost;
+	}
+
+	public double getDiscountPercentage() {
+		return discountPercentage;
+	}
+
+	public void setDiscountPercentage(double discountPercentage) {
+		this.discountPercentage = discountPercentage;
+	}
+
+	public double getTotal() {
+		return total;
+	}
+
+	public void setTotal(double total) {
+		this.total = total;
+	}
+
+	public LocalDateTime getSaleDate() {
+		return saleDate;
+	}
+
+	public void setSaleDate(LocalDateTime saleDate) {
+		this.saleDate = saleDate;
+	}
+
+	public List<SaleDetails> getDetails() {
+		return details;
+	}
+
+	public void setDetails(List<SaleDetails> details) {
+		this.details = details;
+	}
+
+	public Claim getClaim() {
+		return claim;
+	}
+
+	public void setClaim(Claim claim) {
+		this.claim = claim;
+	}
+    
 }
