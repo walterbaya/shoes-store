@@ -1,17 +1,9 @@
 package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "purchase_order_item")
 public class PurchaseOrderItem {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,8 +20,25 @@ public class PurchaseOrderItem {
     private int quantity;
     private BigDecimal purchasePrice;
     private BigDecimal subtotal;
+    
+    public PurchaseOrderItem() {
+    	
+    }
+    
+    public PurchaseOrderItem(Long id, PurchaseOrder order, Product product, int quantity, BigDecimal purchasePrice,
+			BigDecimal subtotal) {
+		super();
+		this.id = id;
+		this.order = order;
+		this.product = product;
+		this.quantity = quantity;
+		this.purchasePrice = purchasePrice;
+		this.subtotal = subtotal;
+	}
 
-    public BigDecimal getTotal() {
+
+
+	public BigDecimal getTotal() {
         return purchasePrice.multiply(BigDecimal.valueOf(quantity));
     }
 
@@ -80,24 +89,4 @@ public class PurchaseOrderItem {
 	public void setSubtotal(BigDecimal subtotal) {
 		this.subtotal = subtotal;
 	}
-
-	public PurchaseOrderItem() {
-		
-	}
-
-	public PurchaseOrderItem(Long id, PurchaseOrder order, Product product, int quantity, BigDecimal purchasePrice,
-			BigDecimal subtotal) {
-		super();
-		this.id = id;
-		this.order = order;
-		this.product = product;
-		this.quantity = quantity;
-		this.purchasePrice = purchasePrice;
-		this.subtotal = subtotal;
-	}
-	
-	
-    
-    
-
 }
