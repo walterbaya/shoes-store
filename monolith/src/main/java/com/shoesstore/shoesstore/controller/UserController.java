@@ -6,13 +6,11 @@ import com.shoesstore.shoesstore.service.ClaimService;
 import com.shoesstore.shoesstore.service.FileStorageService;
 import com.shoesstore.shoesstore.service.SaleService;
 import com.shoesstore.shoesstore.service.UserService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +18,15 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/users")
-@AllArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
+    
+    public UserController(UserService userService) {
+    	this.userService = userService;
+    }
+    
+    
     @GetMapping
     public String listUsers(Model model) {
         model.addAttribute("users", userService.findAll());
@@ -85,4 +87,7 @@ public class UserController {
 //        return "redirect:/claims";
 //    }
 
+    
+    
+    
 }

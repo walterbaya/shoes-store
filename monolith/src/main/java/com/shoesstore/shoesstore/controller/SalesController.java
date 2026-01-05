@@ -8,28 +8,26 @@ import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
 import com.shoesstore.shoesstore.utils.SaleForm;
 import com.shoesstore.shoesstore.utils.SaleItemForm;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/sales")
-@AllArgsConstructor
 public class SalesController {
 
-    @Autowired
     private ProductService productService;
-
-    @Autowired
     private SaleService saleService;
+    
+    public SalesController(SaleService saleService, ProductService productService) {
+    	this.saleService = saleService;
+    	this.productService = productService;
+    }
 
     @GetMapping
     public String listSales(Model model) {
@@ -160,6 +158,8 @@ public class SalesController {
         }
         return "redirect:/sales";
     }
+    
+    
 }
 
 
