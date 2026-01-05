@@ -14,6 +14,7 @@ public class SaleForm {
     private double shippingCost;
     private double discountPercentage;
     private double total;
+    
 	public String getChannel() {
 		return channel;
 	}

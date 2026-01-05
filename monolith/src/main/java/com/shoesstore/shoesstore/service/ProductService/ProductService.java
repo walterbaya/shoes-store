@@ -4,17 +4,14 @@ import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.exception.InsufficientStockException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -22,7 +19,19 @@ public class ProductService {
     private final ClaimRepository claimRepository;
     private final SaleDetailsRepository saleDetailsRepository;
 
-    public List<Product> getAllProducts() {
+    
+    
+    public ProductService(ProductRepository productRepository,
+			PurchaseOrderItemsRepository purchaseOrderItemsRepository, ClaimRepository claimRepository,
+			SaleDetailsRepository saleDetailsRepository) {
+		
+		this.productRepository = productRepository;
+		this.purchaseOrderItemsRepository = purchaseOrderItemsRepository;
+		this.claimRepository = claimRepository;
+		this.saleDetailsRepository = saleDetailsRepository;
+	}
+
+	public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 

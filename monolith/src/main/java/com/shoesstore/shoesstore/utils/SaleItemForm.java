@@ -9,7 +9,6 @@ public class SaleItemForm {
     }
     
 	public SaleItemForm(Long productId, Integer quantity) {
-		super();
 		this.productId = productId;
 		this.quantity = quantity;
 	}
