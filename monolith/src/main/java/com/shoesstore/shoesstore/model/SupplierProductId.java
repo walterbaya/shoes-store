@@ -3,16 +3,10 @@ package com.shoesstore.shoesstore.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
+import java.util.Objects;
 
-@Getter
-@Setter
-@EqualsAndHashCode
+
 @Embeddable
 @Table(name = "supplier_product_id")
 public class SupplierProductId implements Serializable {
@@ -30,4 +24,38 @@ public class SupplierProductId implements Serializable {
         this.supplierId = supplierId;
         this.productId = productId;
     }
+
+	public Long getSupplierId() {
+		return supplierId;
+	}
+
+	public void setSupplierId(Long supplierId) {
+		this.supplierId = supplierId;
+	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(productId, supplierId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SupplierProductId other = (SupplierProductId) obj;
+		return Objects.equals(productId, other.productId) && Objects.equals(supplierId, other.supplierId);
+	}
+	
 }

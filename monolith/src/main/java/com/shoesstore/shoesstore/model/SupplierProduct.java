@@ -1,17 +1,10 @@
 package com.shoesstore.shoesstore.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 
 
 @Entity
-@Getter
-@Setter
 @Table(name = "supplier_product")
 public class SupplierProduct {
     @EmbeddedId
@@ -39,4 +32,37 @@ public class SupplierProduct {
         this.product = product;
         this.price = price;
     }
+
+	public SupplierProductId getId() {
+		return id;
+	}
+
+	public void setId(SupplierProductId id) {
+		this.id = id;
+	}
+
+	public Supplier getSupplier() {
+		return supplier;
+	}
+
+	public void setSupplier(Supplier supplier) {
+		this.supplier = supplier;
+	}
+
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public BigDecimal getPrice() {
+		return price;
+	}
+
+	public void setPrice(BigDecimal price) {
+		this.price = price;
+	}
+    
 }

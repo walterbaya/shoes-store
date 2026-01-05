@@ -18,15 +18,21 @@ import java.util.Map;
 
 
 @Service
-@AllArgsConstructor
 public class ClaimService {
 
     private final ClaimRepository claimRepository;
     private final SaleRepository saleRepository;
     private final SaleDetailsRepository saleDetailsRepository;
 
+    public ClaimService(ClaimRepository claimRepository, SaleRepository saleRepository,
+			SaleDetailsRepository saleDetailsRepository) {
+		super();
+		this.claimRepository = claimRepository;
+		this.saleRepository = saleRepository;
+		this.saleDetailsRepository = saleDetailsRepository;
+	}
 
-    // Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
+	// Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
     // Todas las claims tienen asociadas una venta y un conjunto de productos que se quieren actualizar en la venta
     // Al crear la claim podría eliminarse en algun momento supongo, por lo tanto los items no deberia borrarse instantamente
     //sino cuando ya se procesaron y se saben que se van a descontar

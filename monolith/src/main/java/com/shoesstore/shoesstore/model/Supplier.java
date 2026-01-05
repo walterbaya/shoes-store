@@ -14,14 +14,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "proveedores")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"products", "supplierProducts"})
 public class Supplier {
-    @Id @GeneratedValue(strategy = IDENTITY) @EqualsAndHashCode.Include
+    @Id @GeneratedValue(strategy = IDENTITY) 
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -77,4 +72,152 @@ public class Supplier {
     )
     private List<PurchaseOrder> purchaseOrders = new ArrayList<>();
 
+    public Supplier() {
+    	
+    }
+    
+	public Supplier(Long id, String name, @Email String email, String contactName, String cuit, String address,
+			String phone, Set<PaymentCondition> paymentConditions, boolean active, Set<Product> products,
+			Map<Long, BigDecimal> productPrices, Set<SupplierProduct> supplierProducts,
+			List<PurchaseOrder> purchaseOrders) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.contactName = contactName;
+		this.cuit = cuit;
+		this.address = address;
+		this.phone = phone;
+		this.paymentConditions = paymentConditions;
+		this.active = active;
+		this.products = products;
+		this.productPrices = productPrices;
+		this.supplierProducts = supplierProducts;
+		this.purchaseOrders = purchaseOrders;
+	}
+
+
+
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getCuit() {
+		return cuit;
+	}
+
+	public void setCuit(String cuit) {
+		this.cuit = cuit;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public Set<PaymentCondition> getPaymentConditions() {
+		return paymentConditions;
+	}
+
+	public void setPaymentConditions(Set<PaymentCondition> paymentConditions) {
+		this.paymentConditions = paymentConditions;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public Set<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(Set<Product> products) {
+		this.products = products;
+	}
+
+	public Map<Long, BigDecimal> getProductPrices() {
+		return productPrices;
+	}
+
+	public void setProductPrices(Map<Long, BigDecimal> productPrices) {
+		this.productPrices = productPrices;
+	}
+
+	public Set<SupplierProduct> getSupplierProducts() {
+		return supplierProducts;
+	}
+
+	public void setSupplierProducts(Set<SupplierProduct> supplierProducts) {
+		this.supplierProducts = supplierProducts;
+	}
+
+	public List<PurchaseOrder> getPurchaseOrders() {
+		return purchaseOrders;
+	}
+
+	public void setPurchaseOrders(List<PurchaseOrder> purchaseOrders) {
+		this.purchaseOrders = purchaseOrders;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Supplier other = (Supplier) obj;
+		return Objects.equals(id, other.id);
+	}
 }

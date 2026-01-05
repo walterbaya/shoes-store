@@ -27,9 +27,18 @@ public class SaleService {
     private final ProductService productService;
     private final SaleDetailsRepository saleDetailsRepository;
     private final UserService userService;
+    	
+    public SaleService(SaleRepository saleRepository, ProductService productService,
+			SaleDetailsRepository saleDetailsRepository, UserService userService) {
+		super();
+		this.saleRepository = saleRepository;
+		this.productService = productService;
+		this.saleDetailsRepository = saleDetailsRepository;
+		this.userService = userService;
+	}
 
 
-    @Transactional
+	@Transactional
     public Sale processSale(Sale sale, List<SaleItemForm> itemsToProcess) {
         double totalSale = 0;
         List<SaleDetails> saleDetailsList = new ArrayList<>();
