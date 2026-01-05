@@ -1,5 +1,5 @@
 # Shoe Store Backend
-
+      
 
 
 Backend REST API for managing a shoe store, including product catalog, stock control, purchase orders, supplier management, claim management, and user roles.
