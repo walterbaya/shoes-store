@@ -1,0 +1,254 @@
+package com.shoesstore.shoesstore.service;
+
+import com.shoesstore.shoesstore.exception.InsufficientStockException;
+import com.shoesstore.shoesstore.model.*;
+import com.shoesstore.shoesstore.repository.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class ProductServiceTest {
+
+    @Mock
+    private ProductRepository productRepository;
+    @Mock
+    private PurchaseOrderItemsRepository purchaseOrderItemsRepository;
+    @Mock
+    private ClaimRepository claimRepository;
+    @Mock
+    private ClaimDetailsRepository claimDetailsRepository;
+    @Mock
+    private SaleDetailsRepository saleDetailsRepository;
+
+    @InjectMocks
+    private ProductService productService;
+
+    private Product producto;
+
+    @BeforeEach
+    void setUp() {
+        producto = new Product();
+        producto.setId(1L);
+        producto.setStock(10);
+        producto.setDescription("Zapatilla deportiva");
+        producto.setSuppliers(new HashSet<>());
+        producto.setSupplierProducts(new HashSet<>());
+    }
+
+    @Test
+    void testGetAllProducts() {
+        when(productRepository.findAll()).thenReturn(List.of(producto));
+        List<Product> result = productService.getAllProducts();
+        assertEquals(1, result.size());
+        verify(productRepository).findAll();
+    }
+
+    @Test
+    void testUpdateStockSuccess() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        productService.updateStock(1L, 5);
+        assertEquals(5, producto.getStock());
+        verify(productRepository).save(producto);
+    }
+
+    @Test
+    void testUpdateStockInsufficient() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        assertThrows(InsufficientStockException.class, () -> productService.updateStock(1L, 20));
+    }
+
+    @Test
+    void testGetProductByIdFound() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        Product result = productService.getProductById(1L);
+        assertEquals("Zapatilla deportiva", result.getDescription());
+    }
+
+    @Test
+    void testGetProductByIdNotFound() {
+        when(productRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> productService.getProductById(2L));
+    }
+
+    @Test
+    void testSaveProductSuccess() {
+        producto.setId(2L);
+        when(productRepository.existsById(2L)).thenReturn(false);
+        when(productRepository.save(producto)).thenReturn(producto);
+        Product result = productService.saveProduct(producto);
+        assertEquals(producto, result);
+    }
+
+    @Test
+    void testSaveProductAlreadyExists() {
+        producto.setId(1L);
+        when(productRepository.existsById(1L)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> productService.saveProduct(producto));
+    }
+
+    @Test
+    void testUpdateProductSuccess() {
+        when(productRepository.existsById(1L)).thenReturn(true);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(productRepository.save(any())).thenReturn(producto);
+        Product result = productService.updateProduct(producto);
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUpdateProductNonexistent() {
+        producto.setId(99L);
+        when(productRepository.existsById(99L)).thenReturn(false);
+        assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(producto));
+    }
+
+    @Test
+    void testDeleteProductWithClaims() {
+        SaleDetails saleDetail = new SaleDetails();
+        Claim claim = new Claim();
+        claim.setId(10L);
+        saleDetail.setClaim(claim);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(List.of(saleDetail));
+
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+    }
+
+    @Test
+    void testDeleteProductWithPurchaseOrders() {
+        PurchaseOrderItem item = new PurchaseOrderItem();
+        item.setId(20L);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
+        when(purchaseOrderItemsRepository.findAllByProductId(1L)).thenReturn(List.of(item));
+
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+    }
+
+    @Test
+    void testDeleteProductWithSales() {
+        SaleDetails saleDetail = new SaleDetails();
+        Sale sale = new Sale();
+        sale.setId(30L);
+        saleDetail.setSale(sale);
+
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(List.of(saleDetail));
+        when(purchaseOrderItemsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
+
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+    }
+
+    @Test
+    void testDeleteProductSuccess() {
+        when(productRepository.findById(1L)).thenReturn(Optional.of(producto)).thenReturn(Optional.of(producto));
+        when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
+        when(purchaseOrderItemsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
+
+        assertDoesNotThrow(() -> productService.deleteProduct(1L));
+        verify(productRepository).deleteById(1L);
+    }
+
+    @Test
+    void testDeleteProductNotFound() {
+        when(productRepository.findById(2L)).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(2L));
+    }
+
+    @Test
+    void testDeleteProduct_afterClaimIsDeleted_productDeletedSuccessfully() {
+        //Generamos un nuevo producto
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+        // Simulamos que el producto existe
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+
+        // Simulamos que primero hay un reclamo (por eso la primera llamada a findAllByProductId devuelve 1 reclamo)
+        SaleDetails saleDetails = new SaleDetails();
+        Claim claim = new Claim();
+        claim.setId(100L);
+        saleDetails.setClaim(claim);
+
+        // Simulamos que el producto tiene un reclamo, vemos que forma parte de una venta
+        when(saleDetailsRepository.findAllByProductId(productId)).thenReturn(List.of(saleDetails));
+        //Vemos que el dicha detalle de venta está asociado a un reclamo
+
+        // Primera llamada lanza excepción porque hay reclamos asociados
+        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(productId));
+
+        // Ahora simulamos que borramos ese reclamo y que ya no quedan reclamos ni compras ni ventas
+
+        //Al no existir detalles de venta asociados al producto es imposible que forme parte de claim details y por lo tanto imposible que este vinculado a claim.
+        when(saleDetailsRepository.findAllByProductId(productId)).thenReturn(Collections.emptyList());
+        when(purchaseOrderItemsRepository.findAllByProductId(productId)).thenReturn(Collections.emptyList());
+
+        // También simulamos que el producto se elimina sin problemas
+        doNothing().when(productRepository).deleteById(productId);
+
+        // Ahora debería eliminarse sin errores
+        assertDoesNotThrow(() -> productService.deleteProduct(productId));
+    }
+
+
+/*    @Test
+    void testDeleteProduct_withActiveSaleThenRemoveSale_productDeletedSuccessfully() {
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+        SaleDetails activeSale = new SaleDetails();
+        activeSale.setProduct(product);
+
+        // Primero: el producto tiene una venta activa
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(saleDetailsRepository.findAllByProductId(product.getId())).thenReturn(List.of(activeSale));
+        when(purchaseOrderItemsRepository.findAllByProductId(product.getId())).thenReturn(List.of());
+
+        // Debería lanzar una excepción al intentar borrar
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            productService.deleteProduct(productId);
+        });
+        assertEquals("El producto no se puede eliminar porque tiene ventas asociadas", exception.getMessage());
+
+        // Ahora simulamos que la venta fue eliminada
+        when(saleDetailsRepository.findByProduct(product)).thenReturn(List.of()); // sin ventas activas
+
+        // Y que el delete se realiza correctamente
+        doNothing().when(productRepository).delete(product);
+
+        // Ahora sí debería poder eliminarse
+        assertDoesNotThrow(() -> productService.deleteProduct(productId));
+        verify(productRepository).delete(product);
+    }
+
+
+    @Test
+    void testDeleteProduct_afterPurchasesAreDeleted_productDeletedSuccessfully() {
+        Long productId = 1L;
+        Product product = new Product();
+        product.setId(productId);
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(purchaseDetailRepository.findByProduct(product)).thenReturn(List.of()); // Sin compras activas
+
+        doNothing().when(productRepository).delete(product);
+
+        assertDoesNotThrow(() -> productService.deleteProduct(productId));
+        verify(productRepository).delete(product);
+    }*/
+
+
+}

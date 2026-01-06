@@ -1,0 +1,157 @@
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4" th:fragment="header">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center fw-bold me-4" th:href="@{/dashboard}">
+            <i class="bi bi-boot me-2"></i>
+            <span class="d-none d-sm-inline">Gestión Calzado</span>
+        </a>
+
+        <!-- Breadcrumb / Page title -->
+        <div class="d-none d-md-flex align-items-center me-auto">
+            <ul class="breadcrumb mb-0 bg-transparent p-0">
+                <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page" th:text="${title}"></li>
+            </ul>
+        </div>
+
+        <!-- Search bar --
+
+        <!-- Extras: date, notifications, help, user -->
+        <ul class="navbar-nav align-items-center ms-auto gap-3">
+            <li class="nav-item d-none d-md-block text-secondary small">
+                <!-- Sample date/time -->
+                <i class="bi bi-calendar3 me-1"></i><span th:text="${#calendars.format(#calendars.createNow(), 'dd MMM yyyy HH:mm')}"></span>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="btn dropdown-toggle d-flex align-items-center p-1" href="#" role="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle fs-5 me-2"></i>
+                    <span class="d-none d-md-inline" th:text="${username}">Usuario</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li>
+                        <form action="/logout" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit" class="dropdown-item d-flex align-items-center">
+                                <i class="bi bi-box-arrow-right me-2 text-danger"></i>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<style>
+    :root {
+        --header-height: 70px;
+        --bg-color: #fff;
+        --border-color: #e2e8f0;
+        --primary: #5a4fff;
+        --primary-light: #f3f1ff;
+        --text-main: #1e293b;
+        --text-secondary: #475569;
+        --transition: 0.25s ease;
+    }
+
+    .navbar {
+        height: var(--header-height) !important;
+        min-height: var(--header-height) !important;      /* Garantiza la altura aunque haya clase “active” */
+        background: var(--bg-color) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: background var(--transition), box-shadow var(--transition);
+    }
+    .navbar:hover {
+        background: var(--primary-light) !important;
+    }
+
+    /* Evita que el padding interno se colapse en .active */
+    .navbar .nav-item .active,
+    .navbar .btn.dropdown-toggle.active {
+        padding-top: calc((var(--header-height) - 1.2rem) / 2) !important;
+        padding-bottom: calc((var(--header-height) - 1.2rem) / 2) !important;
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem;
+        color: var(--primary) !important;
+    }
+    .navbar-brand i {
+        font-size: 1.9rem;
+        color: var(--primary);
+        transition: transform var(--transition);
+    }
+    .navbar-brand:hover i {
+        transform: rotate(-20deg) scale(1.1);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        background: transparent;
+        padding: 0;
+        margin-bottom: 0;
+    }
+    .breadcrumb .breadcrumb-item a {
+        color: var(--text-secondary);
+    }
+    .breadcrumb .breadcrumb-item.active {
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    /* Search */
+    form .form-control {
+        border-radius: 20px;
+        padding-left: 2.5rem;
+        height: calc(var(--header-height) * 0.6);
+    }
+
+    /* Iconos y dropdowns */
+    .navbar-nav .nav-link,
+    .navbar-nav .dropdown-toggle {
+        color: var(--text-main) !important;
+        transition: color var(--transition), background var(--transition);
+        padding-top: calc((var(--header-height) - 1.2rem) / 2) !important;
+        padding-bottom: calc((var(--header-height) - 1.2rem) / 2) !important;
+    }
+    .navbar-nav .nav-link:hover,
+    .navbar-nav .dropdown-toggle:hover {
+        color: var(--primary) !important;
+        background: var(--primary-light) !important;
+    }
+
+    .badge {
+        font-size: 0.5rem;
+        pointer-events: none;
+    }
+
+    .dropdown-menu {
+        border: 1px solid rgba(0,0,0,0.1);
+        border-radius: 8px;
+        padding: 0.5rem 0;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        transform-origin: top right;
+        animation: fadeIn 0.2s var(--transition);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-item {
+        color: var(--text-secondary) !important;
+        font-size: 0.95rem;
+        padding: 0.6rem 1rem;
+        transition: background var(--transition), color var(--transition);
+    }
+    .dropdown-item:hover {
+        background: var(--primary-light);
+        color: var(--primary) !important;
+    }
+    .dropdown-item i {
+        font-size: 1.2rem;
+        color: var(--primary);
+        margin-right: 0.5rem;
+    }
+</style>
