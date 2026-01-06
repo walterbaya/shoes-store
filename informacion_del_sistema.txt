@@ -1,7 +1,0 @@
-En la ventana de productos solamente los puede registrar el administrador
-y mismo borrarlos, los empleados o vendedores no tienen acceso a este inventario.
-
-en la ventana de reportes, solamente el administrador puede acceder a la misma, ya que
-es el unico que puede ver los reportes de las ventas y de los empleados que mas
-vendieron entre otras.
-
