@@ -1,6 +1,5 @@
 package com.shoesstore.shoesstore.service;
 
-import com.shoesstore.shoesstore.exception.InsufficientStockException;
 import com.shoesstore.shoesstore.exception.ProductServiceException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
@@ -64,7 +63,7 @@ public class ProductServiceTest {
     @Test
     void testUpdateStockInsufficient() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
-        assertThrows(InsufficientStockException.class, () -> productService.updateStock(1L, 20));
+        assertThrows(ProductServiceException.class, () -> productService.updateStock(1L, 20));
     }
 
     @Test

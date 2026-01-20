@@ -1,7 +1,6 @@
 package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
-import com.shoesstore.shoesstore.exception.InsufficientStockException;
 import com.shoesstore.shoesstore.exception.ProductServiceException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
@@ -10,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

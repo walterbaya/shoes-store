@@ -13,12 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InsufficientStockException.class)
-    public String handleStockError(InsufficientStockException ex, Model model) {
-        model.addAttribute("error", ex.getMessage());
-        return "error/stock-error";
-    }
-
     @ExceptionHandler(ProductServiceException.class)
     public String handleProductServiceException(ProductServiceException ex, Model model, RedirectAttributes redirectAttributes){
         if(redirectAttributes != null){
