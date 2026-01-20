@@ -1,6 +1,7 @@
 package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.exception.InsufficientStockException;
+import com.shoesstore.shoesstore.exception.ProductServiceException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +83,7 @@ public class ProductServiceTest {
     @Test
     void testSaveProductSuccess() {
         producto.setId(2L);
-        when(productRepository.existsById(2L)).thenReturn(false);
+        producto.setPrice(50.0);
         when(productRepository.save(producto)).thenReturn(producto);
         Product result = productService.saveProduct(producto);
         assertEquals(producto, result);
@@ -92,7 +93,7 @@ public class ProductServiceTest {
     void testSaveProductAlreadyExists() {
         producto.setId(1L);
         when(productRepository.existsById(1L)).thenReturn(true);
-        assertThrows(IllegalArgumentException.class, () -> productService.saveProduct(producto));
+        assertThrows(ProductServiceException.class, () -> productService.saveProduct(producto));
     }
 
     @Test
@@ -108,7 +109,7 @@ public class ProductServiceTest {
     void testUpdateProductNonexistent() {
         producto.setId(99L);
         when(productRepository.existsById(99L)).thenReturn(false);
-        assertThrows(IllegalArgumentException.class, () -> productService.updateProduct(producto));
+        assertThrows(ProductServiceException.class, () -> productService.updateProduct(producto));
     }
 
     @Test
@@ -121,7 +122,7 @@ public class ProductServiceTest {
         when(productRepository.findById(1L)).thenReturn(Optional.of(producto));
         when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(List.of(saleDetail));
 
-        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+        assertThrows(ProductServiceException.class, () -> productService.deleteProduct(1L));
     }
 
     @Test
@@ -133,7 +134,7 @@ public class ProductServiceTest {
         when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
         when(purchaseOrderItemsRepository.findAllByProductId(1L)).thenReturn(List.of(item));
 
-        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+        assertThrows(ProductServiceException.class, () -> productService.deleteProduct(1L));
     }
 
     @Test
@@ -147,7 +148,7 @@ public class ProductServiceTest {
         when(saleDetailsRepository.findAllByProductId(1L)).thenReturn(List.of(saleDetail));
         when(purchaseOrderItemsRepository.findAllByProductId(1L)).thenReturn(Collections.emptyList());
 
-        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(1L));
+        assertThrows(ProductServiceException.class, () -> productService.deleteProduct(1L));
     }
 
     @Test
@@ -163,6 +164,6 @@ public class ProductServiceTest {
     @Test
     void testDeleteProductNotFound() {
         when(productRepository.findById(2L)).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class, () -> productService.deleteProduct(2L));
+        assertThrows(ProductServiceException.class, () -> productService.deleteProduct(2L));
     }
 }

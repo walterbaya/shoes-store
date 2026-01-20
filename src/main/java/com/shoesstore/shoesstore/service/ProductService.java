@@ -7,6 +7,7 @@ import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,32 +18,29 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final PurchaseOrderItemsRepository purchaseOrderItemsRepository;
-    private final ClaimRepository claimRepository;
     private final SaleDetailsRepository saleDetailsRepository;
 
-    
-    
-    public ProductService(ProductRepository productRepository,
-			PurchaseOrderItemsRepository purchaseOrderItemsRepository, ClaimRepository claimRepository,
-			SaleDetailsRepository saleDetailsRepository) {
-		
-		this.productRepository = productRepository;
-		this.purchaseOrderItemsRepository = purchaseOrderItemsRepository;
-		this.claimRepository = claimRepository;
-		this.saleDetailsRepository = saleDetailsRepository;
-	}
 
-	public List<Product> getAllProducts() {
+    public ProductService(ProductRepository productRepository,
+                          PurchaseOrderItemsRepository purchaseOrderItemsRepository, ClaimRepository claimRepository,
+                          SaleDetailsRepository saleDetailsRepository) {
+
+        this.productRepository = productRepository;
+        this.purchaseOrderItemsRepository = purchaseOrderItemsRepository;
+        this.saleDetailsRepository = saleDetailsRepository;
+    }
+
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
     @Transactional
     public void updateStock(Long productId, int quantity) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new ProductServiceException("Producto no encontrado"));
 
         if (product.getStock() < quantity) {
-            throw new InsufficientStockException("Stock insuficiente");
+            throw new ProductServiceException("Stock insuficiente");
         }
 
         product.setStock(product.getStock() - quantity);
@@ -59,7 +57,7 @@ public class ProductService {
 
     public Product getProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+                .orElseThrow(() -> new ProductServiceException("Producto no encontrado con ID: " + id));
     }
 
     @Transactional
@@ -85,7 +83,7 @@ public class ProductService {
     @Transactional
     public void addOneToStock(Long id) {
         if (id == null || !productRepository.existsById(id)) {
-            throw new IllegalArgumentException("No existe un producto con ID: " + id);
+            throw new ProductServiceException("No existe un producto con ID: " + id);
         }
 
         productRepository.addOneToStock(id);
@@ -93,69 +91,64 @@ public class ProductService {
 
     public Product saveProduct(Product product) {
         // Validar que siempre venga ID desde el formulario
-        if (product.getName() == null) {
+        if (product.getId() == null) {
             throw new ProductServiceException("El ID del producto es obligatorio");
+        }
+        if (product.getId() != null && productRepository.existsById(product.getId())) {
+            throw new ProductServiceException("El producto con ID " + product.getId() + " ya existe");
         }
         if (product.getPrice() <= 0) {
             throw new ProductServiceException("El precio debe ser mayor a 0");
         }
-        if(product.getStock() <= 0){
+        if (product.getStock() <= 0) {
             throw new ProductServiceException("El stock debe ser mayor a 0");
         }
 
         return productRepository.save(product);
     }
 
+
+    private void validateDeleteProduct(List<SaleDetails> saleDetailsList, List<Claim> claims, List<PurchaseOrderItem> purchaseOrderItems) {
+        if (!claims.isEmpty()) {
+            String claimIds = claims.stream().map(c -> String.valueOf(c.getId())).collect(Collectors.joining(", "));
+            throw new ProductServiceException("No se puede eliminar un producto que posee reclamos registrados, elimine primeramente las reclamos con los siguientes IDs: " + claimIds);
+        }
+
+        if (!purchaseOrderItems.isEmpty()) {
+            String purchaseOrderItemIds = purchaseOrderItems.stream().map(p -> String.valueOf(p.getId())).collect(Collectors.joining(", "));
+            throw new ProductServiceException("No se puede eliminar un producto que posee ordenes de compra registradas" + ", elimine primeramente las ordenes de compra con los siguientes IDs: " + purchaseOrderItemIds);
+        }
+
+        if (!saleDetailsList.isEmpty()) {
+            String saleIds = saleDetailsList.stream().map(sd -> String.valueOf(sd.getSale().getId())).collect(Collectors.joining(", "));
+            throw new ProductServiceException("No se puede eliminar un producto que posee ventas registradas, elimine primeramente las ventas con los siguientes IDs: " + saleIds);
+        }
+    }
+
     @Transactional
     public void deleteProduct(Long id) {
 
-        if (!productRepository.existsById(id)) {
-            throw new ProductServiceException("El producto con ID " + id + " no existe");
-        }
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductServiceException("No existe un producto con ID: " + id));
 
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        List<SaleDetails> saleDetailsList = saleDetailsRepository.findAllByProductId(id);
+        List<Claim> claims = saleDetailsList.stream()
+                .map(SaleDetails::getClaim)
+                .filter(Objects::nonNull)
+                .toList();
 
-        if(optionalProduct.isPresent()){
+        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemsRepository.findAllByProductId(id)
+                .stream()
+                .filter(Objects::nonNull)
+                .toList();
 
-           List<SaleDetails> saleDetailsList = saleDetailsRepository.findAllByProductId(id);
-           List<Claim> claims = saleDetailsList.stream()
-                   .map(SaleDetails::getClaim)
-                   .filter(Objects::nonNull)
-                   .toList();
-           List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemsRepository.findAllByProductId(id)
-                   .stream()
-                   .filter(Objects::nonNull)
-                   .toList();
-
-           if(!claims.isEmpty()){
-               List<Long> claimIds = claims.stream().map(Claim::getId).toList();
-               throw new IllegalArgumentException("No se puede eliminar un producto que posee reclamos registrados, elimine primeramente las reclamos con los siguientes IDs: " + claimIds.stream().map(String::valueOf).collect(Collectors.joining(", ")));
-           }
-
-            if(!purchaseOrderItems.isEmpty()){
-                List<Long> purchaseOrderItemIds = purchaseOrderItems.stream().map(PurchaseOrderItem::getId).toList();
-                throw new IllegalArgumentException("No se puede eliminar un producto que posee ordenes de compra registradas" + ", elimine primeramente las ordenes de compra con los siguientes IDs: " + purchaseOrderItemIds.stream().map(String::valueOf).collect(Collectors.joining(", ")));
-            }
-
-            if(!saleDetailsList.isEmpty()){
-               List<Long> saleIds = saleDetailsList.stream().map(sd -> sd.getSale().getId()).toList();
-               throw new IllegalArgumentException("No se puede eliminar un producto que posee ventas registradas, elimine primeramente las ventas con los siguientes IDs: " + saleIds.stream().map(String::valueOf).collect(Collectors.joining(", ")));
-           }
-
-
-        }
-        else{
-            throw new IllegalArgumentException("No existe un producto con ID: " + id);
-        }
-
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No existe un producto con ID: " + id));
+        validateDeleteProduct(saleDetailsList, claims, purchaseOrderItems);
 
         //Eliminar de los suppliers y supplierProducts
         product.getSuppliers().forEach(supplier -> supplier.getProducts().remove(product));
         product.getSupplierProducts().forEach(supplierProduct -> supplierProduct.setProduct(null));
 
         productRepository.deleteById(id);
+
     }
 
 }
