@@ -2,6 +2,7 @@ package com.shoesstore.shoesstore.service;
 
 import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.exception.InsufficientStockException;
+import com.shoesstore.shoesstore.exception.ProductServiceException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
 import org.springframework.stereotype.Service;
@@ -93,8 +94,15 @@ public class ProductService {
     public Product saveProduct(Product product) {
         // Validar que siempre venga ID desde el formulario
         if (product.getName() == null) {
-            throw new IllegalArgumentException("El ID del producto es obligatorio");
+            throw new ProductServiceException("El ID del producto es obligatorio");
         }
+        if (product.getPrice() <= 0) {
+            throw new ProductServiceException(("El precio debe ser mayor a 0");
+        }
+        if(product.getStock() <= 0){
+            throw new ProductServiceException(("El stock debe ser mayor a 0");
+        }
+
         return productRepository.save(product);
     }
 

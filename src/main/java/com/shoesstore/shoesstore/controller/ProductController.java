@@ -20,13 +20,12 @@ public class ProductController {
 
     private final ProductService productService;
 
-    // Inyección de dependencias
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
     @GetMapping
-    public String listarProductos(Model model) {
+    public String listProducts(Model model) {
         List<ProductWithSuppliersDTO> products = productService.getAllProductsWithSuppliers();
         model.addAttribute("products", products);
         model.addAttribute("title", "Productos");
@@ -38,7 +37,7 @@ public class ProductController {
     public String showProductForm(Model model) {
         model.addAttribute("allGenders", Product.Gender.values());
         model.addAttribute("product", new Product());
-        model.addAttribute("shoeSizes", Product.ShoeSize.values()); // Pasa los valores del enum
+        model.addAttribute("shoeSizes", Product.ShoeSize.values());
         model.addAttribute("view", "products/form");
         return "layout";
     }
@@ -49,7 +48,6 @@ public class ProductController {
             BindingResult result,
             Model model) {
 
-        // repoblamos tallas y la vista
         model.addAttribute("allSizes", Product.ShoeSize.values());
         model.addAttribute("view", "products/form");
 
@@ -57,17 +55,10 @@ public class ProductController {
         if (result.hasErrors()) {
             return "layout";
         }
-        if (product.getPrice() <= 0) {
-            throw new IllegalArgumentException("El precio debe ser mayor a 0");
-        }
-        if(product.getStock() <= 0){
-            throw new IllegalArgumentException("El stock debe ser mayor a 0");
-        }
 
         try {
             productService.saveProduct(product);
         } catch (IllegalArgumentException ex) {
-            // pasamos el mensaje de excepción al modelo
             model.addAttribute("error", ex.getMessage());
             return "layout";
         }
