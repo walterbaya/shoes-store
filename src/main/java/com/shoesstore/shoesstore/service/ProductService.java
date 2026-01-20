@@ -78,15 +78,6 @@ public class ProductService {
         return productRepository.save(existing);
     }
 
-    @Transactional
-    public void addOneToStock(Long id) {
-        if (id == null || !productRepository.existsById(id)) {
-            throw new ProductServiceException("No existe un producto con ID: " + id);
-        }
-
-        productRepository.addOneToStock(id);
-    }
-
     public Product saveProduct(Product product) {
         // Validar que siempre venga ID desde el formulario
         if (product.getId() == null) {
@@ -104,8 +95,7 @@ public class ProductService {
 
         return productRepository.save(product);
     }
-
-
+    
     private void validateDeleteProduct(List<SaleDetails> saleDetailsList, List<Claim> claims, List<PurchaseOrderItem> purchaseOrderItems) {
         if (!claims.isEmpty()) {
             String claimIds = claims.stream().map(c -> String.valueOf(c.getId())).collect(Collectors.joining(", "));
