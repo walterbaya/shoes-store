@@ -1,5 +1,7 @@
 package com.shoesstore.shoesstore.model;
 
+import com.shoesstore.shoesstore.model.enums.PaymentMethod;
+import com.shoesstore.shoesstore.model.enums.SaleChannel;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,8 +27,8 @@ public class Sale {
 
     private double shippingCost;
     private double discountPercentage;
-
     private double total;
+    private double totalWithShippingCost;
 
     private LocalDateTime saleDate = LocalDateTime.now();
 
@@ -35,10 +37,6 @@ public class Sale {
 
     @OneToOne(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
     private Claim claim;
-
-    public enum SaleChannel {
-        ONLINE, TIENDA;
-    }
 
 	public Long getId() {
 		return id;
@@ -96,7 +94,15 @@ public class Sale {
 		this.total = total;
 	}
 
-	public LocalDateTime getSaleDate() {
+    public double getTotalWithShippingCost() {
+        return totalWithShippingCost;
+    }
+
+    public void setTotalWithShippingCost(double totalWithShippingCost) {
+        this.totalWithShippingCost = totalWithShippingCost;
+    }
+
+    public LocalDateTime getSaleDate() {
 		return saleDate;
 	}
 

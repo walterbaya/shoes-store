@@ -95,7 +95,7 @@ public class ProductService {
 
         return productRepository.save(product);
     }
-    
+
     private void validateDeleteProduct(List<SaleDetails> saleDetailsList, List<Claim> claims, List<PurchaseOrderItem> purchaseOrderItems) {
         if (!claims.isEmpty()) {
             String claimIds = claims.stream().map(c -> String.valueOf(c.getId())).collect(Collectors.joining(", "));

@@ -1,9 +1,10 @@
 package com.shoesstore.shoesstore.controller;
 
-import com.shoesstore.shoesstore.model.PaymentMethod;
+import com.shoesstore.shoesstore.model.enums.PaymentMethod;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
+import com.shoesstore.shoesstore.model.enums.SaleChannel;
 import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
 import com.shoesstore.shoesstore.utils.SaleForm;
@@ -13,47 +14,40 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/sales")
-public class SalesController {
+public class SaleController {
 
     private ProductService productService;
     private SaleService saleService;
-    
-    public SalesController(SaleService saleService, ProductService productService) {
-    	this.saleService = saleService;
-    	this.productService = productService;
+
+    public SaleController(SaleService saleService, ProductService productService) {
+        this.saleService = saleService;
+        this.productService = productService;
     }
 
     @GetMapping
     public String listSales(Model model) {
-        List<Sale> sales = saleService.getAllSales();       // o findAll(), como lo tengas
+        List<Sale> sales = saleService.getAllSales();
+        double totalSalesSum = sales.stream().mapToDouble(Sale::getTotalWithShippingCost).sum();
+        Map<SaleChannel, Long> salesCountByChannel = sales.stream().collect(Collectors.groupingBy(Sale::getChannel, Collectors.counting()));
+        long onlineSalesCount = salesCountByChannel.getOrDefault(SaleChannel.ONLINE, 0L);
+        long storeSalesCount = salesCountByChannel.getOrDefault(SaleChannel.TIENDA, 0L);
+
         model.addAttribute("title", "Listado de Ventas");
         model.addAttribute("sales", sales);
-        double totalSalesSum = sales.stream().mapToDouble(Sale::getTotal).sum();
-        long onlineSalesCount = sales.stream()
-                                     .filter(sale -> "ONLINE".equalsIgnoreCase(sale.getChannel().toString()))
-                                     .count();
         model.addAttribute("onlineSalesCount", onlineSalesCount);
-        long storeSalesCount = sales.stream()
-                                    .filter(sale -> "TIENDA".equalsIgnoreCase(sale.getChannel().toString()))
-                                    .count();
-        model.addAttribute("totalSalesCount",onlineSalesCount + storeSalesCount);
+        model.addAttribute("totalSalesCount", sales.size());
         model.addAttribute("storeSalesCount", storeSalesCount);
         model.addAttribute("totalRevenue", String.format("%.2f", totalSalesSum));
-
-        sales.forEach(sale -> {
-            if(sale.getTotal() > 0) {
-                sale.setTotal(sale.getTotal() + sale.getShippingCost());
-            }
-        });
-
-        // Indica a layout.html qué fragmento renderizar
         model.addAttribute("view", "sales/list");
+
         return "layout";
     }
 
@@ -61,19 +55,6 @@ public class SalesController {
     @GetMapping("/{id}/details")
     public String getSaleDetail(@PathVariable Long id, Model model) {
         Sale sale = saleService.getSaleById(id);
-        sale.setTotal(sale.getTotal() + sale.getShippingCost());
-
-        if (sale == null) {
-            return "redirect:/sales";
-        }
-
-        // Calcular valores para el resumen
-        double subtotal = sale.getDetails().stream()
-                .mapToDouble(SaleDetails::getSubtotal)
-                .sum();
-        double discountAmount = subtotal * (sale.getDiscountPercentage() / 100);
-        double taxableAmount = subtotal - discountAmount;
-        double taxAmount = taxableAmount * 0.21; // IVA 21%
 
         model.addAttribute("sale", sale);
         model.addAttribute("products", sale.getDetails());
@@ -100,9 +81,8 @@ public class SalesController {
         // Agregar datos al modelo
         model.addAttribute("title", "Ventas");
         model.addAttribute("saleForm", saleForm);
-        model.addAttribute("channels", List.of("ONLINE", "TIENDA"));
+        model.addAttribute("channels", SaleChannel.values());
         model.addAttribute("products", products);
-
         model.addAttribute("view", "sales/newSale");
 
         return "layout";  // Vista Thymeleaf para nueva venta
@@ -117,7 +97,7 @@ public class SalesController {
             Model model) {
 
         if (result.hasErrors()) {
-            model.addAttribute("channels", Sale.SaleChannel.values());
+            model.addAttribute("channels", SaleChannel.values());
             model.addAttribute("products", productService.getAllProducts());
             model.addAttribute("view", "sales/list");
             redirectAttrs.addFlashAttribute("error", "Hubo un error al procesar la venta."); // ← flash
@@ -132,7 +112,7 @@ public class SalesController {
 
         if (!itemsToProcess.isEmpty()) {
             Sale sale = new Sale();
-            sale.setChannel(Sale.SaleChannel.valueOf(saleForm.getChannel()));
+            sale.setChannel(SaleChannel.valueOf(saleForm.getChannel()));
             sale.setSaleDate(LocalDateTime.now());
             sale.setTotal(saleForm.getTotal());
             sale.setDiscountPercentage(saleForm.getDiscountPercentage());
@@ -141,8 +121,7 @@ public class SalesController {
             saleService.processSale(sale, itemsToProcess);
 
             redirectAttrs.addFlashAttribute("success", "Venta registrada exitosamente."); // ← flash
-        }
-        else{
+        } else {
             redirectAttrs.addFlashAttribute("error", "No se pueden vender 0 o menos productos."); // ← flash
         }
         return "redirect:/sales";
@@ -150,16 +129,12 @@ public class SalesController {
 
     @DeleteMapping("/delete/{id}")
     public String deleteSale(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            saleService.deleteSale(id);
-            redirectAttributes.addFlashAttribute("success", "Venta eliminada correctamente");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar venta: " + e.getMessage());
-        }
+        saleService.deleteSale(id);
+        redirectAttributes.addFlashAttribute("success", "Venta eliminada correctamente");
         return "redirect:/sales";
     }
-    
-    
+
+
 }
 
 

@@ -1,6 +1,7 @@
 package com.shoesstore.shoesstore.controller;
 
 import com.shoesstore.shoesstore.model.*;
+import com.shoesstore.shoesstore.model.enums.PriorityCondition;
 import com.shoesstore.shoesstore.repository.PurchaseOrderAttachmentRepository;
 import com.shoesstore.shoesstore.service.*;
 import org.springframework.core.io.Resource;

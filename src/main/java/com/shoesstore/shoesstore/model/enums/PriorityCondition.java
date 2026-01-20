@@ -1,4 +1,4 @@
-package com.shoesstore.shoesstore.model;
+package com.shoesstore.shoesstore.model.enums;
 
 public enum PriorityCondition {
     NORMAL("Normal"),

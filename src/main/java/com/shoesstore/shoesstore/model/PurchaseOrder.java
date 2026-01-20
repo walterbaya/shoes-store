@@ -1,5 +1,6 @@
 package com.shoesstore.shoesstore.model;
 
+import com.shoesstore.shoesstore.model.enums.PriorityCondition;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

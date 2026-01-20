@@ -25,6 +25,12 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler(SaleServiceException.class)
+    public String handleSaleServiceException(SaleServiceException ex, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("error", "Error al eliminar venta: " + ex.getMessage());
+        return "redirect:/sales";
+    }
+
     //Exceptions para products
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseDto> handleBadRequest(IllegalArgumentException ex){

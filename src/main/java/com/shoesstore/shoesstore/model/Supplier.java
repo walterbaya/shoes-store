@@ -1,11 +1,11 @@
 package com.shoesstore.shoesstore.model;
 
+import com.shoesstore.shoesstore.model.enums.PaymentCondition;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import java.math.BigDecimal;
 import java.util.*;
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 

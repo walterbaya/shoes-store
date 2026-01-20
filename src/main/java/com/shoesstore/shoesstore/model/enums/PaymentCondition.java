@@ -1,6 +1,6 @@
-package com.shoesstore.shoesstore.model;
+package com.shoesstore.shoesstore.model.enums;
 
-public enum PaymentMethod {
+public enum PaymentCondition {
     EFECTIVO("Efectivo"),
     TRANSFERENCIA("Transferencia"),
     CHEQUE("Cheque"),
@@ -8,7 +8,7 @@ public enum PaymentMethod {
 
     private final String displayName;
 
-    PaymentMethod(String displayName) {
+    PaymentCondition(String displayName) {
         this.displayName = displayName;
     }
 
