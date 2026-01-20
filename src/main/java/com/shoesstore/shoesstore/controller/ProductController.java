@@ -56,12 +56,7 @@ public class ProductController {
             return "layout";
         }
 
-        try {
-            productService.saveProduct(product);
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", ex.getMessage());
-            return "layout";
-        }
+        productService.saveProduct(product);
 
         return "redirect:/products";
     }
@@ -90,25 +85,15 @@ public class ProductController {
             return "layout";
         }
 
-        try {
-            product.setId(id);  // aseguramos que venga el mismo ID de la URL
-            productService.updateProduct(product);
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", ex.getMessage());
-            return "layout";
-        }
+        product.setId(id);  // aseguramos que venga el mismo ID de la URL
+        productService.updateProduct(product);
 
         return "redirect:/products";
     }
 
     @DeleteMapping("/{id}")
     public String deleteProduct(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        try {
-            productService.deleteProduct(id);
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al eliminar el producto: " + e.getMessage());
-        }
-
+        productService.deleteProduct(id);
         return "redirect:/products";
     }
 

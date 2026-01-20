@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,6 +17,18 @@ public class GlobalExceptionHandler {
     public String handleStockError(InsufficientStockException ex, Model model) {
         model.addAttribute("error", ex.getMessage());
         return "error/stock-error";
+    }
+
+    @ExceptionHandler(ProductServiceException.class)
+    public String handleProductServiceException(ProductServiceException ex, Model model, RedirectAttributes redirectAttributes){
+        if(redirectAttributes != null){
+            redirectAttributes.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/products";
+        }
+        else{
+            model.addAttribute("error", ex.getMessage());
+            return "layout";
+        }
     }
 
     //Exceptions para products

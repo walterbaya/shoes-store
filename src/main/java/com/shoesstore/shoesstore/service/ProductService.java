@@ -66,7 +66,7 @@ public class ProductService {
     public Product updateProduct(Product product) {
         Long id = product.getId();
         if (id == null || !productRepository.existsById(id)) {
-            throw new IllegalArgumentException("No existe un producto con ID: " + id);
+            throw new ProductServiceException("No existe un producto con ID: " + id);
         }
         // Recupero el original y actualizo solo los campos editables
         Product existing = productRepository.findById(id).get();
@@ -97,10 +97,10 @@ public class ProductService {
             throw new ProductServiceException("El ID del producto es obligatorio");
         }
         if (product.getPrice() <= 0) {
-            throw new ProductServiceException(("El precio debe ser mayor a 0");
+            throw new ProductServiceException("El precio debe ser mayor a 0");
         }
         if(product.getStock() <= 0){
-            throw new ProductServiceException(("El stock debe ser mayor a 0");
+            throw new ProductServiceException("El stock debe ser mayor a 0");
         }
 
         return productRepository.save(product);
@@ -108,6 +108,10 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
+
+        if (!productRepository.existsById(id)) {
+            throw new ProductServiceException("El producto con ID " + id + " no existe");
+        }
 
         Optional<Product> optionalProduct = productRepository.findById(id);
 
