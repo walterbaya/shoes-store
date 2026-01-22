@@ -3,12 +3,16 @@ package com.shoesstore.shoesstore.service;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
-import com.shoesstore.shoesstore.utils.SaleItemForm;
+import com.shoesstore.shoesstore.dto.SaleItemForm;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,10 +38,24 @@ class SaleServiceTest {
     @InjectMocks
     private SaleService saleService;
 
+    @BeforeAll
+    static void setUpBeforeClass() throws Exception {
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getName()).thenReturn("testUser");
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
     @Test
     void processSale_shouldProcessCorrectly() {
+
         User user = new User();
         user.setId(1L);
+        user.setUsername("testUser");
+
         Product product = new Product();
         product.setId(1L);
         product.setPrice(10.0);
@@ -46,7 +64,6 @@ class SaleServiceTest {
         SaleItemForm itemForm = new SaleItemForm(1L, 2);
         List<SaleItemForm> items = List.of(itemForm);
 
-        when(customUserDetailsService.getCurrentUserName()).thenReturn("testUser");
         when(userService.getUserByUsername("testUser")).thenReturn(Optional.of(user));
         when(productService.getProductById(1L)).thenReturn(product);
         when(saleRepository.save(any(Sale.class))).thenAnswer(inv -> {
@@ -58,6 +75,7 @@ class SaleServiceTest {
         Sale result = saleService.processSale(sale, items);
 
         assertEquals(20.0, result.getTotal());
+        assertEquals("testUser", result.getUser().getUsername());
         verify(productService).updateStock(1L, 2);
         verify(saleDetailsRepository).save(any(SaleDetails.class));
     }
@@ -170,13 +188,21 @@ class SaleServiceTest {
     }
 
     @Test
-    void getSalesWithoutClaims_shouldFilterCorrectly() {
-        Sale s1 = new Sale(); s1.setTotal(100); s1.setClaim(null);
-        Sale s2 = new Sale(); s2.setTotal(50); s2.setClaim(new Claim());
-        Sale s3 = new Sale(); s3.setTotal(0); s3.setClaim(null);
-        when(saleRepository.findAll()).thenReturn(List.of(s1, s2, s3));
+    void getSalesWithoutClaims_shouldUseOptimizedRepositoryMethod() {
+        Sale s1 = new Sale();
+        s1.setTotal(100);
+        List<Sale> mockSales = List.of(s1);
+
+        // Configuramos el mock para el NUEVO método optimizado
+        when(saleRepository.findSalesWithTotalAndNoClaim()).thenReturn(mockSales);
+
         List<Sale> result = saleService.getSalesWithoutClaims();
+
         assertEquals(1, result.size());
-        assertEquals(s1, result.get(0));
+        
+        // Verificamos que se llame al método optimizado
+        verify(saleRepository).findSalesWithTotalAndNoClaim();
+        // Verificamos que NO se llame al método ineficiente
+        verify(saleRepository, never()).findAll();
     }
 }

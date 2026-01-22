@@ -4,17 +4,18 @@ import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.model.User;
-import com.shoesstore.shoesstore.repository.ClaimRepository;
+import com.shoesstore.shoesstore.model.enums.SaleChannel;
 import com.shoesstore.shoesstore.repository.SaleDetailsRepository;
 import com.shoesstore.shoesstore.repository.SaleRepository;
-import com.shoesstore.shoesstore.repository.UserRepository;
-import com.shoesstore.shoesstore.utils.SaleItemForm;
+import com.shoesstore.shoesstore.dto.SaleItemForm;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,21 +26,24 @@ public class SaleService {
     private final ProductService productService;
     private final SaleDetailsRepository saleDetailsRepository;
     private final UserService userService;
-    	
+
     public SaleService(SaleRepository saleRepository, ProductService productService,
-			SaleDetailsRepository saleDetailsRepository, UserService userService) {
-		this.saleRepository = saleRepository;
-		this.productService = productService;
-		this.saleDetailsRepository = saleDetailsRepository;
-		this.userService = userService;
-	}
+                       SaleDetailsRepository saleDetailsRepository, UserService userService) {
+        this.saleRepository = saleRepository;
+        this.productService = productService;
+        this.saleDetailsRepository = saleDetailsRepository;
+        this.userService = userService;
+    }
 
 
-	@Transactional
+    @Transactional
     public Sale processSale(Sale sale, List<SaleItemForm> itemsToProcess) {
         double totalSale = 0;
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
         List<SaleDetails> saleDetailsList = new ArrayList<>();
-        Optional<User> user = userService.getUserByUsername("username");
+
+        Optional<User> user = userService.getUserByUsername(username);
 
         for (SaleItemForm item : itemsToProcess) {
             productService.updateStock(item.getProductId(), item.getQuantity());
@@ -53,24 +57,20 @@ public class SaleService {
             saleDetailsList.add(saleDetails);
 
             totalSale += saleDetails.getSubtotal();
-
         }
 
         sale.setUser(user.get());
-        sale.setTotal(totalSale - totalSale * (sale.getDiscountPercentage()/100.0));
+        sale.setTotal(totalSale - totalSale * (sale.getDiscountPercentage() / 100.0));
 
         Sale res = saleRepository.save(sale);
 
-        saleDetailsList.forEach(saleDetails ->
-                {
-                    saleDetails.setSale(res);
-                    saleDetailsRepository.save(saleDetails);
-            }
-        );
+        saleDetailsList.forEach(saleDetails -> {
+            saleDetails.setSale(res);
+            saleDetailsRepository.save(saleDetails);
+        });
 
         return res;
     }
-
 
     public List<Sale> getSalesByDate(LocalDateTime startDate, LocalDateTime endDate) {
         // Si startDate o endDate son nulos, asignar valores por defecto
@@ -92,8 +92,7 @@ public class SaleService {
 
         if (sale.getClaim() != null) {
             throw new RuntimeException("No se puede eliminar una venta con un reclamo asociado, elimine primero el reclamo y posteriormente la venta.");
-        }
-        else {
+        } else {
 
             sale.getDetails().forEach(saleDetails -> {
                 productService.updateStock(saleDetails.getProduct().getId(), saleDetails.getQuantity());
@@ -102,7 +101,7 @@ public class SaleService {
             saleRepository.delete(sale);
         }
     }
-    
+
     public List<Object[]> getDailySalesData(LocalDateTime start, LocalDateTime end) {
         return saleRepository.findDailySalesByUser(start, end);
     }
@@ -116,8 +115,17 @@ public class SaleService {
     }
 
     public List<Sale> getSalesWithoutClaims() {
-        return saleRepository.findAll().stream()
-                .filter(sale -> sale.getTotal() > 0 && sale.getClaim() == null)
-                .collect(Collectors.toList());
+        return saleRepository.findSalesWithTotalAndNoClaim();
+    }
+
+    public double calculateTotalRevenue(List<Sale> sales) {
+        return sales.stream()
+                .mapToDouble(Sale::getTotalWithShippingCost)
+                .sum();
+    }
+
+    public Map<SaleChannel, Long> countSalesByChannel(List<Sale> sales) {
+        return sales.stream()
+                .collect(Collectors.groupingBy(Sale::getChannel, Collectors.counting()));
     }
 }

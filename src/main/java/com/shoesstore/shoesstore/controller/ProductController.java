@@ -1,11 +1,14 @@
 package com.shoesstore.shoesstore.controller;
 
-
+import com.shoesstore.shoesstore.dto.ProductDto;
 import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.service.CustomUserDetailsService;
+import com.shoesstore.shoesstore.model.enums.Gender;
+import com.shoesstore.shoesstore.model.enums.ShoeSize;
 import com.shoesstore.shoesstore.service.ProductService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,6 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+
+import static com.shoesstore.shoesstore.mapper.ProductMapper.convertToDto;
+import static com.shoesstore.shoesstore.mapper.ProductMapper.convertToEntity;
 
 @Controller
 @RequestMapping("/products")
@@ -35,27 +41,28 @@ public class ProductController {
 
     @GetMapping("/new")
     public String showProductForm(Model model) {
-        model.addAttribute("allGenders", Product.Gender.values());
-        model.addAttribute("product", new Product());
-        model.addAttribute("shoeSizes", Product.ShoeSize.values());
+        model.addAttribute("allGenders", Gender.values());
+        model.addAttribute("product", new ProductDto()); // Usamos DTO
+        model.addAttribute("shoeSizes", ShoeSize.values());
         model.addAttribute("view", "products/form");
         return "layout";
     }
 
     @PostMapping("/save")
     public String saveProduct(
-            @Valid @ModelAttribute("product") Product product,
+            @Valid @ModelAttribute("product") ProductDto productDto, // Recibimos DTO
             BindingResult result,
             Model model) {
 
-        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("allSizes", ShoeSize.values());
         model.addAttribute("view", "products/form");
 
-        // errores de validación estándar
         if (result.hasErrors()) {
+            model.addAttribute("allGenders", Gender.values()); // Re-enviar géneros si hay error
             return "layout";
         }
 
+        Product product = convertToEntity(productDto);
         productService.saveProduct(product);
 
         return "redirect:/products";
@@ -64,9 +71,11 @@ public class ProductController {
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         Product product = productService.getProductById(id);
-        model.addAttribute("allGenders", Product.Gender.values());
-        model.addAttribute("product", product);
-        model.addAttribute("allSizes", Product.ShoeSize.values()); // Si usas el enum de tallas
+        ProductDto productDto = convertToDto(product); // Convertimos a DTO para la vista
+
+        model.addAttribute("allGenders", Gender.values());
+        model.addAttribute("product", productDto);
+        model.addAttribute("allSizes", ShoeSize.values());
         model.addAttribute("view", "products/edit");
         return "layout";
     }
@@ -74,18 +83,20 @@ public class ProductController {
     @PutMapping("/update/{id}")
     public String updateProduct(
             @PathVariable Long id,
-            @Valid @ModelAttribute("product") Product product,
+            @Valid @ModelAttribute("product") ProductDto productDto, // Recibimos DTO
             BindingResult result,
             Model model) {
 
-        model.addAttribute("allSizes", Product.ShoeSize.values());
+        model.addAttribute("allSizes", ShoeSize.values());
         model.addAttribute("view", "products/edit");
 
         if (result.hasErrors()) {
+            model.addAttribute("allGenders", Gender.values());
             return "layout";
         }
 
-        product.setId(id);  // aseguramos que venga el mismo ID de la URL
+        Product product = convertToEntity(productDto);
+        product.setId(id);
         productService.updateProduct(product);
 
         return "redirect:/products";

@@ -1,26 +1,51 @@
 package com.shoesstore.shoesstore.dto;
 
 import com.shoesstore.shoesstore.model.Product;
-import com.shoesstore.shoesstore.model.Product.Gender;
-import com.shoesstore.shoesstore.model.Product.ShoeSize;
 import com.shoesstore.shoesstore.model.Supplier;
+import com.shoesstore.shoesstore.model.enums.Gender;
+import com.shoesstore.shoesstore.model.enums.ShoeSize;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ProductWithSuppliersDTO {
     private Long id;
+
+    @NotBlank(message = "El nombre es obligatorio")
     private Long name;
+
     private String description;
+
+    @NotBlank(message = "El color es obligatorio")
     private String color;
+
+    @NotBlank(message = "El tipo de artículo es obligatorio")
     private String type;
+
+    @NotBlank(message = "El material es obligatorio")
     private String material;
+
+    @NotBlank(message = "La marca es obligatoria")
     private String brand;
+
+    @NotNull(message = "La talla es obligatoria")
     private ShoeSize size;
+
+    @NotNull(message = "El precio es obligatorio")
+    @Min(value = 0, message = "El precio no puede ser negativo")
     private Double price;
+
+    @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock;
+
     private Set<String> supplierNames = new HashSet<>();
     private LocalDateTime createdAt;
+
+    @NotNull(message = "El género es obligatorio")
     private Gender gender;
 
     
@@ -44,8 +69,10 @@ public class ProductWithSuppliersDTO {
 
 
         // Extraer nombres de proveedores
-        for (Supplier supplier : product.getSuppliers()) {
-            this.supplierNames.add(supplier.getName());
+        if (product.getSuppliers() != null) {
+            for (Supplier supplier : product.getSuppliers()) {
+                this.supplierNames.add(supplier.getName());
+            }
         }
     }
     
@@ -61,7 +88,7 @@ public class ProductWithSuppliersDTO {
     }
 
     public String getGenderDisplay() {
-        return gender.getDisplayValue();
+        return gender != null ? gender.getDisplayValue() : "";
     }
 
 	public Long getId() {
@@ -120,6 +147,14 @@ public class ProductWithSuppliersDTO {
 		this.brand = brand;
 	}
 
+    public ShoeSize getSize() {
+        return size;
+    }
+
+    public void setSize(ShoeSize size) {
+        this.size = size;
+    }
+
 	public Double getPrice() {
 		return price;
 	}
@@ -150,5 +185,13 @@ public class ProductWithSuppliersDTO {
 
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
-	}    
+	}
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
 }

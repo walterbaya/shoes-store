@@ -1,4 +1,4 @@
-package com.shoesstore.shoesstore.utils;
+package com.shoesstore.shoesstore.dto;
 
 public class SaleItemForm {
     private Long productId;

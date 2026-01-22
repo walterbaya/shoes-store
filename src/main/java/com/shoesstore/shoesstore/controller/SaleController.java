@@ -3,12 +3,11 @@ package com.shoesstore.shoesstore.controller;
 import com.shoesstore.shoesstore.model.enums.PaymentMethod;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
-import com.shoesstore.shoesstore.model.SaleDetails;
 import com.shoesstore.shoesstore.model.enums.SaleChannel;
 import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
-import com.shoesstore.shoesstore.utils.SaleForm;
-import com.shoesstore.shoesstore.utils.SaleItemForm;
+import com.shoesstore.shoesstore.dto.SaleForm;
+import com.shoesstore.shoesstore.dto.SaleItemForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -35,8 +34,10 @@ public class SaleController {
     @GetMapping
     public String listSales(Model model) {
         List<Sale> sales = saleService.getAllSales();
-        double totalSalesSum = sales.stream().mapToDouble(Sale::getTotalWithShippingCost).sum();
-        Map<SaleChannel, Long> salesCountByChannel = sales.stream().collect(Collectors.groupingBy(Sale::getChannel, Collectors.counting()));
+
+        double totalSalesSum = saleService.calculateTotalRevenue(sales);
+        Map<SaleChannel, Long> salesCountByChannel = saleService.countSalesByChannel(sales);
+
         long onlineSalesCount = salesCountByChannel.getOrDefault(SaleChannel.ONLINE, 0L);
         long storeSalesCount = salesCountByChannel.getOrDefault(SaleChannel.TIENDA, 0L);
 
@@ -93,18 +94,16 @@ public class SaleController {
     public String registerSale(
             @ModelAttribute("saleForm") SaleForm saleForm,
             BindingResult result,
-            RedirectAttributes redirectAttrs,    // ← inyectamos RedirectAttributes
-            Model model) {
+            RedirectAttributes redirectAttrs,
+            Model model) { // ← 1. Inyectamos Principal
 
         if (result.hasErrors()) {
             model.addAttribute("channels", SaleChannel.values());
             model.addAttribute("products", productService.getAllProducts());
             model.addAttribute("view", "sales/list");
-            redirectAttrs.addFlashAttribute("error", "Hubo un error al procesar la venta."); // ← flash
-            return "redirect:/sales";  // ← redirect igual
+            redirectAttrs.addFlashAttribute("error", "Hubo un error al procesar la venta.");
+            return "redirect:/sales";
         }
-
-        // Filtrar ítems con qty > 0
 
         List<SaleItemForm> itemsToProcess = saleForm.getSaleItems().stream()
                 .filter(item -> item.getQuantity() != null && item.getQuantity() > 0)
@@ -118,11 +117,13 @@ public class SaleController {
             sale.setDiscountPercentage(saleForm.getDiscountPercentage());
             sale.setShippingCost(saleForm.getShippingCost());
             sale.setPaymentMethod(PaymentMethod.valueOf(saleForm.getPaymentMethod()));
+
+            // ← 2. Pasamos el nombre del usuario autenticado (principal.getName())
             saleService.processSale(sale, itemsToProcess);
 
-            redirectAttrs.addFlashAttribute("success", "Venta registrada exitosamente."); // ← flash
+            redirectAttrs.addFlashAttribute("success", "Venta registrada exitosamente.");
         } else {
-            redirectAttrs.addFlashAttribute("error", "No se pueden vender 0 o menos productos."); // ← flash
+            redirectAttrs.addFlashAttribute("error", "No se pueden vender 0 o menos productos.");
         }
         return "redirect:/sales";
     }

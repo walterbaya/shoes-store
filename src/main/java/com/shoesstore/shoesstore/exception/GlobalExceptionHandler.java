@@ -1,10 +1,7 @@
 package com.shoesstore.shoesstore.exception;
 
-import com.shoesstore.shoesstore.dto.ResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,50 +10,51 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Manejo específico para excepciones de negocio de Productos
     @ExceptionHandler(ProductServiceException.class)
-    public String handleProductServiceException(ProductServiceException ex, Model model, RedirectAttributes redirectAttributes){
-        if(redirectAttributes != null){
-            redirectAttributes.addFlashAttribute("error", ex.getMessage());
-            return "redirect:/products";
-        }
-        else{
-            model.addAttribute("error", ex.getMessage());
-            return "layout";
-        }
+    public String handleProductServiceException(ProductServiceException ex, RedirectAttributes redirectAttributes){
+        redirectAttributes.addFlashAttribute("error", ex.getMessage());
+        return "redirect:/products";
     }
 
+    // Manejo específico para excepciones de negocio de Ventas
     @ExceptionHandler(SaleServiceException.class)
     public String handleSaleServiceException(SaleServiceException ex, RedirectAttributes redirectAttributes){
-        redirectAttributes.addFlashAttribute("error", "Error al eliminar venta: " + ex.getMessage());
+        redirectAttributes.addFlashAttribute("error", "Error en venta: " + ex.getMessage());
         return "redirect:/sales";
     }
 
-    //Exceptions para products
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ResponseDto> handleBadRequest(IllegalArgumentException ex){
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ResponseDto("400", ex.getMessage()));
-    }
-
+    // Recurso no encontrado (ej. ID inválido en URL)
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ResponseDto> handleNotFound(EntityNotFoundException ex){
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ResponseDto("404", ex.getMessage()));
+    public String handleNotFound(EntityNotFoundException ex, Model model){
+        model.addAttribute("error", "Recurso no encontrado: " + ex.getMessage());
+        model.addAttribute("status", 404);
+        return "error"; // Asegúrate de tener una vista 'error.html' o 'layout' con mensaje
     }
 
-    public ResponseEntity<ResponseDto> handleInternalServerError(Exception ex){
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ResponseDto("500", ex.getMessage()));
+    // Argumentos inválidos (ej. parámetros mal formados)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleBadRequest(IllegalArgumentException ex, Model model){
+        model.addAttribute("error", "Solicitud inválida: " + ex.getMessage());
+        model.addAttribute("status", 400);
+        return "error";
     }
 
+    // Error de base de datos
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ResponseDto> handleServiceUnavailable(DataAccessException ex) {
-        return ResponseEntity
-                .status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(new ResponseDto("503", "Error en la base de datos"));
+    public String handleDatabaseException(DataAccessException ex, Model model) {
+        model.addAttribute("error", "Error de conexión con la base de datos. Intente más tarde.");
+        model.addAttribute("details", ex.getMessage());
+        model.addAttribute("status", 503);
+        return "error";
     }
 
+    // Manejador genérico para cualquier otra excepción no controlada (Error 500)
+    @ExceptionHandler(Exception.class)
+    public String handleGeneralException(Exception ex, Model model){
+        model.addAttribute("error", "Ha ocurrido un error inesperado.");
+        model.addAttribute("details", ex.getMessage()); // Ojo: en producción quizás no quieras mostrar esto
+        model.addAttribute("status", 500);
+        return "error";
+    }
 }

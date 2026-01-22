@@ -45,7 +45,7 @@ public class SaleApiController {
         ProductDto dto = new ProductDto();
         dto.setId(p.getId());;
         dto.setDescription(p.getDescription());
-        dto.setSize(p.getSize().name());
+        dto.setSize(p.getSize());
         dto.setPrice(p.getPrice());
         dto.setStock(p.getStock());
 
