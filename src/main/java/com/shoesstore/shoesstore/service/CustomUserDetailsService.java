@@ -23,10 +23,11 @@ public class CustomUserDetailsService implements org.springframework.security.co
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
 
+
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword()) // bcrypt con {bcrypt}
-                .roles(user.getRole().name()) // Spring agrega ROLE_
+                .authorities(user.getRole().getGrantedAuthorities()) // Usamos el método que devuelve roles y permisos
                 .build();
     }
 

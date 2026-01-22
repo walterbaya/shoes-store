@@ -79,10 +79,6 @@ public class ProductService {
     }
 
     public Product saveProduct(Product product) {
-        // Validar que siempre venga ID desde el formulario
-        if (product.getId() == null) {
-            throw new ProductServiceException("El ID del producto es obligatorio");
-        }
         if (product.getId() != null && productRepository.existsById(product.getId())) {
             throw new ProductServiceException("El producto con ID " + product.getId() + " ya existe");
         }

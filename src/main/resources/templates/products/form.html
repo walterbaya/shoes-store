@@ -82,7 +82,7 @@
                                 th:field="*{size}"
                                 required>
                             <option value="">Seleccionar talla</option>
-                            <option th:each="size : ${T(com.shoesstore.shoesstore.model.Product$ShoeSize).values()}"
+                            <option th:each="size : ${T(com.shoesstore.shoesstore.model.enums.ShoeSize).values()}"
                                     th:value="${size}"
                                     th:text="${size.displayValue}">
                             </option>

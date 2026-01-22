@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.cache.annotation.Cacheable; // Importación añadida
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +91,7 @@ public class SupplierService {
         }
     }
 
+    @Cacheable("suppliers") // Anotación añadida
     public List<Supplier> findAll() { return supplierRepository.findAll(); }
     public Supplier findById(Long id) { return supplierRepository.findById(id).orElse(null); }
 
@@ -101,5 +103,3 @@ public class SupplierService {
         supplierRepository.deleteById(id);
     }
 }
-
-

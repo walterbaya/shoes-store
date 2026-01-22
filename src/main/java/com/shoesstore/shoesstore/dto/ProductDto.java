@@ -3,14 +3,14 @@ package com.shoesstore.shoesstore.dto;
 import com.shoesstore.shoesstore.model.enums.Gender;
 import com.shoesstore.shoesstore.model.enums.ShoeSize;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 
 public class ProductDto {
     private Long id;
 
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotNull(message = "El código (name) es obligatorio")
     private Long name;
 
     @NotNull(message = "El género es obligatorio")
@@ -18,16 +18,16 @@ public class ProductDto {
 
     private String description;
 
-    @NotBlank(message = "El color es obligatorio")
+    @NotNull(message = "El color es obligatorio")
     private String color;
 
-    @NotBlank(message = "El tipo de artículo es obligatorio")
+    @NotNull(message = "El tipo de artículo es obligatorio")
     private String type;
 
-    @NotBlank(message = "El material es obligatorio")
+    @NotNull(message = "El material es obligatorio")
     private String material;
 
-    @NotBlank(message = "La marca es obligatoria")
+    @NotNull(message = "La marca es obligatoria")
     private String brand;
 
     @NotNull(message = "La talla es obligatoria")
@@ -40,11 +40,12 @@ public class ProductDto {
     @Min(value = 0, message = "El stock no puede ser negativo")
     private Integer stock = 0;
 
+    private LocalDateTime createdAt;
 
     public ProductDto() {
     }
 
-    public ProductDto(Long id, Long name, Gender gender, String description, String color, String type, String material, String brand, ShoeSize size, Double price, Integer stock) {
+    public ProductDto(Long id, Long name, Gender gender, String description, String color, String type, String material, String brand, ShoeSize size, Double price, Integer stock, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.gender = gender;
@@ -56,6 +57,7 @@ public class ProductDto {
         this.size = size;
         this.price = price;
         this.stock = stock;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -144,5 +146,13 @@ public class ProductDto {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

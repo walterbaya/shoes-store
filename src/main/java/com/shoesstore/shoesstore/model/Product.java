@@ -5,6 +5,8 @@ import com.shoesstore.shoesstore.model.enums.ShoeSize;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -13,7 +15,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "products")
-//@ToString(exclude = {"suppliers", "supplierProducts"})
+@EntityListeners(AuditingEntityListener.class) // Habilita auditoría
 public class Product {
 
     @Id
@@ -22,7 +24,7 @@ public class Product {
     private Long id;
 
     @Column(nullable = false)
-    private Long name;
+    private Long name; // Revertido a Long
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -54,6 +56,8 @@ public class Product {
     @Column(nullable = false)
     private Integer stock = 0;
 
+    @CreatedDate // Se llena automáticamente
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToMany
@@ -68,7 +72,7 @@ public class Product {
     private Set<SupplierProduct> supplierProducts = new HashSet<>();
 
     public Product() {
-        this.createdAt = LocalDateTime.now();
+        // createdAt se maneja automáticamente
     }
 
     public Product(Long id, Long name, Gender gender, String description,
@@ -92,7 +96,6 @@ public class Product {
         this.stock = stock;
         this.suppliers = suppliers;
         this.supplierProducts = supplierProducts;
-        this.createdAt = LocalDateTime.now();
     }
 
 

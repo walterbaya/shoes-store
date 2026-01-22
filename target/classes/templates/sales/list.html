@@ -1,166 +1,196 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <!-- Añadido el dialecto de seguridad -->
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Ventas</title>
+</head>
+<body>
+
 <div class="content card shadow order-card">
 
-                <!-- Mensaje de error -->
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+    <!-- Mensaje de error -->
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mt-3">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="h4 mb-0">
-                            <i class="bi bi-cash-coin me-2"></i>
-                            Listado de Ventas
-                        </h1>
-                        <a href="/sales/create" class="btn btn-light">
-                            <i class="bi bi-plus-circle me-1"></i> Nueva Venta
-                        </a>
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">
+                <i class="bi bi-cash-coin me-2"></i>
+                Listado de Ventas
+            </h1>
+            <!-- Botón "Nueva Venta" visible solo para ADMIN o SELLER -->
+            <a sec:authorize="hasAnyRole('ADMIN', 'SELLER')" href="/sales/create" class="btn btn-light">
+                <i class="bi bi-plus-circle me-1"></i> Nueva Venta
+            </a>
 
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Resumen Estadístico -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Total Ventas</h6>
+                                <div class="stat-number text-primary" th:text="${salesPage.totalElements}">0</div>
+                            </div>
+                            <div class="icon-circle bg-primary-light">
+                                <i class="bi bi-cart text-primary"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="card-body">
-                    <!-- Resumen Estadístico -->
-                    <div class="row mb-4">
-                        <div class="col-md-3 mb-3">
-                            <div class="card summary-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6 class="text-muted text-uppercase small">Total Ventas</h6>
-                                            <div class="stat-number text-primary" th:text="${totalSalesCount}">0</div>
-                                        </div>
-                                        <div class="icon-circle bg-primary-light">
-                                            <i class="bi bi-cart text-primary"></i>
-                                        </div>
-                                    </div>
-                                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Ventas Online</h6>
+                                <div class="stat-number text-success" th:text="${onlineSalesCount}">0</div>
                             </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card summary-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6 class="text-muted text-uppercase small">Ventas Online</h6>
-                                            <div class="stat-number text-success" th:text="${onlineSalesCount}">0</div>
-                                        </div>
-                                        <div class="icon-circle bg-success-light">
-                                            <i class="bi bi-globe text-success"></i>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="icon-circle bg-success-light">
+                                <i class="bi bi-globe text-success"></i>
                             </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card summary-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6 class="text-muted text-uppercase small">Ventas en Tienda</h6>
-                                            <div class="stat-number text-warning" th:text="${storeSalesCount}">0</div>
-                                        </div>
-                                        <div class="icon-circle bg-warning-light">
-                                            <i class="bi bi-shop text-warning"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card summary-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <h6 class="text-muted text-uppercase small">Ingresos Totales</h6>
-                                            <div class="stat-number text-info" th:text="'$' + ${totalRevenue}">$0</div>
-                                        </div>
-                                        <div class="icon-circle bg-info-light">
-                                            <i class="bi bi-currency-dollar text-info"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-center">
-                            <div class="indicator-square bg-warning">
-                                <i class="text-white"></i>
-                            </div>
-
-                            <span class="text-muted  small ms-2">ventas devueltas</span>
-
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Ventas en Tienda</h6>
+                                <div class="stat-number text-warning" th:text="${storeSalesCount}">0</div>
+                            </div>
+                            <div class="icon-circle bg-warning-light">
+                                <i class="bi bi-shop text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase small">Ingresos Totales</h6>
+                                <div class="stat-number text-info" th:text="'$' + ${totalRevenue}">$0</div>
+                            </div>
+                            <div class="icon-circle bg-info-light">
+                                <i class="bi bi-currency-dollar text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Tabla de ventas -->
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                            <tr>
-                                <th class="py-3">ID</th>
-                                <th class="py-3">Canal</th>
-                                <th class="py-3">Fecha</th>
-                                <th class="py-3">Usuario</th>
-                                <th class="py-3 text-end">Total</th>
-                                <th class="py-3">Acciones</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="sale : ${sales}" th:classappend="${sale.total == 0} ? 'table-warning' : ''">
-                                <td data-label="ID" th:text="${sale.id}"></td>
-                                <td data-label="Canal">
+            <div class="d-flex align-items-center">
+                <div class="indicator-square bg-warning">
+                    <i class="text-white"></i>
+                </div>
+
+                <span class="text-muted  small ms-2">ventas devueltas</span>
+
+            </div>
+        </div>
+
+        <!-- Tabla de ventas -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th class="py-3">ID</th>
+                    <th class="py-3">Canal</th>
+                    <th class="py-3">Fecha</th>
+                    <th class="py-3">Usuario</th>
+                    <th class="py-3 text-end">Total</th>
+                    <th class="py-3">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="sale : ${sales}" th:classappend="${sale.total == 0} ? 'table-warning' : ''">
+                    <td data-label="ID" th:text="${sale.id}"></td>
+                    <td data-label="Canal">
                                     <span class="channel-badge" th:classappend="${sale.channel.name() == 'ONLINE'} ? 'badge-online' : 'badge-store'">
                                         <i class="bi" th:class="${sale.channel.name() == 'ONLINE'} ? 'bi-globe' : 'bi-shop'"></i>
                                         <span th:text="${sale.channel}"></span>
                                     </span>
-                                </td>
-                                <td data-label="Fecha" th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
-                                <td data-label="Usuario" th:text="${sale.user.username}"></td>
-                                <td data-label="Total" class="text-end fw-bold total-cell" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></td>
-                                <td data-label="Acciones" class="action-cell">
-                                    <a th:href="@{'/sales/' + ${sale.id} + '/details'}"
-                                       class="action-btn view-btn"
-                                       title="Ver detalle"
-                                       data-bs-toggle="tooltip">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
+                    </td>
+                    <td data-label="Fecha" th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td data-label="Usuario" th:text="${sale.user.username}"></td>
+                    <td data-label="Total" class="text-end fw-bold total-cell" th:text="${'$' + #numbers.formatDecimal(sale.total, 1, 2)}"></td>
+                    <td data-label="Acciones" class="action-cell">
+                        <a th:href="@{'/sales/' + ${sale.id} + '/details'}"
+                           class="action-btn view-btn"
+                           title="Ver detalle"
+                           data-bs-toggle="tooltip">
+                            <i class="bi bi-eye"></i>
+                        </a>
 
-                                    <form method="post"
-                                          th:action="@{'/sales/delete/' + ${sale.id}}"
-                                          style="display:inline-block"
-                                          >
-                                        <input type="hidden" name="_method" value="delete">
-                                        <button type="submit"
-                                                class="action-btn btn btn-sm btn-danger"
-                                                title="Eliminar"
-                                                data-bs-toggle="tooltip"
-                                                onclick="return confirm('¿Estas seguro de eliminar esta venta?');">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                        <!-- Botón "Eliminar" visible solo para ADMIN -->
+                        <form sec:authorize="hasRole('ADMIN')" method="post"
+                              th:action="@{'/sales/delete/' + ${sale.id}}"
+                              style="display:inline-block"
+                        >
+                            <input type="hidden" name="_method" value="delete">
+                            <button type="submit"
+                                    class="action-btn btn btn-sm btn-danger"
+                                    title="Eliminar"
+                                    data-bs-toggle="tooltip"
+                                    onclick="return confirm('¿Estas seguro de eliminar esta venta?');">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
 
-                                </td>
-                            </tr>
+                    </td>
+                </tr>
 
-                            <!-- Estado cuando no hay ventas -->
-                            <tr th:if="${sales == null || sales.isEmpty()}">
-                                <td colspan="6">
-                                    <div class="no-sales">
-                                        <i class="bi bi-receipt"></i>
-                                        <h4>No se encontraron ventas</h4>
-                                        <p>No hay registros de ventas en el sistema</p>
-                                        <a href="/sales/create" class="btn btn-primary mt-2">
-                                            <i class="bi bi-plus-circle me-1"></i> Crear primera venta
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                <!-- Estado cuando no hay ventas -->
+                <tr th:if="${sales == null || sales.isEmpty()}">
+                    <td colspan="6">
+                        <div class="no-sales">
+                            <i class="bi bi-receipt"></i>
+                            <h4>No se encontraron ventas</h4>
+                            <p>No hay registros de ventas en el sistema</p>
+                            <a sec:authorize="hasAnyRole('ADMIN', 'SELLER')" href="/sales/create" class="btn btn-primary mt-2">
+                                <i class="bi bi-plus-circle me-1"></i> Crear primera venta
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Controles de Paginación -->
+        <nav aria-label="Page navigation" th:if="${salesPage.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <!-- Botón "Anterior" -->
+                <li class="page-item" th:classappend="${salesPage.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/sales(page=${salesPage.number - 1}, size=${salesPage.size})}">Anterior</a>
+                </li>
+                <!-- Números de página -->
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, salesPage.totalPages - 1)}" th:classappend="${i == salesPage.number} ? 'active'">
+                    <a class="page-link" th:href="@{/sales(page=${i}, size=${salesPage.size})}" th:text="${i + 1}"></a>
+                </li>
+                <!-- Botón "Siguiente" -->
+                <li class="page-item" th:classappend="${salesPage.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/sales(page=${salesPage.number + 1}, size=${salesPage.size})}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</div>
 
 
 <script>

@@ -29,10 +29,6 @@ public class ClaimService {
 		this.saleDetailsRepository = saleDetailsRepository;
 	}
 
-	// Tenemos que crear el reclamo, esto significa establecer las cantidades que se van a querer eliminar de las ventas
-    // Todas las claims tienen asociadas una venta y un conjunto de productos que se quieren actualizar en la venta
-    // Al crear la claim podría eliminarse en algun momento supongo, por lo tanto los items no deberia borrarse instantamente
-    //sino cuando ya se procesaron y se saben que se van a descontar
     @Transactional
     public Claim createClaim(Long saleId, String description, Map<Long, Integer> claimItems) {
         Sale sale = saleRepository.findById(saleId)
@@ -44,11 +40,7 @@ public class ClaimService {
         claim.setState(Claim.State.INITIATED);
         claim.setCreatedAt(LocalDateTime.now());
 
-        //claimItems tiene el id del saleDetail y la cantidad
-
         List<ClaimDetails> claimDetails = new ArrayList<>();
-
-        //Armo los claim details
 
         claimItems.keySet().forEach(id -> {
             ClaimDetails claimDetail = new ClaimDetails();
@@ -64,54 +56,62 @@ public class ClaimService {
         claim.setClaimDetails(claimDetails);
 
         return claimRepository.save(claim);
-
     }
 
-    // Subir comprobante de despacho
     @Transactional
     public Claim uploadProof(Long claimId, String fileName) {
         Claim claim = getClaimById(claimId);
-        claim.uploadProof(fileName); // Solo almacena el nombre del archivo
+        
+        if (claim.getState() != Claim.State.INITIATED) {
+            throw new IllegalStateException("Solo se puede subir comprobante en estado INICIADO");
+        }
+        
+        claim.setShippingProofUrl(fileName);
+        claim.setState(Claim.State.PROOF_UPLOADED);
+        claim.setProofUploadedDate(LocalDateTime.now());
+        
         return claimRepository.save(claim);
     }
-    // Aprobar devolución y procesar reembolso
 
     @Transactional
     public Claim approveRefund(Long claimId) {
         Claim claim = getClaimById(claimId);
-        claim.approveRefund();
+        
+        if (claim.getState() != Claim.State.PROOF_UPLOADED) {
+            throw new IllegalStateException("El comprobante debe estar subido y en espera de aprobación");
+        }
+        
+        claim.setState(Claim.State.REFUND_PROCESSED);
+        claim.setRefundProcessedDate(LocalDateTime.now());
 
         //Actualizamos los detalles
-
         claim.getClaimDetails().forEach(claimDetail -> {
-
             //Actualizamos ahora el subtotal
             claimDetail.getSaleDetails().setSubtotal(claimDetail.getSaleDetails().getSubtotal() - claimDetail.getSaleDetails().getProduct().getPrice() * claimDetail.getQuantity());
-
         });
-
-
-        //Revisamos si la venta quedo sin ninguno de los detalles
 
         //En otro caso Actualizamos ahora la venta, cambiando el total
         Sale sale = claim.getSale();
         sale.setTotal(sale.getTotal() - calculateRefundAmount(claim).doubleValue());
 
-        return claim;
+        return claim; // Se guarda automáticamente al final de la transacción
     }
 
-    // Recibir paquete y actualizar stock
     @Transactional
     public Claim receivePackage(Long claimId) {
-        System.out.println("El claim id en receive package es: " + claimId);
         Claim claim = getClaimById(claimId);
-        claim.receivePackage();
+        
+        if (claim.getState() != Claim.State.REFUND_PROCESSED) {
+            throw new IllegalStateException("Debe haberse procesado el reembolso antes de recibir el paquete");
+        }
+        
+        claim.setState(Claim.State.PACKAGE_RECEIVED);
+        claim.setPackageReceivedDate(LocalDateTime.now());
 
         // Actualizar el stock de los productos
         updateProductStock(claim);
 
         //Actualizamos los detalles
-
         claim.getClaimDetails().forEach(claimDetail -> {
             //Actualizamos la cantidad
             claimDetail.getSaleDetails().setQuantity(claimDetail.getSaleDetails().getQuantity() - claimDetail.getQuantity());
@@ -123,9 +123,7 @@ public class ClaimService {
             if(claimDetail.getSaleDetails().getQuantity() < 0){
                 throw new IllegalArgumentException("La cantidad reclamada no puede ser mayor a la comprada");
             }
-
         });
-
 
         //Revisamos si la venta quedo sin ninguno de los detalles
         if(claim.getSale().getDetails() == null || claim.getSale().getDetails().isEmpty() ) {
@@ -134,10 +132,8 @@ public class ClaimService {
         }
 
         return claim;
-
     }
 
-    //Obtener todos los reclamos
     public List<Claim> getAllClaims() {
         return claimRepository.findAll();
     }
@@ -152,16 +148,10 @@ public class ClaimService {
     }
 
     private void updateProductStock(Claim claim) {
-// Actualizar el stock de los productos
-        //Obtengo los detalles del claim
         claim.getClaimDetails().forEach(detail -> {
-            //se obtiene el producto que se debe actualizar
             detail.getSaleDetails().getProduct()
-                    //le seteamos el stock
                     .setStock(detail.getSaleDetails().getProduct().getStock() + detail.getQuantity());
-
         });
-
     }
 
     private BigDecimal calculateRefundAmount(Claim claim) {
@@ -196,11 +186,9 @@ public class ClaimService {
             detail.getSaleDetails().setClaim(null);
         });
         if (sale != null) {
-            sale.setClaim(null); // Si tenés `sale.claim`
+            sale.setClaim(null);
         }
-
 
         claimRepository.delete(claim);
     }
-
 }

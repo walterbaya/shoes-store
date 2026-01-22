@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Table(name = "claim")
@@ -23,19 +22,17 @@ public class Claim {
 
     private String description;
 
-    // Nuevo campo para almacenar la URL del comprobante de despacho
+    // Almacena solo el nombre del archivo
     private String shippingProofUrl;
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "El estado es obligatorio")
     @Column(nullable = false)
-    private State state = State.INITIATED;  // Valor por defecto
+    private State state = State.INITIATED;
 
     @NotNull(message = "Es obligatorio tener una fecha de inicio para el reclamo")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-
-    // Nuevos campos para registrar fechas de cada etapa
     private LocalDateTime proofUploadedDate;
     private LocalDateTime refundProcessedDate;
     private LocalDateTime packageReceivedDate;
@@ -51,111 +48,85 @@ public class Claim {
         public String getDisplayValue() { return displayValue; }
     }
 
-    // Métodos para manejar las transiciones de estado
-    public void uploadProof(String proofUrl) {
-        if (this.state != State.INITIATED) {
-            throw new IllegalStateException("Solo se puede subir comprobante en estado INICIADO");
-        }
-        this.shippingProofUrl = proofUrl;
-        this.state = State.PROOF_UPLOADED;
-        this.proofUploadedDate = LocalDateTime.now();
+    // Getters y Setters (POJO puro)
+
+    public Long getId() {
+        return id;
     }
 
-    public void approveRefund() {
-        if (this.state != State.PROOF_UPLOADED) {
-            throw new IllegalStateException("El comprobante debe estar subido y en espera de aprobación");
-        }
-        this.state = State.REFUND_PROCESSED;
-        this.refundProcessedDate = LocalDateTime.now();
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void receivePackage() {
-        if (this.state != State.REFUND_PROCESSED) {
-            throw new IllegalStateException("Debe haberse procesado el reembolso antes de recibir el paquete");
-        }
-        this.state = State.PACKAGE_RECEIVED;
-        this.packageReceivedDate = LocalDateTime.now();
+    public Sale getSale() {
+        return sale;
     }
 
-    // Getter para la URL completa
+    public void setSale(Sale sale) {
+        this.sale = sale;
+    }
+
+    public List<ClaimDetails> getClaimDetails() {
+        return claimDetails;
+    }
+
+    public void setClaimDetails(List<ClaimDetails> claimDetails) {
+        this.claimDetails = claimDetails;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getShippingProofUrl() {
-        return "/uploads/" + shippingProofUrl;
+        return shippingProofUrl;
     }
 
-	public Long getId() {
-		return id;
-	}
+    public void setShippingProofUrl(String shippingProofUrl) {
+        this.shippingProofUrl = shippingProofUrl;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public State getState() {
+        return state;
+    }
 
-	public Sale getSale() {
-		return sale;
-	}
+    public void setState(State state) {
+        this.state = state;
+    }
 
-	public void setSale(Sale sale) {
-		this.sale = sale;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public List<ClaimDetails> getClaimDetails() {
-		return claimDetails;
-	}
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public void setClaimDetails(List<ClaimDetails> claimDetails) {
-		this.claimDetails = claimDetails;
-	}
+    public LocalDateTime getProofUploadedDate() {
+        return proofUploadedDate;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setProofUploadedDate(LocalDateTime proofUploadedDate) {
+        this.proofUploadedDate = proofUploadedDate;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public LocalDateTime getRefundProcessedDate() {
+        return refundProcessedDate;
+    }
 
-	public State getState() {
-		return state;
-	}
+    public void setRefundProcessedDate(LocalDateTime refundProcessedDate) {
+        this.refundProcessedDate = refundProcessedDate;
+    }
 
-	public void setState(State state) {
-		this.state = state;
-	}
+    public LocalDateTime getPackageReceivedDate() {
+        return packageReceivedDate;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getProofUploadedDate() {
-		return proofUploadedDate;
-	}
-
-	public void setProofUploadedDate(LocalDateTime proofUploadedDate) {
-		this.proofUploadedDate = proofUploadedDate;
-	}
-
-	public LocalDateTime getRefundProcessedDate() {
-		return refundProcessedDate;
-	}
-
-	public void setRefundProcessedDate(LocalDateTime refundProcessedDate) {
-		this.refundProcessedDate = refundProcessedDate;
-	}
-
-	public LocalDateTime getPackageReceivedDate() {
-		return packageReceivedDate;
-	}
-
-	public void setPackageReceivedDate(LocalDateTime packageReceivedDate) {
-		this.packageReceivedDate = packageReceivedDate;
-	}
-
-	public void setShippingProofUrl(String shippingProofUrl) {
-		this.shippingProofUrl = shippingProofUrl;
-	}
-
+    public void setPackageReceivedDate(LocalDateTime packageReceivedDate) {
+        this.packageReceivedDate = packageReceivedDate;
+    }
 }

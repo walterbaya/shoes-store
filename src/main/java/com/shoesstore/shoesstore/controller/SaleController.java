@@ -8,6 +8,9 @@ import com.shoesstore.shoesstore.service.ProductService;
 import com.shoesstore.shoesstore.service.SaleService;
 import com.shoesstore.shoesstore.dto.SaleForm;
 import com.shoesstore.shoesstore.dto.SaleItemForm;
+import org.springframework.data.domain.Page; // <-- Importar Page
+import org.springframework.data.domain.Pageable; // <-- Importar Pageable
+import org.springframework.data.web.PageableDefault; // <-- Importar PageableDefault
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,8 +35,12 @@ public class SaleController {
     }
 
     @GetMapping
-    public String listSales(Model model) {
-        List<Sale> sales = saleService.getAllSales();
+    public String listSales(
+            Model model,
+            @PageableDefault(size = 10, sort = "saleDate", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable // <-- Añadir Pageable
+    ) {
+        Page<Sale> salesPage = saleService.getAllSales(pageable); // <-- Usar el nuevo método paginado
+        List<Sale> sales = salesPage.getContent(); // Obtener el contenido de la página
 
         double totalSalesSum = saleService.calculateTotalRevenue(sales);
         Map<SaleChannel, Long> salesCountByChannel = saleService.countSalesByChannel(sales);
@@ -42,9 +49,10 @@ public class SaleController {
         long storeSalesCount = salesCountByChannel.getOrDefault(SaleChannel.TIENDA, 0L);
 
         model.addAttribute("title", "Listado de Ventas");
-        model.addAttribute("sales", sales);
+        model.addAttribute("salesPage", salesPage); // <-- Pasar el objeto Page completo a la vista
+        model.addAttribute("sales", sales); // También pasamos la lista para compatibilidad con el código existente
         model.addAttribute("onlineSalesCount", onlineSalesCount);
-        model.addAttribute("totalSalesCount", sales.size());
+        model.addAttribute("totalSalesCount", salesPage.getTotalElements()); // <-- Usar el total de elementos de la página
         model.addAttribute("storeSalesCount", storeSalesCount);
         model.addAttribute("totalRevenue", String.format("%.2f", totalSalesSum));
         model.addAttribute("view", "sales/list");
@@ -137,5 +145,3 @@ public class SaleController {
 
 
 }
-
-

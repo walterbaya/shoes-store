@@ -17,7 +17,7 @@ public class PurchaseOrder {
     private Long id;
 
     private LocalDate generatedDate;
-    private LocalDate dispatchDate;
+    private LocalDate dispatchDate; // Corresponde a deliveryDate del DTO
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority_condition", nullable = false)
@@ -31,7 +31,13 @@ public class PurchaseOrder {
     @Min(0)
     private BigDecimal total;
 
-    private String additionalInformation;
+    private String additionalInformation; // Este campo no se usa en el DTO, pero se mantiene
+
+    @Column(length = 500) // Añadido campo para notas
+    private String notes;
+
+    @Column(nullable = false, length = 255) // Añadido campo para dirección de entrega
+    private String deliveryAddress;
 
     @OneToOne(
             mappedBy = "order",
@@ -133,6 +139,22 @@ public class PurchaseOrder {
 		this.additionalInformation = additionalInformation;
 	}
 
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
 	public boolean isCompleted() {
 		return completed;
 	}
@@ -185,10 +207,11 @@ public class PurchaseOrder {
 		return attachment;
 	}
 
+    // Constructor completo (actualizado con nuevos campos)
 	public PurchaseOrder(Long id, LocalDate generatedDate, LocalDate dispatchDate, PriorityCondition priorityCondition,
-			@Min(0) BigDecimal iva, @Min(0) BigDecimal total, String additionalInformation,
+			BigDecimal iva, BigDecimal total, String additionalInformation, String notes, String deliveryAddress,
 			PurchaseOrderAttachment attachment, boolean completed, Supplier supplier, List<PurchaseOrderItem> items,
-			User user, @Min(0) @Max(100) BigDecimal discount, @Min(0) BigDecimal shippingCost) {
+			User user, BigDecimal discount, BigDecimal shippingCost) {
 		super();
 		this.id = id;
 		this.generatedDate = generatedDate;
@@ -197,6 +220,8 @@ public class PurchaseOrder {
 		this.iva = iva;
 		this.total = total;
 		this.additionalInformation = additionalInformation;
+		this.notes = notes;
+		this.deliveryAddress = deliveryAddress;
 		this.attachment = attachment;
 		this.completed = completed;
 		this.supplier = supplier;

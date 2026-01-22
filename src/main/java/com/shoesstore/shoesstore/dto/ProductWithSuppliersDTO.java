@@ -5,7 +5,6 @@ import com.shoesstore.shoesstore.model.Supplier;
 import com.shoesstore.shoesstore.model.enums.Gender;
 import com.shoesstore.shoesstore.model.enums.ShoeSize;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -15,21 +14,21 @@ import java.util.Set;
 public class ProductWithSuppliersDTO {
     private Long id;
 
-    @NotBlank(message = "El nombre es obligatorio")
-    private Long name;
+    @NotNull(message = "El código (name) es obligatorio")
+    private Long name; // Revertido a Long
 
     private String description;
 
-    @NotBlank(message = "El color es obligatorio")
+    @NotNull(message = "El color es obligatorio")
     private String color;
 
-    @NotBlank(message = "El tipo de artículo es obligatorio")
+    @NotNull(message = "El tipo de artículo es obligatorio")
     private String type;
 
-    @NotBlank(message = "El material es obligatorio")
+    @NotNull(message = "El material es obligatorio")
     private String material;
 
-    @NotBlank(message = "La marca es obligatoria")
+    @NotNull(message = "La marca es obligatoria")
     private String brand;
 
     @NotNull(message = "La talla es obligatoria")

@@ -1,5 +1,6 @@
 package com.shoesstore.shoesstore.model;
 
+import com.shoesstore.shoesstore.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -52,10 +53,6 @@ public class User {
     )
     private List<PurchaseOrder> ordenes = new ArrayList<>();
 
-    public enum Role {
-        ADMIN, SELLER, STOCK_MANAGER
-    }
-    
     //Deberia ir protected pero para mantener el funcionamiento en el codigo actual
     //es importante
     public User() {
