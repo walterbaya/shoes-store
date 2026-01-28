@@ -1,0 +1,10 @@
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/ShoesstoreApplicationTests.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/controller/SaleControllerTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/security/PasswordEncoderTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/ClaimServiceTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/ProductServiceTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/PurchaseOrderTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/ReportServiceTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/SaleServiceTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/SupplierServiceTest.java
+/home/walter/Escritorio/shoes-store/src/test/java/com/shoesstore/shoesstore/service/UserServiceTest.java

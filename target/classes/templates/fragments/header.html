@@ -1,45 +1,103 @@
-<nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4" th:fragment="header">
+<nav class="navbar navbar-expand-lg bg-dark shadow-sm px-4" th:fragment="header">
     <div class="container-fluid">
-        <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center fw-bold me-4" th:href="@{/dashboard}">
-            <i class="bi bi-boot me-2"></i>
-            <span class="d-none d-sm-inline">Gestión Calzado</span>
-        </a>
+        <div class="px-4 py-3 row">
+            <div class="d-flex align-items-between justify-content-between gap-3">
+                <div class="brand-icon bg-dark text-white p-2 mp-2 rounded">
+                    <i class="bi bi-shop text-white fs-4"></i>
+                </div>
+                <h5 class="mb-0 text-white fw-bold">Shoes Store</h5>
+            </div>
 
-        <!-- Breadcrumb / Page title -->
-        <div class="d-none d-md-flex align-items-center me-auto">
-            <ul class="breadcrumb mb-0 bg-transparent p-0">
-                <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Inicio</a></li>
-                <li class="breadcrumb-item active" aria-current="page" th:text="${title}"></li>
+            <ul class="navbar-nav align-items-center ms-auto gap-3">
+                <li class="nav-item d-none d-md-block text-secondary small">
+                    <!-- Sample date/time -->
+                    <i class="bi bi-calendar3 me-1"></i><span th:text="${#calendars.format(#calendars.createNow(), 'dd MMM yyyy HH:mm')}"></span>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="btn dropdown-toggle d-flex align-items-center p-1" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-5 me-2"></i>
+                        <span class="d-none d-md-inline" th:text="${username}">Usuario</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <form action="/logout" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item d-flex align-items-center">
+                                    <i class="bi bi-box-arrow-right me-2 text-danger"></i>
+                                    Cerrar Sesión
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
-        <!-- Search bar --
+        <div class="pt-3">
+            <ul class="nav d-flex gap-1 px-3">
+                <!-- Elementos de menú -->
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/dashboard}">
+                        <span class="fw-medium">Dashboard</span>
+                    </a>
+                </li>
 
-        <!-- Extras: date, notifications, help, user -->
-        <ul class="navbar-nav align-items-center ms-auto gap-3">
-            <li class="nav-item d-none d-md-block text-secondary small">
-                <!-- Sample date/time -->
-                <i class="bi bi-calendar3 me-1"></i><span th:text="${#calendars.format(#calendars.createNow(), 'dd MMM yyyy HH:mm')}"></span>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="btn dropdown-toggle d-flex align-items-center p-1" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle fs-5 me-2"></i>
-                    <span class="d-none d-md-inline" th:text="${username}">Usuario</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                    <li>
-                        <form action="/logout" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                            <button type="submit" class="dropdown-item d-flex align-items-center">
-                                <i class="bi bi-box-arrow-right me-2 text-danger"></i>
-                                Cerrar Sesión
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/products}">
+                        <span class="fw-medium">Productos</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/suppliers}">
+                        <span class="fw-medium">Proveedores</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/orders}">
+                        <span class="fw-medium">Compras</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasAnyRole('ADMIN','SELLER')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/sales}">
+                        <span class="fw-medium">Ventas</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/reports/sales}">
+                        <span class="fw-medium">Reportes</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/claims}">
+
+                        <span class="fw-medium">Reclamos y Devoluciones</span>
+                    </a>
+                </li>
+
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link d-flex align-items-center gap-3 py-3 rounded-3 menu-item"
+                       th:href="@{/users}">
+
+                        <span class="fw-medium">Manejo de Usuarios</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+
     </div>
 </nav>
 
