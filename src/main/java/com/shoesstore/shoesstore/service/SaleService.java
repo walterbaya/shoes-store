@@ -1,6 +1,6 @@
 package com.shoesstore.shoesstore.service;
 
-import com.shoesstore.shoesstore.events.SaleCreatedEvent; // <-- Importar el evento
+import com.shoesstore.shoesstore.events.SaleCreatedEvent;
 import com.shoesstore.shoesstore.model.Product;
 import com.shoesstore.shoesstore.model.Sale;
 import com.shoesstore.shoesstore.model.SaleDetails;
@@ -11,11 +11,11 @@ import com.shoesstore.shoesstore.repository.SaleRepository;
 import com.shoesstore.shoesstore.dto.SaleItemForm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize; // Importación añadida
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.ApplicationEventPublisher; // <-- Importar esto
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,6 +27,10 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Servicio para la lógica de negocio de las ventas.
+ * Implementa el rol de "Publisher" en el Patrón Observador.
+ */
 @Service
 public class SaleService {
 
@@ -36,16 +40,16 @@ public class SaleService {
     private final ProductService productService;
     private final SaleDetailsRepository saleDetailsRepository;
     private final UserService userService;
-    private final ApplicationEventPublisher eventPublisher; // <-- Inyectar
+    private final ApplicationEventPublisher eventPublisher;
 
     public SaleService(SaleRepository saleRepository, ProductService productService,
                        SaleDetailsRepository saleDetailsRepository, UserService userService,
-                       ApplicationEventPublisher eventPublisher) { // <-- Añadir al constructor
+                       ApplicationEventPublisher eventPublisher) {
         this.saleRepository = saleRepository;
         this.productService = productService;
         this.saleDetailsRepository = saleDetailsRepository;
         this.userService = userService;
-        this.eventPublisher = eventPublisher; // <-- Asignar
+        this.eventPublisher = eventPublisher;
     }
 
 
@@ -92,8 +96,13 @@ public class SaleService {
             logger.debug("Detalle de venta para producto {} guardado.", saleDetails.getProduct().getName());
         });
 
-        // Publicar el evento después de que la venta y sus detalles se hayan guardado
-        eventPublisher.publishEvent(new SaleCreatedEvent(this, res)); // <-- Publicar evento
+        /**
+         * Patrón Observador (Publisher):
+         * Después de completar la lógica principal (guardar la venta), se publica un evento.
+         * Esto desacopla la lógica de venta de las acciones secundarias (como enviar notificaciones).
+         * Otros componentes pueden "suscribirse" a este evento sin que este servicio los conozca.
+         */
+        eventPublisher.publishEvent(new SaleCreatedEvent(this, res));
         logger.info("Evento SaleCreatedEvent publicado para la venta con ID {}.", res.getId());
 
         return res;
@@ -116,7 +125,7 @@ public class SaleService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('sale:delete')") // Anotación añadida
+    @PreAuthorize("hasAuthority('sale:delete')")
     public void deleteSale(Long id) {
         logger.info("Intentando eliminar venta con ID {}.", id);
         Sale sale = getSaleById(id);
@@ -150,7 +159,6 @@ public class SaleService {
         return saleRepository.findAll();
     }
 
-    // Nuevo método para obtener ventas paginadas
     public Page<Sale> getAllSales(Pageable pageable) {
         logger.debug("Obteniendo ventas paginadas. Página: {}, Tamaño: {}, Orden: {}", pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
         return saleRepository.findAll(pageable);
@@ -172,5 +180,15 @@ public class SaleService {
         logger.debug("Contando ventas por canal para {} ventas.", sales.size());
         return sales.stream()
                 .collect(Collectors.groupingBy(Sale::getChannel, Collectors.counting()));
+    }
+
+    /**
+     * Método de soporte para la seguridad a nivel de método.
+     * Permite verificar la propiedad de un objeto antes de autorizar una operación.
+     */
+    public boolean isOwner(Long saleId, String username) {
+        return saleRepository.findById(saleId)
+                .map(sale -> sale.getUser().getUsername().equals(username))
+                .orElse(false);
     }
 }

@@ -4,6 +4,7 @@ import com.shoesstore.shoesstore.model.Sale;
 import org.springframework.context.ApplicationEvent;
 
 public class SaleCreatedEvent extends ApplicationEvent {
+
     private final Sale sale;
 
     public SaleCreatedEvent(Object source, Sale sale) {

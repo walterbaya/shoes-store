@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; // Importación añadida
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,7 +15,7 @@ import com.shoesstore.shoesstore.service.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Anotación añadida
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // directo, sin {bcrypt}
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -45,12 +45,12 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/recover", "/css/**", "/js/**", "/webjars/**").permitAll()
-                    .requestMatchers("/h2-console/**").permitAll()  //necesario eliminar
+                    .requestMatchers("/h2-console/**").permitAll()
                     .requestMatchers("/admin/**", "/reports/**", "/products/**").hasRole("ADMIN")
                 .requestMatchers("/sales/**", "/dashboard/**").hasAnyRole("ADMIN", "SELLER")
                 .anyRequest().authenticated()
-            ).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))  //eliminar
-                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))  //eliminar
+            ).csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
             .formLogin(form -> form
                 .loginPage("/login")

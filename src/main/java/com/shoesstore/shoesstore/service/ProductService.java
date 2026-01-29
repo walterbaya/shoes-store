@@ -4,6 +4,8 @@ import com.shoesstore.shoesstore.dto.ProductWithSuppliersDTO;
 import com.shoesstore.shoesstore.exception.ProductServiceException;
 import com.shoesstore.shoesstore.model.*;
 import com.shoesstore.shoesstore.repository.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +13,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio que gestiona la lógica de negocio para los productos.
+ * Implementa varios patrones de diseño clave:
+ * 1. Inyección de Dependencias (DI): Las dependencias se inyectan a través del constructor.
+ * 2. Patrón de Caché: Utiliza Spring Cache para optimizar lecturas frecuentes.
+ */
 @Service
 public class ProductService {
 
@@ -18,7 +26,11 @@ public class ProductService {
     private final PurchaseOrderItemsRepository purchaseOrderItemsRepository;
     private final SaleDetailsRepository saleDetailsRepository;
 
-
+    /**
+     * Patrón de Inyección de Dependencias (Constructor Injection).
+     * Spring inyecta automáticamente los repositorios necesarios.
+     * Esto facilita el testing unitario al permitir inyectar mocks.
+     */
     public ProductService(ProductRepository productRepository,
                           PurchaseOrderItemsRepository purchaseOrderItemsRepository, ClaimRepository claimRepository,
                           SaleDetailsRepository saleDetailsRepository) {
@@ -45,7 +57,14 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    @Transactional
+    /**
+     * Implementación del Patrón de Caché (Cache-Aside).
+     * @Cacheable: Antes de ejecutar el método, Spring verifica si el resultado ya está en la caché "products".
+     * Si existe, lo devuelve inmediatamente (ahorrando una consulta a BD).
+     * Si no, ejecuta el método y guarda el resultado en la caché.
+     */
+    @Transactional(readOnly = true)
+    @Cacheable("products")
     public List<ProductWithSuppliersDTO> getAllProductsWithSuppliers() {
         List<Product> products = productRepository.findAllWithSuppliers();
         return products.stream()
@@ -58,7 +77,13 @@ public class ProductService {
                 .orElseThrow(() -> new ProductServiceException("Producto no encontrado con ID: " + id));
     }
 
+    /**
+     * @CacheEvict: Invalida la caché "products" cuando se modifica un producto.
+     * Esto asegura la consistencia de datos (Cache Consistency), forzando a que la próxima lectura
+     * vaya a la base de datos para obtener los datos frescos.
+     */
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public Product updateProduct(Product product) {
         Long id = product.getId();
         if (id == null || !productRepository.existsById(id)) {
@@ -78,6 +103,8 @@ public class ProductService {
         return productRepository.save(existing);
     }
 
+    @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public Product saveProduct(Product product) {
         if (product.getId() != null && productRepository.existsById(product.getId())) {
             throw new ProductServiceException("El producto con ID " + product.getId() + " ya existe");
@@ -110,6 +137,7 @@ public class ProductService {
     }
 
     @Transactional
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long id) {
 
         Product product = productRepository.findById(id).orElseThrow(() -> new ProductServiceException("No existe un producto con ID: " + id));
@@ -136,5 +164,3 @@ public class ProductService {
     }
 
 }
-
-
